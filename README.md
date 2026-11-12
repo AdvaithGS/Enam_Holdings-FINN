@@ -23,7 +23,7 @@ A mobile-first investment agent for a 20-stock NSE portfolio. It tells you what 
 - The reading is shown under the box ("Read as: …"), so a wrong interpretation is visible, not silent.
 - This runs on the device. For phrasing the concept map does not cover, a small model picks fields from a fixed list; it is sent the question with every network name masked first.
 
-- A company opens a research page: headline numbers, trajectory, balance sheet and cash quality (all computed in code), the business from the annual report, **promised vs delivered** across the last four earnings calls, how guidance moved, story vs numbers, bull and bear. Every point links to its source document.
+- A company opens a research page built for scanning. A locked header keeps price, seven colour-coded vital signs and your strongest contact on screen while you read. Four tabs (Verdict, Numbers, Management, Business) hold collapsible modules; a closed module still states its one-line conclusion. Charts are interactive: drag to read any period, switch years and quarters, rupees and margins, and tap the promise scorecard to filter by verdict. Every point links to its source document.
 - The research page opens with who you know at the company, a competitor, a supplier or a customer.
 - Demo companies are precomputed. Any other NSE symbol is read live in stages, and the page shows what is being read.
 

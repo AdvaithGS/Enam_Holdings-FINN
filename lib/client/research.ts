@@ -9,7 +9,7 @@ export interface Fundamentals { ok: boolean; lender: boolean; last_fy: string; b
   metrics: Record<string, number | string | null>; formulas: Record<string, string> }
 export interface Commitment { id: string; source: string; metric: string; target: string; horizon?: string; quote: string; speaker?: string }
 export interface CallExtract { id: string; when: string; url: string; ok: boolean; reason?: string; quarter?: string; commitments: Commitment[];
-  claims: { topic: string; claim: string; quote: string; source: string }[]; analyst_concerns: { topic: string; question: string }[]; dropped?: number }
+  claims: { topic: string; claim: string; quote: string; source: string }[]; analyst_concerns: { topic: string; question: string; quote?: string }[]; dropped?: number }
 export interface AnnualExtract { ok: boolean; reason?: string; year: number; url: string; what_it_does?: string; segments?: { name: string; share_pct?: number; note?: string }[];
   revenue_mix_basis?: string; geography?: string; customers?: string; facts?: { fact: string; page: number }[]; risks?: { risk: string; page: number }[]; pages_read?: number[]; pages_total?: number }
 export interface Cited { point: string; sources: string[] }
@@ -18,7 +18,7 @@ export interface Analysis {
   scorecard: Record<string, number>; guidance_drift: { metric: string; direction: string; path: string; sources: string[] }[];
   narrative_vs_numbers: { story: string; numbers: string; verdict: string; sources: string[] }[]; bull: Cited[]; bear: Cited[]; watch: Cited[];
 }
-export interface Dossier { ok: boolean; reason?: string; symbol: string; name: string; industry: string[]; fundamentals: Fundamentals; llm?: boolean;
+export interface Dossier { price?: { dates: string[]; close: number[] } | null; ok: boolean; reason?: string; symbol: string; name: string; industry: string[]; fundamentals: Fundamentals; llm?: boolean;
   calls: { id: string; when: string; url: string }[]; annual_report: { year: number; url: string } | null;
   call_extracts?: CallExtract[]; annual?: AnnualExtract | null; analysis?: Analysis; sources: Record<string, { label: string; url: string }>; generated_at?: string }
 export interface Stage { id: string; label: string; state: "wait" | "now" | "done" | "fail"; note?: string }
@@ -41,7 +41,7 @@ export function useDossier(symbol: string) {
   useEffect(() => {
     if (started.current === symbol) return;
     started.current = symbol;
-    const key = `finn.research.v1.${symbol}`;
+    const key = `finn.research.v2.${symbol}`;
     const mark = (id: string, state: Stage["state"], note?: string) => setStages((s) => s.map((x) => (x.id === id ? { ...x, state, note } : x)));
     (async () => {
       try {

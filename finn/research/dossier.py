@@ -17,7 +17,7 @@ import re
 from pathlib import Path
 
 from .. import llm
-from ..sources import nse, screener
+from ..sources import nse, prices, screener
 from . import documents, fundamentals, synthesis
 
 OUT = Path(__file__).resolve().parent.parent.parent / "public" / "data" / "research"
@@ -65,7 +65,12 @@ def base(symbol: str) -> dict:
     f = fundamentals.compute(co)
     calls = [{"id": f"C{i + 1}", "when": c["when"], "url": c["transcript"]} for i, c in enumerate(co["docs"]["concalls"][:N_CALLS])]
     ars = sorted(co["docs"]["annual_reports"], key=lambda a: -a["year"])
-    return {"ok": f.get("ok", False), "symbol": symbol, "name": co["name"], "industry": co["industry"],
+    try:  # a year of end-of-day closes for the header chart; research works without it
+        bars = prices.history(symbol, years=1)
+        price = {"dates": [b["date"] for b in bars], "close": [round(b["close"], 2) for b in bars]}
+    except Exception:
+        price = None
+    return {"ok": f.get("ok", False), "symbol": symbol, "name": co["name"], "industry": co["industry"], "price": price,
             "about_source": co["url"], "fundamentals": f, "calls": calls,
             "annual_report": ars[0] if ars else None, "llm": llm.available(),
             "sources": {"FIN": {"label": "Reported statements (screener.in)", "url": co["url"]}}}
