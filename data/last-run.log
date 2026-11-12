@@ -1,0 +1,132 @@
+FINN digest  2026-11-12 15:12 IST  window 2026-10-08 .. 2026-11-12
+baseline P(noticed | no filing) = 0.054; 'what matters' cut-off = 3x = 0.163
+prices: 20 stocks, latest session 2026-11-11; fx {'USD': 93.68, 'EUR': 103.9701, 'GBP': 124.3574}
+filings: 294 in window
+opaque titles opened locally: 80 (OCR pages: 4)
+events after folding: 217
+
+--- WHAT MATTERS (25)
+  0.92 RELIANCE   2026-10-30 Results          Q2 FY27: revenue +29%, PAT +34% YoY
+         . The stock moved +9.9% vs market on 5.8x volume that session; a day this unusual comes about 1 in 501. This event carries 89% of the credit among 2 that session.
+  0.87 DEEPAKNTR  2026-10-29 Results          Q2 FY27: revenue +62%, PAT +235% YoY
+         . The stock moved +2.4% vs market on 24.1x volume that session; a day this unusual comes about 1 in 251.
+  0.82 TITAN      2026-11-06 Results          Q2 FY27: revenue +10%, PAT +114% YoY
+         . The stock moved +1.2% vs market on 5.6x volume that session; a day this unusual comes about 1 in 251. This event carries 62% of the credit among 4 that session.
+  0.80 CREDITACC  2026-10-12 Business update  CreditAccess Grameen broadens its Global Lender Base with USD 175 Million Syndicated Socia
+         . ₹1,639 cr is 36x this company's SEBI materiality line (₹46 cr, 5% of 3-year average profit)
+  0.79 DIXON      2026-10-31 Results          Q2 FY27: revenue +47%, PAT -45% YoY
+         . The stock moved +9.5% vs market on 6.0x volume that session; a day this unusual comes about 1 in 167. This event carries 79% of the credit among 3 that session.
+  0.76 TCS        2026-10-08 Results          Q2 FY27: revenue +11%, PAT +15% YoY
+         . The stock moved +2.9% vs market on 3.5x volume that session; a day this unusual comes about 1 in 167. This event carries 67% of the credit among 4 that session.
+  0.68 LT         2026-10-27 Results          Q2 FY27: revenue +16%, PAT +27% YoY
+         . The stock moved +4.0% vs market on 3.2x volume that session; a day this unusual comes about 1 in 84. This event carries 89% of the credit among 2 that session.
+  0.68 SUNPHARMA  2026-10-30 Results          Q2 FY27: revenue +12%, PAT -36% YoY
+         . The stock moved +0.7% vs market on 3.4x volume that session; a day this unusual comes about 1 in 84. This event carries 88% of the credit among 2 that session.
+  0.64 SRF        2026-10-22 Results          Q2 FY27: revenue +35%, PAT +31% YoY
+         . The stock moved -4.8% vs market on 3.9x volume that session; a day this unusual comes about 1 in 72. This event carries 87% of the credit among 2 that session.
+  0.57 CREDITACC  2026-10-22 Results          Q2 FY27: revenue +26%, PAT +299% YoY
+         . The stock moved -5.2% vs market on 13.7x volume that session; a day this unusual comes about 1 in 56. This event carries 79% of the credit among 3 that session.
+  0.56 ASIANPAINT 2026-10-29 Results          Q2 FY27: revenue +17%, PAT +7% YoY
+         . The stock moved -0.3% vs market on 3.7x volume that session; a day this unusual comes about 1 in 50. This event carries 86% of the credit among 2 that session.
+  0.55 TRENT      2026-10-29 Management       Noel N Tata retires as Chairman
+         . Noel N Tata, Chairman: runs the company or its finances
+         . The stock moved +4.9% vs market on 3.9x volume that session; a day this unusual comes about 1 in 39. This event carries 59% of the credit among 2 that session.
+  0.49 CGPOWER    2026-10-23 Results          Q2 FY27: revenue +30%, PAT +44% YoY
+         . The stock moved -0.2% vs market on 3.6x volume that session; a day this unusual comes about 1 in 42. This event carries 70% of the credit among 4 that session.
+  0.43 TRENT      2026-11-02 Results          Q2 FY27: revenue +22%, PAT +25% YoY
+         . The stock moved +4.9% vs market on 3.9x volume that session; a day this unusual comes about 1 in 39. This event carries 41% of the credit among 2 that session.
+  0.41 TITAN      2026-11-05 Management       Noel N. Tata retires as Director and Vice-Chairman
+         . Noel N. Tata, Director and Vice-Chairman: senior executive
+         . The stock moved +1.2% vs market on 5.6x volume that session; a day this unusual comes about 1 in 251. This event carries 22% of the credit among 4 that session.
+  0.41 BAJFINANCE 2026-10-19 Results          Q2 FY27: revenue +22%, PAT +29% YoY
+         . The stock moved -2.8% vs market on 2.4x volume that session; a day this unusual comes about 1 in 26. This event carries 79% of the credit among 3 that session.
+  0.35 HDFCBANK   2026-10-17 Results          Q2 FY27: revenue +9%, PAT +6% YoY
+  0.35 ETERNAL    2026-10-21 Results          Q2 FY27: revenue +78%, PAT +92% YoY
+  0.35 PAYTM      2026-10-27 Results          Q2 FY27: revenue +28%, PAT +971% YoY
+  0.35 MARUTI     2026-10-29 Results          Q2 FY27: revenue +26%, PAT -26% YoY
+  0.35 ITC        2026-11-02 Results          Q2 FY27: revenue +44%, PAT -18% YoY
+  0.35 BHARTIARTL 2026-11-06 Results          Q2 FY27: revenue +17%, PAT +24% YoY
+  0.23 TCS        2026-10-14 Business update  Press Release -MyState Limited selects TCS BaNCSTM to transform core banking operations
+         . The stock moved +2.5% vs market on 2.9x volume that session; a day this unusual comes about 1 in 50.
+  0.19 TCS        2026-10-09 Other            Statement of the Company regarding the announcement by the US Government on the Permanent 
+         . The stock moved +2.9% vs market on 3.5x volume that session; a day this unusual comes about 1 in 167. This event carries 14% of the credit among 4 that session.
+  0.17 SUNPHARMA  2026-11-04 Business update  Clarification regarding news report relating to the Company’s Assam facility
+         . The stock moved -0.1% vs market on 2.8x volume that session; a day this unusual comes about 1 in 36.
+--- WORTH A GLANCE (67)
+  0.16 HDFCBANK   2026-11-06 Management       Change in Management
+         . The stock moved +1.3% vs market on 2.3x volume that session; a day this unusual comes about 1 in 50.
+  0.15 CGPOWER    2026-11-05 Legal & regulatory Action(s) taken or orders passed
+         . The stock moved -6.0% vs market on 2.0x volume that session; a day this unusual comes about 1 in 63.
+  0.14 TCS        2026-10-08 Dividend         Date of Payment of Dividend
+         . The stock moved +2.9% vs market on 3.5x volume that session; a day this unusual comes about 1 in 167. This event carries 11% of the credit among 4 that session.
+  0.12 ETERNAL    2026-10-21 M&A              Eternal Limited has informed exchange regarding proposed restructuring, acquisition and di
+         . The stock moved -1.8% vs market on 3.9x volume that session; a day this unusual comes about 1 in 42.
+  0.12 DIXON      2026-10-30 Management       Change in Management
+         . The stock moved +9.5% vs market on 6.0x volume that session; a day this unusual comes about 1 in 167. This event carries 11% of the credit among 3 that session.
+  0.12 LT         2026-10-19 Business update  L&T Commences Initial Activities for New Tashkent International Airport (Ultra-mega*) Proj
+         . The stock moved +2.5% vs market on 1.3x volume that session; a day this unusual comes about 1 in 24. This event carries 62% of the credit among 2 that session.
+  0.11 TCS        2026-11-04 Business update  Press Release - TCS Enterprise AI Study: 84% say productivity is AI s top benefit; just 10
+  0.11 MARUTI     2026-10-12 Other            General Updates
+  0.10 TCS        2026-10-15 Business update  Press Release - TCS launches Industrial Intelligence Foundry to accelerate AI-led autonomy
+  0.10 TCS        2026-10-19 Business update  Press Release - TCS BaNCS for Treasury marks its entry into Sri Lanka with Indian Bank
+  0.10 SUNPHARMA  2026-10-20 Business update  A press release dated October 20, 2026
+  0.10 LT         2026-10-21 Business update  L&T Wins Orders (*Large) in New Delhi and Andhra Pradesh
+  0.10 SUNPHARMA  2026-10-23 Business update  A press release dated October 23, 2026
+  0.10 MARUTI     2026-10-24 Business update  Maruti Suzuki VICTORIS AURUM Edition Launched to Celebrate 1 Year of Record Sales Success
+  0.10 LT         2026-10-27 Business update  L&T Wins Orders (Major*) for Dhaka Metro
+  0.10 CGPOWER    2026-10-29 Business update  Axiro Semiconductor Invests in ThinSiC to Strengthen Position in Next-Generation Silicon C
+  0.10 MARUTI     2026-11-01 Business update  Maruti Suzuki Production Volume: October 2026
+  0.10 LT         2026-11-02 Business update  L&T Wins Orders (Significant*) for Residential, Commercial Buildings & Factories Business
+  0.10 SUNPHARMA  2026-11-02 Business update  The Exchange has sought clarification from Sun Pharmaceutical Industries Limited with resp
+  0.10 LT         2026-11-09 Business update  L&T bags ( Significant*) order from Noida Metro for Aqua Line Extension
+  0.10 HDFCBANK   2026-10-08 Other            General Updates
+  0.10 SUNPHARMA  2026-10-12 Other            Outcome of the Board Meeting held on 12 October 2026
+  0.10 PAYTM      2026-10-13 Other            Update on levy of MDR on select UPI P2M transactions
+  0.10 HDFCBANK   2026-10-17 Other            And other applicable regulations of the SEBI (Listing Obligations and Disclosure Requireme
+  0.10 DIXON      2026-10-21 Other            Giving of guarantees or indemnity or becoming a surety for any third party
+  0.10 RELIANCE   2026-10-21 Other            Media Statement
+  0.10 CGPOWER    2026-10-26 Other            General Updates
+  0.10 PAYTM      2026-10-26 Other            National Payments Corporation of India ( NPCI ) Circular update
+  0.10 HDFCBANK   2026-10-27 Other            And other applicable regulations of the SEBI (Listing Obligations and Disclosure Requireme
+  0.10 CGPOWER    2026-11-07 Other            General Updates
+  0.10 ASIANPAINT 2026-10-29 Dividend         The Board of Directors at their meeting held today i.e., 29th October 2026, has, inter ali
+         . The stock moved -0.3% vs market on 3.7x volume that session; a day this unusual comes about 1 in 50. This event carries 14% of the credit among 2 that session.
+  0.10 SRF        2026-10-21 Capex            Capital Expenditure proposal approved by the Board
+         . The stock moved -4.8% vs market on 3.9x volume that session; a day this unusual comes about 1 in 72. This event carries 13% of the credit among 2 that session.
+  0.09 BAJFINANCE 2026-11-11 Fund raise       Outcome of QIP 2026 - Special Committee meeting
+         . The stock moved +3.1% vs market on 1.2x volume that session; a day this unusual comes about 1 in 24.
+  0.08 CGPOWER    2026-10-23 Capex            Capacity addition
+         . The stock moved -0.2% vs market on 3.6x volume that session; a day this unusual comes about 1 in 42. This event carries 10% of the credit among 4 that session.
+  0.08 BAJFINANCE 2026-10-30 Fund raise       Allotment of 2,06,950 securities pursuant to Non Convertible Securities at its meeting hel
+  0.08 BAJFINANCE 2026-11-10 Fund raise       Allotment of 5,74,25,740 securities pursuant to Preferential Issue at its meeting held on 
+  0.08 CGPOWER    2026-10-23 Management       Change in Management
+         . The stock moved -0.2% vs market on 3.6x volume that session; a day this unusual comes about 1 in 42. This event carries 10% of the credit among 4 that session.
+  0.08 PAYTM      2026-10-27 Insider trade    Of the Securities and Exchange Board of India (Prohibition of Insider Trading) Regulations
+  0.07 BAJFINANCE 2026-10-19 Management       (the ‘SEBI Listing Regulations, 2015’) –Change in Senior Management Personnel
+  0.07 ASIANPAINT 2026-11-06 Management       Leo Puri joins as Independent Director
+         . Leo Puri, Independent Director: board oversight role
+  0.07 SUNPHARMA  2026-10-12 Management       Resignation of Director of the Company
+  0.07 TRENT      2026-10-18 Management       Intimation of resignation of Non-Executive Non-Independent Director of the Company
+  0.07 TRENT      2026-10-19 Management       Resignation of Director/KMP/SMP
+  0.07 HDFCBANK   2026-10-31 Management       Change in Management
+  0.07 DEEPAKNTR  2026-10-16 Earnings call    Schedule of Q2 & Hl Fy 2027 Earnings conference call
+  0.06 RELIANCE   2026-10-14 M&A              Proposed Initial Public Offer of Jio Platforms Limited
+  0.06 TCS        2026-10-15 M&A              Completion of acquisition of BBY Services India LLP
+  0.06 RELIANCE   2026-10-17 M&A              Newspaper Clipping – Proposed Initial Public Offer of Jio Platforms Limited - Reservation 
+  0.06 TRENT      2026-10-23 M&A              Nahar Retail Trading Services Limited ( Nahar ), a wholly owned subsidiary of the Company,
+  0.06 RELIANCE   2026-10-24 M&A              Initial Public Offer of Jio Platforms Limited
+  0.06 PAYTM      2026-10-26 M&A              Additional investment by the Company into Paytm Cloud Technologies Limited ("PCTL"), a who
+  0.06 MARUTI     2026-10-27 M&A              Incorporation of Wholly Owned Subsidiary
+  0.06 TITAN      2026-10-28 M&A              (Listing Regulations)
+  0.06 RELIANCE   2026-10-29 M&A              Voluntary strike off of Hamleys (Franchising) Limited
+  0.06 LT         2026-10-31 M&A              Updates on the Business Transfer Agreement with Vyoma.AI Limited (Vyoma), Wholly owned Sub
+  0.06 ITC        2026-11-02 M&A              Amalgamation/Merger
+  0.06 KAYNES     2026-11-02 M&A              Incorporation of wholly owned subsidiary
+  0.05 SUNPHARMA  2026-10-26 Fund raise       Allotment of 781600 securities pursuant to Non Convertible Securities at its meeting held 
+         . Routine debt issuance for a borrower of this kind
+  0.05 TITAN      2026-11-09 Fund raise       Redemption of Commercial Paper
+         . Routine debt issuance for a borrower of this kind
+  0.05 PAYTM      2026-10-13 Legal & regulatory Proposed GST Demand on First Games Reduced; Assessing Solutions Under Relevant Provisions;
+--- SET ASIDE (125 events, 140 filings)
+
+run: {'filings': 294, 'events': 217, 'documents_read': 0, 'llm': {'calls': 0, 'cache_hits': 0, 'input_tokens': 0, 'output_tokens': 0, 'by_tier': {}}, 'http': {'fetched': 84, 'cached': 324, 'bytes': 220064018}, 'seconds': 114.0, 'ocr_pages': 7, 'llm_available': False}

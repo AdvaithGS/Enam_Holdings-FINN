@@ -119,6 +119,7 @@ SUBJECT = {
 # Ordered text rules for catch-all subjects. (category, pattern)
 _R = lambda p: re.compile(p, re.I)  # noqa: E731
 TEXT_RULES: list[tuple[str, re.Pattern]] = [
+    ("routine", _R(r"(appointment|re-?appointment|rotation) of .{0,30}auditors?|change (in|of) .{0,30}(address|registrar|rta)\b")),
     ("earnings_call", _R(r"transcript|audio (recording|link)|recording of (the )?(earnings|conference|analyst)|earnings (conference )?call|con(ference)?[. ]*call")),
     ("investor_meetings", _R(r"investor'?s?'? (meet|conference|day)|analyst'?s?'? (meet|day)|non-deal roadshow|one-on-one|schedule of (analyst|investor)")),
     ("results", _R(r"financial results|results for the (quarter|period|year|half)|(un)?audited .{0,40}results|investor presentation|shareholders?'? letter|earnings (release|presentation)|quarterly (update|business update)")),
@@ -133,7 +134,7 @@ TEXT_RULES: list[tuple[str, re.Pattern]] = [
     ("dividend", _R(r"\bdividend\b")),
     ("capex", _R(r"capacity (addition|expansion)|capex|capital expenditure|new (plant|facility|manufacturing|unit|line)|greenfield|brownfield|commenc(e|ed|ement) .{0,30}(production|operations)|expansion of")),
     ("shareholder_meeting", _R(r"postal ballot|annual general meeting|\bagm\b|\begm\b|extra-?ordinary general|e-?voting|voting results|scrutinizer")),
-    ("routine", _R(r"share certificate|newspaper|trading window|esop|esps|employee stock|regulation 74\(5\)|compliance certificate|business responsibility|\bbrsr\b|sustainability report|esg rating|unclaimed dividend|\biepf\b|record date|book closure|secretarial|reg(ulation)?\.? ?40\(|investor (grievance|complaint)|annual report|change of (name|address)|registrar|statement of deviation|monitoring agency|reclassification|re-classification|tds on dividend|duplicate")),
+    ("routine", _R(r"share certificate|newspaper|trading window|esop|esps|employee stock|regulation 74\(5\)|compliance certificate|business responsibility|\bbrsr\b|sustainability report|esg rating|unclaimed dividend|\biepf\b|record date|book closure|secretarial|reg(ulation)?\.? ?40\(|investor (grievance|complaint)|annual report|change of (name|address)|registrar|statement of deviation|monitoring agency|reclassification|re-classification|tds on dividend|duplicate|statutory auditor|secretarial auditor|cost auditor|\brta\b|share transfer agent|reminder (notice|letter)|half[- ]yearly report|closure of (the )?board meeting|certificate (pursuant|under)|call money|partly paid")),
     ("press_release", _R(r"press release|media release|order|contract|launch|partner|collaborat|agreement|\bmou\b|clarification|news|rumou?r|production volume|sales volume|business update|price (revision|hike|increase)")),
 ]
 
