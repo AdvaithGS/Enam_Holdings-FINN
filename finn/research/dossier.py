@@ -44,6 +44,16 @@ def resolve(query: str) -> list[dict]:
             return 3
         return None
     hits = [(rank(r), len(r["symbol"]), r) for r in rows if rank(r) is not None]
+    if not hits:
+        # nothing matched exactly: fall back to the closest names by edit similarity
+        import difflib
+        sim = lambda x, y: difflib.SequenceMatcher(None, x, y).ratio()  # noqa: E731
+        scored = []
+        for r in rows:
+            by_symbol, by_name = sim(q, r["symbol"]), sim(words[0], r["name"].upper().split()[0])
+            if max(by_symbol, by_name) >= 0.78:
+                scored.append((-max(by_symbol, by_name), -by_symbol, len(r["symbol"]), r))
+        return [r for *_, r in sorted(scored, key=lambda t: t[:3])[:5]]
     return [r for _, _, r in sorted(hits, key=lambda t: (t[0], t[1]))[:8]]
 
 

@@ -17,7 +17,11 @@ A mobile-first investment agent for a 20-stock NSE portfolio. It tells you what 
 - **Set aside.** Known paperwork, collapsed into counts.
 - **Unusual moves.** Stock-days that crossed *your* thresholds (±X% or N× the 20-day average volume), each with how rare it is for that stock and which filing arrived that day. The threshold sheet shows how many alerts a week your setting would have produced over the past year, so you choose a line knowing its cost.
 
-**Ask (pull).** One box takes a company, a person or a theme, typed or spoken.
+**Ask (pull).** One box, asked the way you would ask a colleague, typed or spoken.
+
+- It reads meaning, not strings. "Who understands the raw material suppliers for battery manufacturers?" is read as *suppliers to → battery materials (feeds battery cells)* and returns the chemists in your network. Concepts carry the words people type and list what supplies them, so a supply chain is a graph step, not a keyword. Misspellings match by edit distance ("Reha Kapadia", "semiconducter").
+- The reading is shown under the box ("Read as: …"), so a wrong interpretation is visible, not silent.
+- This runs on the device. For phrasing the concept map does not cover, a small model picks fields from a fixed list; it is sent the question with every network name masked first.
 
 - A company opens a research page: headline numbers, trajectory, balance sheet and cash quality (all computed in code), the business from the annual report, **promised vs delivered** across the last four earnings calls, how guidance moved, story vs numbers, bull and bear. Every point links to its source document.
 - The research page opens with who you know at the company, a competitor, a supplier or a customer.
@@ -44,6 +48,7 @@ Each number on screen has a derivation. The short version:
 | Results | XBRL facts, with four identities checked (income = revenue + other income; PBT = income − expenses; and so on). 20 of 20 portfolio companies pass 4 of 4 |
 | Tie strength | `s = c · 2^(−months/36)`, c from the investor's own closeness rating |
 | "Did they know each other" | `p = 1 − (1 − q)^years`, q set by organisation size, seniority and function; classmates by cohort size; evidence combined by noisy-OR |
+| Ask | Token similarity `1 − d/len` (Damerau-Levenshtein); concept weights fade by 0.7 per supply-chain link; a person's relevance is `1 − e^(−Σ match·years·seniority·freshness / 6)`, the same form as the expertise map |
 | Who to call | `score = tie × knowledge`, knowledge = relation × freshness × depth × seniority × fit, combined across roles |
 | Promised vs delivered | Quantified full-year commitments on revenue growth and margins are adjudicated in code against reported numbers; the model judges only what code cannot |
 
@@ -181,7 +186,7 @@ finn/                    Python: everything that touches public data
   llm.py                 Gemini routing, cache, fallback
   research/              fundamentals.py · documents.py · synthesis.py · dossier.py
 api/research.py          serverless entry, one stage per request
-lib/network/             TypeScript: the on-device network engine and its tests
+lib/network/             TypeScript: the on-device network engine, query engine (search.ts) and tests
 lib/client/              store, formatting, staged research client
 app/ · components/       Brief, Ask, People, research page
 scripts/make_network.py  the synthetic demo network

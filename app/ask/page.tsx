@@ -5,6 +5,7 @@ import { Avatar, Meter } from "@/components/People";
 import { useOpenPerson } from "@/components/Shell";
 import { useStore } from "@/lib/client/store";
 import { strengthWord } from "@/lib/network/graph.ts";
+import { alike, findPeople, masked, plan, words } from "@/lib/network/search.ts";
 
 interface Match { symbol: string; name: string }
 type Recognition = { start: () => void; stop: () => void; onresult: (e: { results: { 0: { 0: { transcript: string } } } }) => void; onend: () => void; lang: string };
@@ -17,13 +18,15 @@ export default function Ask() {
   const [remote, setRemote] = useState<Match[]>([]);
   const [demo, setDemo] = useState<Match[]>([]);
   const [live, setLive] = useState(false);
+  const [extra, setExtra] = useState<string[]>([]);
   const rec = useRef<Recognition | null>(null);
 
+  useEffect(() => { const v = new URLSearchParams(window.location.search).get("q"); if (v) setQ(v); }, []);
   useEffect(() => { fetch("/data/research/index.json").then((r) => (r.ok ? r.json() : [])).then(setDemo).catch(() => {}); }, []);
-  const text = q.trim().toLowerCase().replace(/^(who (knows|can explain|do i know (at|in))|research|analyse|analyze|tell me about)\s+/, "").replace(/\?$/, "");
+  const text = q.trim();
 
   useEffect(() => {
-    if (text.length < 2) { setRemote([]); return; }
+    if (text.length < 2 || text.split(/\s+/).length > 3) { setRemote([]); return; }
     const t = setTimeout(() => {
       fetch(`/api/research?stage=resolve&q=${encodeURIComponent(text)}`).then((r) => (r.ok ? r.json() : { matches: [] }))
         .then((d) => setRemote(d.matches ?? [])).catch(() => setRemote([]));
@@ -31,15 +34,33 @@ export default function Ask() {
     return () => clearTimeout(t);
   }, [text]);
 
+  // Unusual phrasing the concept map does not cover: ask a model which fields apply.
+  // Only the question goes, with every network name masked on this device first.
+  useEffect(() => {
+    setExtra([]);
+    if (!net || !graph || text.split(/\s+/).length < 3) return;
+    const p = plan(graph, text, [...net.contacts, ...publicPeople]);
+    if (p.themes.size || p.orgs.size || p.people.length) return;
+    const t = setTimeout(() => {
+      fetch("/api/research?stage=plan", { method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ q: masked(text, [...net.contacts, ...publicPeople]), themes: net.themes }) })
+        .then((r) => (r.ok ? r.json() : { themes: [] })).then((d) => setExtra(d.themes ?? [])).catch(() => {});
+    }, 600);
+    return () => clearTimeout(t);
+  }, [text, net, graph, publicPeople]);
+
   const hits = useMemo(() => {
     if (!digest || !net || !graph || text.length < 2) return null;
-    const local = Object.values(digest.companies).filter((c) => c.symbol.toLowerCase().includes(text) || c.name.toLowerCase().includes(text)).map((c) => ({ symbol: c.symbol, name: c.name }));
-    const companies = [...local, ...remote.filter((r) => !local.some((l) => l.symbol === r.symbol))].slice(0, 6);
-    const people = [...net.contacts, ...publicPeople].filter((p) => p.name.toLowerCase().includes(text) || p.headline.toLowerCase().includes(text)).slice(0, 6);
-    const themes = net.themes.filter((t) => t.label.toLowerCase().includes(text) || text.includes(t.label.toLowerCase())).slice(0, 3)
-      .map((t) => ({ ...t, experts: graph.expertise(t.id, 4) })).filter((t) => t.experts.length);
-    return { companies, people, themes };
-  }, [digest, net, graph, publicPeople, remote, text]);
+    const everyone = [...net.contacts, ...publicPeople];
+    const p = plan(graph, text, everyone, extra);
+    const experts = p.wantsPeople || p.orgs.size ? findPeople(graph, p, 6) : [];
+    const named = p.people.filter((x) => x.w >= 0.5).map((x) => x.person);
+    const q = words(text);
+    const near = (name: string) => { const t = words(name); return q.length > 0 && q.every((x) => t.some((y) => alike(x, y) >= 0.74)); };
+    const local = experts.length && p.orgs.size === 0 ? [] : Object.values(digest.companies).filter((c) => near(`${c.symbol} ${c.name}`)).map((c) => ({ symbol: c.symbol, name: c.name }));
+    const companies = experts.length && !local.length ? [] : [...local, ...remote.filter((r) => !local.some((l) => l.symbol === r.symbol))].slice(0, 6);
+    return { p, experts, named, companies };
+  }, [digest, net, graph, publicPeople, remote, text, extra]);
 
   function listen() {
     const W = window as unknown as { SpeechRecognition?: new () => Recognition; webkitSpeechRecognition?: new () => Recognition };
@@ -55,15 +76,15 @@ export default function Ask() {
     r.start();
   }
 
-  const examples = ["Who knows rural lending?", "Kaynes", "Semiconductors", "PI Industries", "Noel Tata"];
+  const examples = ["Who understands raw material suppliers for battery makers?", "EV supply chain", "Kaynes", "customers of Dixon", "Reha Kapadia", "PI Industries"];
   return (
     <>
       <header className="top">
         <div className="brand">Ask<i>.</i></div>
-        <p className="lede">A company, a person, or a theme.</p>
+        <p className="lede">Ask it the way you would ask a colleague.</p>
       </header>
       <div className="search">
-        <input autoFocus value={q} onChange={(e) => setQ(e.target.value)} placeholder="Kaynes · who knows specialty chemicals?" aria-label="Ask FINN" enterKeyHint="search" />
+        <input autoFocus value={q} onChange={(e) => setQ(e.target.value)} placeholder="Who knows battery raw materials?" aria-label="Ask FINN" enterKeyHint="search" />
         <button className={`mic ${live ? "live" : ""}`} onClick={listen} aria-label="Speak">●</button>
       </div>
 
@@ -84,36 +105,37 @@ export default function Ask() {
         </>
       )}
 
-      {hits && hits.themes.map((t) => (
-        <section className="section" key={t.id}>
-          <div className="head"><span className="caps" style={{ color: "var(--people)" }}>Your people for {t.label.toLowerCase()}</span></div>
+      {hits && (hits.p.concepts.length > 0 || hits.p.orgs.size > 0 || extra.length > 0) && (
+        <p className="small muted" style={{ marginTop: 12 }}>
+          Read as:{" "}
+          {hits.p.direction !== "self" && <b>{{ inputs: "suppliers to", customers: "customers of", chain: "the chain around", rivals: "competitors of" }[hits.p.direction]} </b>}
+          {[...hits.p.concepts.filter((c) => !c.via).map((c) => c.label), ...hits.p.concepts.filter((c) => c.via).map((c) => `${c.label} (feeds ${c.via})`),
+            ...[...hits.p.orgs.keys()].map((o) => graph!.orgName(o)), ...extra.map((t) => `${graph!.themeLabel(t)} (model)`)].filter((v, i, a) => a.indexOf(v) === i).slice(0, 6).join(" · ")}
+          {hits.p.leftover.length > 0 && <span className="faint"> · also weighing “{hits.p.leftover.join(" ")}”</span>}
+        </p>
+      )}
+      {hits && hits.experts.length > 0 && (
+        <section className="section" style={{ marginTop: 14 }}>
+          <div className="head"><span className="caps" style={{ color: "var(--people)" }}>People who would know</span></div>
           <div className="card" style={{ padding: "2px 14px" }}>
-            {t.experts.map((x) => (
+            {hits.experts.map((x) => (
               <button key={x.person.id} className="hit" onClick={() => open(x.person.id)}>
                 <Avatar person={x.person} />
                 <span className="grow">
                   <b>{x.person.name}</b>
-                  <span className="small muted" style={{ display: "block" }}>{x.years} years in the field · {x.roles.map((r) => graph!.orgName(r.org)).filter((v, i, a) => a.indexOf(v) === i).join(", ")}</span>
-                  <span className="tiny faint"><Meter value={x.expertise} label="depth" /> depth · <Meter value={x.tie} label="tie" /> {strengthWord(x.tie)} tie</span>
+                  <span className="small muted" style={{ display: "block" }}>{x.why}</span>
+                  <span className="tiny faint"><Meter value={x.relevance} label="relevance" /> relevance · <Meter value={x.tie} label="tie" /> {strengthWord(x.tie)} tie</span>
                 </span>
               </button>
             ))}
           </div>
         </section>
-      ))}
-      {hits && hits.companies.length > 0 && (
-        <section className="section">
-          <div className="head"><span className="caps">Companies</span></div>
-          <div className="card" style={{ padding: "2px 14px" }}>
-            {hits.companies.map((c) => <Link key={c.symbol} href={`/research/${c.symbol}`} className="hit"><span className="tick">{c.symbol}</span><span className="grow clip">{c.name}</span><span className="faint">›</span></Link>)}
-          </div>
-        </section>
       )}
-      {hits && hits.people.length > 0 && (
+      {hits && hits.named.length > 0 && (
         <section className="section">
           <div className="head"><span className="caps">People</span></div>
           <div className="card" style={{ padding: "2px 14px" }}>
-            {hits.people.map((p) => (
+            {hits.named.map((p) => (
               <button key={p.id} className="hit" onClick={() => open(p.id)}>
                 <Avatar person={p} /><span className="grow"><b>{p.name}</b><span className="small muted clip" style={{ display: "block" }}>{p.headline}</span></span>
                 <span className="tiny faint">{p.tie ? "you know" : "in filings"}</span>
@@ -122,7 +144,15 @@ export default function Ask() {
           </div>
         </section>
       )}
-      {hits && !hits.companies.length && !hits.people.length && !hits.themes.length && <p className="muted" style={{ marginTop: 18 }}>Nothing matches “{q}”. Try an NSE symbol or a company name.</p>}
+      {hits && hits.companies.length > 0 && (
+        <section className="section">
+          <div className="head"><span className="caps">Companies</span></div>
+          <div className="card" style={{ padding: "2px 14px" }}>
+            {hits.companies.map((c) => <Link key={c.symbol} href={`/research/${c.symbol}`} className="hit"><span className="tick">{c.symbol}</span><span className="grow clip">{c.name}</span><span className="faint">›</span></Link>)}
+          </div>
+        </section>
+      )}
+      {hits && !hits.companies.length && !hits.named.length && !hits.experts.length && <p className="muted" style={{ marginTop: 18 }}>Nobody in your network and no NSE company matches “{q}”.</p>}
     </>
   );
 }

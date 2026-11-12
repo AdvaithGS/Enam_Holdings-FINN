@@ -1,6 +1,7 @@
 """Serverless entry for Pull. One stage per request so each fits a function's time budget.
 
 GET  /api/research?stage=resolve&q=...          symbols matching free text
+POST /api/research?stage=plan    {q, themes}    a masked question -> field ids (no network data)
 GET  /api/research?stage=base&symbol=KAYNES     statements, computed fundamentals, document links
 POST /api/research?stage=call    {name, call}   one transcript -> verified extracts
 POST /api/research?stage=annual  {name, ar}     annual report -> business snapshot
@@ -29,6 +30,8 @@ def run(stage: str, query: dict, body: dict) -> tuple[int, dict]:
     try:
         if stage == "resolve":
             return 200, {"matches": dossier.resolve(query.get("q", ""))}
+        if stage == "plan":
+            return 200, plan(body.get("q", ""), body.get("themes", []))
         if stage == "base":
             return 200, dossier.base(query.get("symbol", ""))
         if stage == "call":
@@ -44,6 +47,24 @@ def run(stage: str, query: dict, body: dict) -> tuple[int, dict]:
         return 400, {"error": f"missing field {e}"}
     except Exception as e:  # report, never hang the phone
         return 500, {"error": "This stage failed.", "detail": repr(e)[:300]}
+
+
+PLAN_SCHEMA = {"type": "object", "required": ["themes"], "properties": {
+    "themes": {"type": "array", "items": {"type": "string"}, "description": "ids from the list, most relevant first, at most 3"}}}
+
+
+def plan(question: str, themes: list) -> dict:
+    """Map an unusual question to fields of expertise. The phone has already removed
+    every name from its network; the answer is ids from the list it sent, nothing else."""
+    allowed = {t["id"]: t["label"] for t in themes if isinstance(t, dict) and "id" in t}
+    if not question.strip() or not allowed:
+        return {"themes": []}
+    listing = "\n".join(f"{i}: {label}" for i, label in allowed.items())
+    got = llm.ask("lite", "An investor asks which of their contacts could help with a question. "
+                  "Pick the fields of industry experience (at most 3, by id) whose practitioners would know the answer. "
+                  "If the question is about suppliers or customers of an industry, pick the supplier or customer fields. "
+                  f"Return an empty list if none fits.\n\nFIELDS\n{listing}\n\nQUESTION\n{question[:400]}", PLAN_SCHEMA, max_tokens=200)
+    return {"themes": [t for t in got.get("themes", []) if t in allowed][:3]}
 
 
 class handler(BaseHTTPRequestHandler):

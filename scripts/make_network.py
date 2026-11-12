@@ -76,6 +76,34 @@ THEMES = {
     "jewellery": "Jewellery", "consumer-lending": "Consumer lending", "agrochemicals": "Agrochemicals",
     "drones": "Drones & defence", "electricals": "Electricals",
 }
+# Concepts: what a query can mean. `terms` are the words people actually type;
+# `inputs` are the concepts that supply this one, so "suppliers to X" is a graph step.
+CONCEPTS = [
+    ("ev", "Electric vehicles", T("ev", "electric vehicle", "e-mobility", "electric car", "electric two-wheeler"), T("autos"), T("battery", "chips", "ems")),
+    ("battery", "Battery cells", T("battery", "cell manufacturer", "lithium ion", "gigafactory", "energy storage"), [], T("battery-materials")),
+    ("battery-materials", "Battery materials", T("cathode", "anode", "electrolyte", "lithium salt", "fluorochemical", "fluorine", "lipf6", "battery chemical"), T("specialty-chemicals"), []),
+    ("chips", "Semiconductors", T("semiconductor", "chip", "osat", "fab", "wafer", "chip packaging", "assembly and test"), T("semiconductors"), []),
+    ("ems", "Electronics manufacturing", T("ems", "electronics manufacturing", "contract manufacturing", "pcb", "box build", "electronics assembly"), T("electronics-manufacturing"), T("chips")),
+    ("chem", "Specialty chemicals", T("specialty chemical", "speciality chemical", "chemical", "intermediate", "refrigerant", "phenol", "fluoro"), T("specialty-chemicals"), []),
+    ("agchem", "Agrochemicals", T("agrochemical", "crop protection", "pesticide", "agri input"), T("agrochemicals"), T("chem")),
+    ("microfinance", "Rural lending", T("microfinance", "mfi", "rural lending", "rural credit", "village lending", "joint liability", "borrower stress"), T("rural-lending"), T("bank-funding")),
+    ("bank-funding", "Bank funding", T("bank", "banking", "wholesale funding", "credit risk", "treasury"), T("banking"), []),
+    ("consumer-credit", "Consumer lending", T("consumer loan", "personal loan", "nbfc", "unsecured credit", "collections"), T("consumer-lending"), T("bank-funding")),
+    ("autos", "Autos", T("auto", "car", "passenger vehicle", "automobile", "oem"), T("autos"), T("ems", "chips")),
+    ("paints", "Paints", T("paint", "coating", "decorative", "dealer channel"), T("paints"), T("chem")),
+    ("retail", "Retail", T("retail", "apparel", "fashion", "store", "merchandising", "fast fashion"), T("retail"), []),
+    ("jewellery", "Jewellery", T("jewellery", "jewelry", "gold", "studded"), T("jewellery"), []),
+    ("pharma", "Pharma", T("pharma", "drug", "generic", "usfda", "fda inspection", "regulatory affairs"), T("pharma"), T("chem")),
+    ("it", "IT services", T("it service", "software service", "outsourcing", "bfsi tech"), T("it-services"), []),
+    ("telecom", "Telecom", T("telecom", "5g", "spectrum", "mobile network", "arpu"), T("telecom"), []),
+    ("fintech", "Fintech", T("fintech", "payment", "upi", "wallet", "payments bank"), T("fintech"), []),
+    ("qcom", "Quick commerce", T("quick commerce", "food delivery", "dark store", "instant delivery"), T("quick-commerce"), []),
+    ("fmcg", "Consumer staples", T("fmcg", "consumer staple", "packaged food", "brand"), T("fmcg"), []),
+    ("infra", "Infrastructure", T("infrastructure", "epc", "construction", "order book", "hydrocarbon project"), T("infrastructure"), []),
+    ("drones", "Drones and defence", T("drone", "uav", "defence", "defense", "unmanned"), T("drones"), []),
+    ("electricals", "Electricals", T("motor", "transformer", "switchgear", "electrical"), T("electricals"), []),
+]
+
 SCHOOLS = [("iitk", "IIT Kanpur", ["Indian Institute of Technology Kanpur", "IIT-K"], "large"),
            ("iima", "IIM Ahmedabad", ["Indian Institute of Management Ahmedabad", "IIM-A", "IIMA"], "small"),
            ("iimb", "IIM Bangalore", ["Indian Institute of Management Bangalore", "IIMB"], "small"),
@@ -224,7 +252,10 @@ def main():
         orgs.append(o)
     net = {"synthetic": True, "me": ME, "contacts": contacts, "orgs": orgs,
            "schools": [{"id": i, "name": n, "aliases": a, "cohort": c} for i, n, a, c in SCHOOLS],
-           "themes": [{"id": k, "label": v} for k, v in THEMES.items()]}
+           "themes": [{"id": k, "label": v} for k, v in THEMES.items()],
+           "concepts": [{"id": i, "label": l, "terms": t, "themes": th, "inputs": inp} for i, l, t, th, inp in CONCEPTS]}
+    cids = {c[0] for c in CONCEPTS}
+    assert all(i in cids for c in CONCEPTS for i in c[4]) and all(t in THEMES for c in CONCEPTS for t in c[3])
     out = Path(__file__).resolve().parent.parent / "public" / "data" / "network.seed.json"
     out.write_text(json.dumps(net, ensure_ascii=False, indent=1))
     print(f"{len(contacts)} contacts, {len(orgs)} organisations -> {out}")

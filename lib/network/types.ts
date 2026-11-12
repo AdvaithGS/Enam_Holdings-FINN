@@ -47,5 +47,7 @@ export interface Network {
   orgs: Org[];
   schools: { id: string; name: string; aliases?: string[]; cohort: "small" | "large" }[];
   themes: { id: string; label: string }[];
+  /** what a query can mean; `inputs` are the concepts that supply this one */
+  concepts?: { id: string; label: string; terms: string[]; themes: string[]; inputs: string[] }[];
   synthetic: boolean;
 }

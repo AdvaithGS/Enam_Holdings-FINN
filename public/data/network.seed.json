@@ -2127,5 +2127,376 @@
    "id": "electricals",
    "label": "Electricals"
   }
+ ],
+ "concepts": [
+  {
+   "id": "ev",
+   "label": "Electric vehicles",
+   "terms": [
+    "ev",
+    "electric vehicle",
+    "e-mobility",
+    "electric car",
+    "electric two-wheeler"
+   ],
+   "themes": [
+    "autos"
+   ],
+   "inputs": [
+    "battery",
+    "chips",
+    "ems"
+   ]
+  },
+  {
+   "id": "battery",
+   "label": "Battery cells",
+   "terms": [
+    "battery",
+    "cell manufacturer",
+    "lithium ion",
+    "gigafactory",
+    "energy storage"
+   ],
+   "themes": [],
+   "inputs": [
+    "battery-materials"
+   ]
+  },
+  {
+   "id": "battery-materials",
+   "label": "Battery materials",
+   "terms": [
+    "cathode",
+    "anode",
+    "electrolyte",
+    "lithium salt",
+    "fluorochemical",
+    "fluorine",
+    "lipf6",
+    "battery chemical"
+   ],
+   "themes": [
+    "specialty-chemicals"
+   ],
+   "inputs": []
+  },
+  {
+   "id": "chips",
+   "label": "Semiconductors",
+   "terms": [
+    "semiconductor",
+    "chip",
+    "osat",
+    "fab",
+    "wafer",
+    "chip packaging",
+    "assembly and test"
+   ],
+   "themes": [
+    "semiconductors"
+   ],
+   "inputs": []
+  },
+  {
+   "id": "ems",
+   "label": "Electronics manufacturing",
+   "terms": [
+    "ems",
+    "electronics manufacturing",
+    "contract manufacturing",
+    "pcb",
+    "box build",
+    "electronics assembly"
+   ],
+   "themes": [
+    "electronics-manufacturing"
+   ],
+   "inputs": [
+    "chips"
+   ]
+  },
+  {
+   "id": "chem",
+   "label": "Specialty chemicals",
+   "terms": [
+    "specialty chemical",
+    "speciality chemical",
+    "chemical",
+    "intermediate",
+    "refrigerant",
+    "phenol",
+    "fluoro"
+   ],
+   "themes": [
+    "specialty-chemicals"
+   ],
+   "inputs": []
+  },
+  {
+   "id": "agchem",
+   "label": "Agrochemicals",
+   "terms": [
+    "agrochemical",
+    "crop protection",
+    "pesticide",
+    "agri input"
+   ],
+   "themes": [
+    "agrochemicals"
+   ],
+   "inputs": [
+    "chem"
+   ]
+  },
+  {
+   "id": "microfinance",
+   "label": "Rural lending",
+   "terms": [
+    "microfinance",
+    "mfi",
+    "rural lending",
+    "rural credit",
+    "village lending",
+    "joint liability",
+    "borrower stress"
+   ],
+   "themes": [
+    "rural-lending"
+   ],
+   "inputs": [
+    "bank-funding"
+   ]
+  },
+  {
+   "id": "bank-funding",
+   "label": "Bank funding",
+   "terms": [
+    "bank",
+    "banking",
+    "wholesale funding",
+    "credit risk",
+    "treasury"
+   ],
+   "themes": [
+    "banking"
+   ],
+   "inputs": []
+  },
+  {
+   "id": "consumer-credit",
+   "label": "Consumer lending",
+   "terms": [
+    "consumer loan",
+    "personal loan",
+    "nbfc",
+    "unsecured credit",
+    "collections"
+   ],
+   "themes": [
+    "consumer-lending"
+   ],
+   "inputs": [
+    "bank-funding"
+   ]
+  },
+  {
+   "id": "autos",
+   "label": "Autos",
+   "terms": [
+    "auto",
+    "car",
+    "passenger vehicle",
+    "automobile",
+    "oem"
+   ],
+   "themes": [
+    "autos"
+   ],
+   "inputs": [
+    "ems",
+    "chips"
+   ]
+  },
+  {
+   "id": "paints",
+   "label": "Paints",
+   "terms": [
+    "paint",
+    "coating",
+    "decorative",
+    "dealer channel"
+   ],
+   "themes": [
+    "paints"
+   ],
+   "inputs": [
+    "chem"
+   ]
+  },
+  {
+   "id": "retail",
+   "label": "Retail",
+   "terms": [
+    "retail",
+    "apparel",
+    "fashion",
+    "store",
+    "merchandising",
+    "fast fashion"
+   ],
+   "themes": [
+    "retail"
+   ],
+   "inputs": []
+  },
+  {
+   "id": "jewellery",
+   "label": "Jewellery",
+   "terms": [
+    "jewellery",
+    "jewelry",
+    "gold",
+    "studded"
+   ],
+   "themes": [
+    "jewellery"
+   ],
+   "inputs": []
+  },
+  {
+   "id": "pharma",
+   "label": "Pharma",
+   "terms": [
+    "pharma",
+    "drug",
+    "generic",
+    "usfda",
+    "fda inspection",
+    "regulatory affairs"
+   ],
+   "themes": [
+    "pharma"
+   ],
+   "inputs": [
+    "chem"
+   ]
+  },
+  {
+   "id": "it",
+   "label": "IT services",
+   "terms": [
+    "it service",
+    "software service",
+    "outsourcing",
+    "bfsi tech"
+   ],
+   "themes": [
+    "it-services"
+   ],
+   "inputs": []
+  },
+  {
+   "id": "telecom",
+   "label": "Telecom",
+   "terms": [
+    "telecom",
+    "5g",
+    "spectrum",
+    "mobile network",
+    "arpu"
+   ],
+   "themes": [
+    "telecom"
+   ],
+   "inputs": []
+  },
+  {
+   "id": "fintech",
+   "label": "Fintech",
+   "terms": [
+    "fintech",
+    "payment",
+    "upi",
+    "wallet",
+    "payments bank"
+   ],
+   "themes": [
+    "fintech"
+   ],
+   "inputs": []
+  },
+  {
+   "id": "qcom",
+   "label": "Quick commerce",
+   "terms": [
+    "quick commerce",
+    "food delivery",
+    "dark store",
+    "instant delivery"
+   ],
+   "themes": [
+    "quick-commerce"
+   ],
+   "inputs": []
+  },
+  {
+   "id": "fmcg",
+   "label": "Consumer staples",
+   "terms": [
+    "fmcg",
+    "consumer staple",
+    "packaged food",
+    "brand"
+   ],
+   "themes": [
+    "fmcg"
+   ],
+   "inputs": []
+  },
+  {
+   "id": "infra",
+   "label": "Infrastructure",
+   "terms": [
+    "infrastructure",
+    "epc",
+    "construction",
+    "order book",
+    "hydrocarbon project"
+   ],
+   "themes": [
+    "infrastructure"
+   ],
+   "inputs": []
+  },
+  {
+   "id": "drones",
+   "label": "Drones and defence",
+   "terms": [
+    "drone",
+    "uav",
+    "defence",
+    "defense",
+    "unmanned"
+   ],
+   "themes": [
+    "drones"
+   ],
+   "inputs": []
+  },
+  {
+   "id": "electricals",
+   "label": "Electricals",
+   "terms": [
+    "motor",
+    "transformer",
+    "switchgear",
+    "electrical"
+   ],
+   "themes": [
+    "electricals"
+   ],
+   "inputs": []
+  }
  ]
 }
