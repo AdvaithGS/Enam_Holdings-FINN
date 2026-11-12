@@ -1,0 +1,25 @@
+{
+  "portfolio": [
+    {"symbol": "RELIANCE", "name": "Reliance Industries", "sector": "Energy & retail"},
+    {"symbol": "HDFCBANK", "name": "HDFC Bank", "sector": "Banking"},
+    {"symbol": "TCS", "name": "Tata Consultancy Services", "sector": "IT services"},
+    {"symbol": "BHARTIARTL", "name": "Bharti Airtel", "sector": "Telecom"},
+    {"symbol": "ITC", "name": "ITC", "sector": "Consumer staples"},
+    {"symbol": "LT", "name": "Larsen & Toubro", "sector": "Engineering & construction"},
+    {"symbol": "SUNPHARMA", "name": "Sun Pharma", "sector": "Pharma"},
+    {"symbol": "MARUTI", "name": "Maruti Suzuki", "sector": "Autos"},
+    {"symbol": "TITAN", "name": "Titan", "sector": "Consumer discretionary"},
+    {"symbol": "BAJFINANCE", "name": "Bajaj Finance", "sector": "Consumer lending"},
+    {"symbol": "ASIANPAINT", "name": "Asian Paints", "sector": "Paints"},
+    {"symbol": "ETERNAL", "name": "Eternal (Zomato)", "sector": "Internet"},
+    {"symbol": "TRENT", "name": "Trent", "sector": "Retail"},
+    {"symbol": "DIXON", "name": "Dixon Technologies", "sector": "Electronics manufacturing"},
+    {"symbol": "KAYNES", "name": "Kaynes Technology", "sector": "Electronics & semiconductors"},
+    {"symbol": "CGPOWER", "name": "CG Power", "sector": "Electricals & semiconductors"},
+    {"symbol": "SRF", "name": "SRF", "sector": "Specialty chemicals"},
+    {"symbol": "DEEPAKNTR", "name": "Deepak Nitrite", "sector": "Specialty chemicals"},
+    {"symbol": "CREDITACC", "name": "CreditAccess Grameen", "sector": "Rural lending"},
+    {"symbol": "PAYTM", "name": "Paytm (One 97)", "sector": "Fintech"}
+  ],
+  "research_demo": ["KAYNES", "CREDITACC", "PIIND", "IDEAFORGE", "SRF"]
+}
