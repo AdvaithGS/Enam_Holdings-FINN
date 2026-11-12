@@ -101,6 +101,23 @@ def bhavcopy(day: dt.date) -> dict[str, dict] | None:
     return out
 
 
+def index_closes(day: dt.date) -> dict[str, dict] | None:
+    """Official open, high, low, close of every NSE index on `day`; None on a holiday."""
+    url = f"{ARCHIVE}/content/indices/ind_close_all_{day:%d%m%Y}.csv"
+    try:
+        text = http.get_text(url, retries=1)
+    except http.FetchError:
+        return None
+    out = {}
+    for r in csv.DictReader(io.StringIO(text)):
+        try:
+            out[r["Index Name"].strip()] = {"o": float(r["Open Index Value"]), "h": float(r["High Index Value"]),
+                                            "l": float(r["Low Index Value"]), "c": float(r["Closing Index Value"])}
+        except (KeyError, ValueError):
+            continue  # indices without an intraday range carry "-" in those columns
+    return out or None
+
+
 def equities(ttl: float = 7 * 24 * HOUR) -> list[dict]:
     """All NSE-listed equities: symbol, name, ISIN."""
     text = http.get_text(f"{ARCHIVE}/content/equities/EQUITY_L.csv", ttl=ttl)

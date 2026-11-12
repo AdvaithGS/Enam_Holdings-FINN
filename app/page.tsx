@@ -1,5 +1,6 @@
 "use client";
 import { useMemo, useState } from "react";
+import { Close } from "@/components/Close";
 import { ActCard, GlanceRow } from "@/components/EventCard";
 import { Moves } from "@/components/Moves";
 import { day, dayTime } from "@/lib/client/format";
@@ -54,6 +55,8 @@ export default function Brief() {
           </div>
         )}
       </header>
+
+      <Close />
 
       <Moves start={view.start} />
 

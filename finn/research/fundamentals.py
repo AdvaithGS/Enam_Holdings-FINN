@@ -10,10 +10,24 @@ Conventions
   balances when both exist (a flow should be compared with the stock that earned it).
   Cumulative ratios (cash conversion) sum numerator and denominator over the window
   first, then divide: one lumpy year cannot swing the answer.
+
+Working capital. Each balance is divided by the flow it turns over against:
+    receivable days = 365 x average receivables / revenue
+    inventory days  = 365 x average inventory   / cost of goods sold
+    payable days    = 365 x average payables    / cost of goods sold
+    cycle           = receivable + inventory - payable
+  Cost of goods sold = revenue x (material cost % + manufacturing cost %), the two
+  product-cost lines of the expense schedule. That schedule is published in whole
+  percentage points, so COGS carries a rounding error of up to half a point of sales
+  (under 1% of COGS for a manufacturer). Where a company reports no product cost of
+  at least COGS_MIN of sales (services, platforms), there is no cost of goods to turn
+  inventory against and all three use revenue; the row says which basis it used.
 """
 from __future__ import annotations
 
 from ..stats import cagr
+
+COGS_MIN = 0.10   # product cost below this share of revenue: not a goods business
 
 
 def _series(table: dict, *names: str) -> dict[str, float]:
@@ -54,6 +68,12 @@ def compute(co: dict) -> dict:
     oa, ol = sch.get("Other Assets", {}), sch.get("Other Liabilities", {})
     recv, inv, cash = oa.get("Trade receivables", {}), oa.get("Inventories", {}), oa.get("Cash Equivalents", {})
     pay = ol.get("Trade Payables", {})
+    ex = sch.get("Expenses", {})
+    mat, mfg = ex.get("Material Cost %", {}), ex.get("Manufacturing Cost %", {})
+
+    def cogs_of(y: str) -> float | None:
+        share = ((mat.get(y) or 0.0) + (mfg.get(y) or 0.0)) / 100
+        return sales[y] * share if y in sales and share >= COGS_MIN else None
     nw = {p: eq[p] + res[p] for p in eq if p in res}
     years = _fy(sales)
     if len(years) < 2:
@@ -66,6 +86,8 @@ def compute(co: dict) -> dict:
             return None
         return cagr(d[ys[-1 - n]], d[ys[-1]], n)
 
+    # one basis per company, so the trend is not an artefact of switching denominators
+    on_cost = not lender and cogs_of(last) is not None
     annual = []
     for y in years[-10:]:
         ebit = None if y not in pbt else pbt[y] + interest.get(y, 0.0)
@@ -77,9 +99,12 @@ def compute(co: dict) -> dict:
                "roce": None if lender else _div(ebit, cap), "roa": _div(pat.get(y), _avg(assets, y)) if lender else None,
                "cash": cash.get(y)}
         if not lender:
+            cg = cogs_of(y) if on_cost else sales.get(y)
+            row["cogs"] = cogs_of(y)
+            row["days_basis"] = "cost" if on_cost else "revenue"
             row["debtor_days"] = None if _div(_avg(recv, y), sales.get(y)) is None else 365 * _avg(recv, y) / sales[y]
-            row["inventory_days"] = None if _div(_avg(inv, y), sales.get(y)) is None else 365 * _avg(inv, y) / sales[y]
-            row["payable_days"] = None if _div(_avg(pay, y), sales.get(y)) is None else 365 * _avg(pay, y) / sales[y]
+            row["inventory_days"] = None if _div(_avg(inv, y), cg) is None else 365 * _avg(inv, y) / cg
+            row["payable_days"] = None if _div(_avg(pay, y), cg) is None else 365 * _avg(pay, y) / cg
             parts = [row["debtor_days"], row["inventory_days"], row["payable_days"]]
             row["cycle_days"] = None if parts[0] is None and parts[1] is None else (parts[0] or 0) + (parts[1] or 0) - (parts[2] or 0)
             ebitda = None if y not in op else op[y]
@@ -138,11 +163,13 @@ def compute(co: dict) -> dict:
         "de": "borrowings / net worth, year end",
         "cash_conversion_3y": "sum of cash from operations over 3 years / sum of PAT over 3 years",
         "debtor_days": "365 x average trade receivables / revenue",
-        "inventory_days": "365 x average inventory / revenue",
-        "payable_days": "365 x average trade payables / revenue",
-        "cycle_days": "debtor days + inventory days - payable days (all on revenue, so they add)",
+        "cogs": "revenue x (material cost % + manufacturing cost %)",
+        "inventory_days": "365 x average inventory / cost of goods sold" if on_cost else "365 x average inventory / revenue",
+        "payable_days": "365 x average trade payables / cost of goods sold" if on_cost else "365 x average trade payables / revenue",
+        "cycle_days": "receivable days + inventory days - payable days",
         "net_debt_ebitda": "(borrowings - cash) / operating profit",
         "pe": "market value / trailing twelve-month PAT",
     }
     return {"ok": True, "lender": lender, "last_fy": "FY" + last[-2:], "annual": annual, "quarters": quarters[-9:],
-            "metrics": metrics, "formulas": formulas, "basis": "consolidated" if co["consolidated"] else "standalone"}
+            "metrics": metrics, "formulas": formulas,
+            "days_basis": "cost" if on_cost else "revenue", "basis": "consolidated" if co["consolidated"] else "standalone"}

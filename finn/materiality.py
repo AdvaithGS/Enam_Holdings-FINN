@@ -6,8 +6,8 @@ which categories of filing arrived and whether the market *noticed*, defined as
     y = 1  if  min(p_return, p_volume) <= ALPHA
 
 where p_return and p_volume are the empirical tail probabilities of that session's
-abnormal return and relative volume against the stock's own trailing 500 sessions
-(see stats.py). A filing made after the 15:30 close, or on a holiday, belongs to the
+abnormal return (in units of its GARCH conditional volatility) and relative volume
+against the stock's own trailing 500 sessions (see stats.py). A filing made after the 15:30 close, or on a holiday, belongs to the
 next session, because that is when the market could first react.
 
 Several categories usually arrive together (results + press release + call notice),
@@ -57,7 +57,9 @@ def signals(bars: list[dict], market: list[dict]) -> dict[str, dict]:
     r, rm = stats.log_returns(px), stats.log_returns(m)
     e, beta = stats.abnormal_returns(r, rm)
     vr = stats.volume_ratio(vol)
-    p_ret, p_vol = stats.tail_prob(np.abs(e)), stats.tail_prob(vr)
+    sigma = stats.garch_vol(e)
+    z = np.abs(e) / sigma
+    p_ret, p_vol = stats.tail_prob(z), stats.tail_prob(vr)
     chg = np.full(len(rows), np.nan)
     chg[1:] = px[1:] / px[:-1] - 1
     out = {}
@@ -65,7 +67,8 @@ def signals(bars: list[dict], market: list[dict]) -> dict[str, dict]:
         f = lambda x: None if np.isnan(x) else float(x)  # noqa: E731
         out[b["date"]] = {"close": float(close[i]), "change": f(chg[i]), "market": f(np.expm1(rm[i])) if i else None,
                           "abnormal": f(np.expm1(e[i])) if not np.isnan(e[i]) else None,
-                          "beta": f(beta[i]), "vol_ratio": f(vr[i]), "volume": int(vol[i]),
+                          "beta": f(beta[i]), "sigma": f(sigma[i]), "z": f(e[i] / sigma[i]),
+                          "vol_ratio": f(vr[i]), "volume": int(vol[i]),
                           "p_ret": f(p_ret[i]), "p_vol": f(p_vol[i])}
     return out
 
@@ -111,9 +114,37 @@ def fit(panel: list[tuple[dict[str, dict], list[dict]]]) -> dict:
     return model
 
 
+def panel(years: int = 5) -> list[tuple[dict[str, dict], list[dict]]]:
+    """Signals and filings for every portfolio stock over `years` of history."""
+    from .sources import nse, prices
+    cfg = json.loads((MODEL_PATH.parent / "portfolio.json").read_text())
+    market = prices.history(prices.NIFTY, years=years)
+    today = dt.datetime.now(prices.IST).date()
+    out = []
+    for p in cfg["portfolio"]:
+        sig = signals(prices.history(p["symbol"], years=years), market)
+        first = min((d for d, g in sig.items() if g["p_ret"] is not None), default=None)
+        if not first:
+            continue
+        filings = nse.announcements(p["symbol"], dt.date.fromisoformat(first), today, ttl=7 * 86400)
+        out.append((sig, filings))
+    return out
+
+
 def save(model: dict) -> None:
     MODEL_PATH.write_text(json.dumps(model, indent=1))
 
 
 def load() -> dict:
     return json.loads(MODEL_PATH.read_text())
+
+
+if __name__ == "__main__":
+    # python -m finn.materiality     refit the event study and print it
+    old = load() if MODEL_PATH.exists() else None
+    model = fit(panel())
+    save(model)
+    print(f"{model['sessions']} stock-sessions; noticed {model['noticed_rate']:.3f}; baseline {model['baseline']:.3f}")
+    for c, v in sorted(model["categories"].items(), key=lambda kv: -kv[1]["lift"]):
+        was = f"   was {old['categories'][c]['lift']:.2f}x" if old and c in old["categories"] else ""
+        print(f"  {c:20s} n={v['n']:5d}  {v['lift']:.2f}x  [{v['lift_lo']:.2f}, {v['lift_hi']:.2f}]{was}")

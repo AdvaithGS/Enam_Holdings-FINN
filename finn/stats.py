@@ -6,12 +6,18 @@ Notation
     e_t   = r_t - (a + b m_t)            abnormal return; a, b by OLS on a trailing window
     v_t   = V_t / mean(V_{t-20..t-1})    volume relative to its 20-session average
 
+    s_t   = conditional volatility of e_t, GARCH(1,1), known at the close of t-1
+    z_t   = e_t / s_t                    the move in units of that day's expected size
+
 "Unusual" is never a Gaussian z-score: daily returns are fat-tailed, so rarity is the
 empirical tail frequency of the stock's own history,
 
-    p_t = (1 + #{s in W : |e_s| >= |e_t|}) / (1 + |W|),
+    p_t = (1 + #{s in W : |z_s| >= |z_t|}) / (1 + |W|),
 
 which is distribution-free and reads directly as "this happens about once in 1/p days".
+It is taken on z, not e: volatility clusters, so in a turbulent month every stock's raw
+residual looks rare at once. Dividing by s_t first asks the sharper question, "is this
+large for the state the stock is in?" (filtered historical simulation).
 """
 from __future__ import annotations
 
@@ -54,6 +60,56 @@ def abnormal_returns(r: np.ndarray, m: np.ndarray, window: int = BETA_WINDOW,
         a = float(rr.mean() - b * mm.mean())
         e[t], beta[t] = r[t] - (a + b * m[t]), b
     return e, beta
+
+
+# GARCH(1,1) parameter grid. Variance targeting fixes the long-run level, so only the
+# reaction (a) and persistence (b) are searched; a = b = 0 is constant variance, which
+# the data may prefer. A grid is coarse but cannot fail to converge on 250 points.
+_GRID = [(0.0, 0.0)] + [(0.02 * i, 0.50 + 0.02 * j) for i in range(1, 16) for j in range(25)
+                        if 0.02 * i + 0.50 + 0.02 * j < 0.995]
+GARCH_MIN, GARCH_MAX, GARCH_REFIT = 120, 750, 21
+
+
+def _garch_fit(x2: np.ndarray) -> tuple[float, float, float, float]:
+    """Quasi-maximum-likelihood GARCH(1,1) on squared residuals x2, by grid.
+
+        s2_t = w + a x2_{t-1} + b s2_{t-1},      w = v (1 - a - b),  v = mean(x2)
+
+    Returns (w, a, b, s2 forecast for the session after the sample).
+    """
+    v = float(x2.mean())
+    if not v > 0:
+        return 0.0, 0.0, 0.0, 0.0
+    a, b = (np.array(col) for col in zip(*_GRID))
+    w = v * (1 - a - b)
+    s2 = np.full(len(a), v)
+    ll = np.zeros(len(a))
+    for x in x2:
+        ll -= np.log(s2) + x / s2
+        s2 = w + a * x + b * s2
+    k = int(np.argmax(ll))
+    return float(w[k]), float(a[k]), float(b[k]), float(s2[k])
+
+
+def garch_vol(e: np.ndarray, min_obs: int = GARCH_MIN, max_obs: int = GARCH_MAX,
+              refit: int = GARCH_REFIT) -> np.ndarray:
+    """One-step-ahead conditional volatility of e, strictly out of sample.
+
+    s_t uses parameters fitted on residuals up to t-1 (re-estimated every `refit`
+    sessions on at most `max_obs` of them) and the recursion run up to t-1.
+    """
+    out = np.full(len(e), np.nan)
+    idx = np.flatnonzero(~np.isnan(e))
+    x2 = e[idx] ** 2
+    w = a = b = s2 = 0.0
+    for i in range(min_obs, len(idx)):
+        if (i - min_obs) % refit == 0:
+            w, a, b, s2 = _garch_fit(x2[max(0, i - max_obs):i])
+        else:
+            s2 = w + a * x2[i - 1] + b * s2
+        if s2 > 0:
+            out[idx[i]] = math.sqrt(s2)
+    return out
 
 
 def volume_ratio(v: np.ndarray, window: int = VOL_WINDOW) -> np.ndarray:

@@ -103,7 +103,7 @@ export function Moves({ start }: { start: Date }) {
               return <button key={k} className={`chip ${on ? "on" : ""}`} aria-pressed={on} onClick={() => setPrefs({ alertOn: on ? prefs.alertOn.filter((x) => x !== k) : [...prefs.alertOn, k] })}>{label}</button>;
             })}
           </div>
-          <p className="tiny faint" style={{ marginTop: 18 }}>“This unusual 1 in N days” is the stock’s own history: the share of its last 500 sessions with a market-adjusted move or relative volume at least this large.</p>
+          <p className="tiny faint" style={{ marginTop: 18 }}>“This unusual 1 in N days” is the stock’s own history: the share of its last 500 sessions with a market-adjusted move, measured against its expected volatility that day, or a relative volume at least this large.</p>
         </Sheet>
       )}
     </section>

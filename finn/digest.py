@@ -10,6 +10,11 @@ shown to the investor:
     z = max(z, logit(ACT) + role term)     who: role tier of the person changing
     z += ln(ALPHA / p_session)             the tape: only if the session was a tail day
 
+Two further lines are shown as evidence with weight 0, because nothing here can yet
+calibrate them: the amount against the company's market value and operating cash flow
+(what the regulator's line cannot say: how much of the business is at stake), and the
+half-hour reaction at the filing's own timestamp (intraday.py).
+
 The SEBI line is Regulation 30(4)(i)(c) of the listing rules: an event is material
 when its value exceeds the lowest of 2% of turnover, 2% of net worth and 5% of the
 three-year average profit after tax. So rho = 1 is the regulator's own definition of
@@ -28,7 +33,7 @@ import re
 import time
 from pathlib import Path
 
-from . import docs, enrich, http, llm, materiality, results, stats
+from . import close, docs, enrich, http, intraday, llm, materiality, results, stats
 from .sources import nse, prices, screener
 from .taxonomy import CATEGORIES, classify, is_reappointment, is_routine_debt
 
@@ -75,6 +80,14 @@ def sebi_line(co: dict) -> dict | None:
         return None
     k = min(legs, key=legs.get)
     return {"cr": legs[k], "leg": k}
+
+
+def cfo_3y(co: dict) -> float | None:
+    """Average cash from operations over the last three reported years, rupees crore."""
+    cf = co.get("cf") or {}
+    row = cf.get("rows", {}).get("Cash from Operating Activity") or []
+    vals = [row[i] for i, p in enumerate(cf.get("periods", [])) if p.startswith("Mar") and i < len(row) and row[i] is not None][-3:]
+    return sum(vals) / len(vals) if len(vals) == 3 else None
 
 
 def _fx() -> dict[str, float]:
@@ -156,6 +169,7 @@ def build(days: int = 35, today: dt.date | None = None) -> dict:
 
     # ---- market
     market = prices.history(prices.NIFTY)
+    prices.overlay_index(market)
     bars = {p["symbol"]: prices.history(p["symbol"]) for p in cfg["portfolio"]}
     bars[prices.NIFTY] = market
     as_of = prices.overlay_official({k: v for k, v in bars.items() if k != prices.NIFTY})
@@ -194,7 +208,7 @@ def build(days: int = 35, today: dt.date | None = None) -> dict:
                      "p_ret": [r4(r["p_ret"]) for r in rows], "p_vol": [r4(r["p_vol"]) for r in rows]}
         companies[s] = {"symbol": s, "name": p["name"], "legal_name": co.get("name"), "sector": p["sector"],
                         "industry": (co.get("industry") or [None])[-1], "mcap_cr": co.get("market_cap"),
-                        "line": line, "beta": next((r4(r["beta"]) for r in reversed(rows) if r.get("beta") is not None), None),
+                        "line": line, "_cfo": cfo_3y(co) if co else None, "beta": next((r4(r["beta"]) for r in reversed(rows) if r.get("beta") is not None), None),
                         "sessions": ses + tail, "_sig": {d: r for d, r in zip(dates, rows)}}
     log(f"prices: {len(companies)} stocks, latest session {as_of}; fx {fx}")
 
@@ -355,6 +369,14 @@ def build(days: int = 35, today: dt.date | None = None) -> dict:
                                          f"(₹{c['line']['cr']:,.0f} cr, {c['line']['leg']})"})
                 if rho < 1:
                     z = min(z, floor)  # a stated, sub-material amount caps the event below the cut-off
+                if c["mcap_cr"]:
+                    share = amount["cr"] / c["mcap_cr"]
+                    e["amount"]["mcap_share"] = round(share, 5)
+                    text = f"For scale: ₹{amount['cr']:,.0f} cr is {share:.2%} of the company's market value (₹{c['mcap_cr']:,.0f} cr)"
+                    if c["_cfo"] and c["_cfo"] > 0:
+                        e["amount"]["cfo_years"] = round(amount["cr"] / c["_cfo"], 2)
+                        text += f" and {amount['cr'] / c['_cfo']:.1f} years of its operating cash flow (3-year average ₹{c['_cfo']:,.0f} cr)"
+                    evidence.append({"k": "value", "d": 0.0, "text": text + ". Shown for scale; not in the score."})
             if routine_debt:
                 z = min(z, b0)
                 evidence.append({"k": "routine", "d": 0.0, "text": "Routine debt issuance for a borrower of this kind"})
@@ -394,17 +416,52 @@ def build(days: int = 35, today: dt.date | None = None) -> dict:
                 share = "" if len(group) == 1 else f" This event carries {r:.0%} of the credit among {len(group)} that session."
                 e["evidence"].append({"k": "tape", "d": round(d, 2),
                                       "text": f"The stock moved {move} on {g['vol_ratio']:.1f}x volume that session; "
-                                              f"a day this unusual comes about 1 in {round(1 / min(ps))}.{share}"})
+                                              f"for its volatility at the time, a day this unusual comes about 1 in {round(1 / min(ps))}.{share}"})
     for e in out_events:
         p = stats.sigmoid(e.pop("_z"))
         paper, dated = e.pop("_paper"), e.pop("_dated")
         tier = "aside" if (paper or dated) else ("act" if p >= act - 1e-9 else "glance")
         e.update(p=round(p, 4), lift=round(p / base, 2), tier=tier)
 
+    # ---- the reaction at the filing's own timestamp, for events the investor will see
+    five: dict[str, dict] = {}
+    timed = 0
+    for e in out_events:
+        if e["tier"] == "aside":
+            continue
+        s = e["symbol"]
+        try:
+            if s not in five:
+                five[s] = intraday.bars(s)
+            first = min(dt.datetime.fromisoformat(f["at"]) for f in e["filings"])
+            got = intraday.reaction(five[s], first)
+        except Exception as ex:  # a missing intraday feed must not sink the run
+            five.setdefault(s, {})
+            got = None
+            log(f"  ! intraday {s}: {ex!r}")
+        if got:
+            timed += 1
+            e["intraday"] = got
+            vol = f" on {got['vol_x']:.1f}x the usual volume for that time of day" if got["vol_x"] else ""
+            rare = min(got["p"], got["p_vol"])
+            verdict = (f"a half hour like that comes about 1 in {round(1 / rare)} at that time of day" if rare <= 0.2
+                       else "nothing unusual for that time of day")
+            e["evidence"].append({"k": "intraday", "d": 0.0,
+                                  "text": f"Filed at {got['at']}. In the next {got['minutes']} minutes the volume-weighted price moved "
+                                          f"{got['shock']:+.2%} against the session so far{vol}: {verdict} "
+                                          f"(n={got['n']:,}). Shown as evidence; not in the score."})
+    log(f"intraday: {timed} filings timed during trading hours")
+
     out_events.sort(key=lambda e: (e["tier"] != "act", -e["p"], e["at"]))
+    try:
+        brief = close.build(companies, market, out_events, dt.datetime.now(prices.IST), log)
+    except Exception as ex:
+        brief = None
+        log(f"  ! close: {ex!r}")
     for c in companies.values():
         c.pop("_sig")
         c.pop("sessions")
+        c.pop("_cfo")
     digest = {
         "generated_at": dt.datetime.now(prices.IST).isoformat(timespec="seconds"),
         "as_of": as_of, "window_days": days,
@@ -412,7 +469,7 @@ def build(days: int = 35, today: dt.date | None = None) -> dict:
                   "categories": {k: {"n": v["n"], "p": round(v["p"], 4), "lift": round(v["lift"], 2),
                                      "lo": round(v["lift_lo"], 2), "hi": round(v["lift_hi"], 2)}
                                  for k, v in model["categories"].items()}},
-        "labels": CATEGORIES, "companies": companies, "events": out_events,
+        "labels": CATEGORIES, "companies": companies, "events": out_events, "close": brief,
         "run": {"filings": len(filings), "events": len(out_events), "documents_read": reads,
                 "llm": dict(llm.usage), "http": dict(http.stats), "seconds": round(time.time() - t0, 1),
                 "ocr_pages": docs.stats["ocr_pages"], "llm_available": llm.available()},
@@ -429,6 +486,13 @@ def build(days: int = 35, today: dt.date | None = None) -> dict:
             log(f"  {e['p']:.2f} {e['symbol']:10s} {e['at'][:10]} {e['label']:16s} {e['title'][:90]}")
             for ev in e["evidence"][1:]:
                 log(f"         . {ev['text']}")
+    if brief:
+        pf = brief["portfolio"]
+        log(f"--- THE CLOSE {brief['session']}: portfolio {pf['ret']:+.2%}, NIFTY {pf['market']:+.2%}, alpha {pf['alpha']:+.2%} "
+            f"(1 in {round(1 / pf['alpha_p']) if pf['alpha_p'] else '?'}); {pf['up']} up, {pf['down']} down; "
+            f"regime {brief['regime']['label'] if brief['regime'] else 'n/a'}; rotation {brief['rotation']}")
+        log("    sectors vs NIFTY: " + ", ".join(f"{x['name']} {x['rel']:+.2%}" for x in brief["sectors"]))
+        log("    world: " + ", ".join(f"{w['name']} {w['change']:+.2%} ({w['session'][5:]})" for w in brief["world"]))
     aside = [e for e in out_events if e["tier"] == "aside"]
     log(f"--- SET ASIDE ({len(aside)} events, {sum(len(e['filings']) for e in aside)} filings)")
     log(f"\nrun: {digest['run']}")

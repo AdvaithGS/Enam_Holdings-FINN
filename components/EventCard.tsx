@@ -74,7 +74,19 @@ export function ActCard({ e }: { e: FinnEvent }) {
           <div className="rho" title={`SEBI line ₹${crore(e.amount.line_cr)} (${e.amount.leg})`}>
             <i style={{ width: `${Math.min(100, (Math.log10(Math.max(e.amount.rho, 0.1)) + 1) / 3 * 100)}%` }} /><b style={{ left: "33.3%" }} />
           </div>
+          {e.amount.mcap_share !== undefined && (
+            <p className="tiny faint" style={{ marginTop: 6 }}>
+              {pct(e.amount.mcap_share, e.amount.mcap_share < 0.01 ? 2 : 1, false)} of market value{e.amount.cfo_years !== undefined ? ` · ${e.amount.cfo_years.toFixed(1)} years of operating cash flow` : ""}
+            </p>
+          )}
         </div>
+      )}
+      {e.intraday && (
+        <p className="small muted" style={{ marginTop: 10 }}>
+          Filed {e.intraday.at}: <b className={`num ${tone(e.intraday.shock)}`}>{pct(e.intraday.shock, 2)}</b> in the next {e.intraday.minutes} minutes
+          {e.intraday.vol_x !== null ? ` on ${e.intraday.vol_x.toFixed(1)}× usual volume` : ""}
+          {Math.min(e.intraday.p, e.intraday.p_vol) <= 0.2 ? ` · 1 in ${Math.round(1 / Math.min(e.intraday.p, e.intraday.p_vol))} half hours` : " · no reaction to speak of"}
+        </p>
       )}
       {reaches.map(({ fp, person, routes }) => (
         <div className="person" key={person.id}>

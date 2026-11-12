@@ -188,7 +188,11 @@ export default function Research({ params }: { params: Promise<{ symbol: string 
               { name: "Receivables", color: "var(--blue)", values: rows.map((r) => r.debtor_days ?? null), kind: "line", fmt: (v) => `${v.toFixed(0)}d` },
               { name: "Inventory", color: "var(--violet)", values: rows.map((r) => r.inventory_days ?? null), kind: "line", fmt: (v) => `${v.toFixed(0)}d` },
               { name: "Payables", color: "var(--teal)", values: rows.map((r) => r.payable_days ?? null), kind: "line", fmt: (v) => `${v.toFixed(0)}d` }]} />
-            <p className="tiny faint" style={{ marginTop: 6 }}>Cycle = receivable days + inventory days − payable days, each as 365 × average balance ÷ revenue.</p>
+            <p className="tiny faint" style={{ marginTop: 6 }}>
+              {f.days_basis === "cost"
+                ? "Cycle = receivable days + inventory days − payable days. Receivables turn over against revenue; inventory and payables against cost of goods sold (revenue × the reported product-cost share, which is published in whole percentage points)."
+                : "Cycle = receivable days + inventory days − payable days, each as 365 × average balance ÷ revenue: this company reports no cost of goods to turn inventory against."}
+            </p>
           </Mod>
         )}
         <Mod id="lev" title={f.lender ? "Funding and returns" : "Debt and returns"} color="violet" icon="⚖" open={open} toggle={toggle}
@@ -211,8 +215,10 @@ export default function Research({ params }: { params: Promise<{ symbol: string 
               <div className="item" key={x.commitment_id}>
                 <div className="row between" style={{ alignItems: "flex-start" }}><b className="grow">{x.promised}</b><span className={`verdict ${x.verdict}`}>{x.verdict.replace("_", " ")}</span></div>
                 <p className="muted" style={{ marginTop: 5 }}>{x.delivered}<Src ids={x.sources} d={d} />{x.by === "code" && <span className="src" title="Computed from reported numbers, not judged by a model">computed</span>}</p>
-                <button className="tiny link" style={{ marginTop: 6 }} onClick={() => setQuote(quote === x.commitment_id ? null : x.commitment_id)}>{quote === x.commitment_id ? "hide" : "their words"}</button>
-                {quote === x.commitment_id && <p className="quote">“{x.quote}”</p>}
+                {x.by === "code" ? <p className="quote">“{x.quote}”</p> : <>
+                  <button className="tiny link" style={{ marginTop: 6 }} onClick={() => setQuote(quote === x.commitment_id ? null : x.commitment_id)}>{quote === x.commitment_id ? "hide" : "their words"}</button>
+                  {quote === x.commitment_id && <p className="quote">“{x.quote}”</p>}
+                </>}
               </div>))}
           </> : <Empty what="The scorecard of what management promised" />}
         </Mod>

@@ -3,8 +3,8 @@ import { useEffect, useRef, useState } from "react";
 
 export interface Annual { fy: string; revenue: number | null; op_profit: number | null; pat: number | null; opm: number | null; npm: number | null; cfo: number | null; fcf: number | null;
   debt: number | null; net_worth: number | null; de: number | null; roe: number | null; roce: number | null; roa: number | null;
-  debtor_days?: number | null; inventory_days?: number | null; payable_days?: number | null; cycle_days?: number | null; net_debt_ebitda?: number | null }
-export interface Fundamentals { ok: boolean; lender: boolean; last_fy: string; basis: string; annual: Annual[];
+  cogs?: number | null; days_basis?: "cost" | "revenue"; debtor_days?: number | null; inventory_days?: number | null; payable_days?: number | null; cycle_days?: number | null; net_debt_ebitda?: number | null }
+export interface Fundamentals { ok: boolean; lender: boolean; last_fy: string; basis: string; days_basis?: "cost" | "revenue"; annual: Annual[];
   quarters: { period: string; revenue: number | null; pat: number | null; opm: number | null; revenue_yoy: number | null; pat_yoy: number | null }[];
   metrics: Record<string, number | string | null>; formulas: Record<string, string> }
 export interface Commitment { id: string; source: string; metric: string; target: string; horizon?: string; quote: string; speaker?: string }

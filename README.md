@@ -11,10 +11,12 @@ A mobile-first investment agent for a 20-stock NSE portfolio. It tells you what 
 - **What matters.** A full card per event.
   - *Results* are read from the company's XBRL filing: Revenue, EBITDA, PBT and PAT against last quarter and the same quarter last year, with margins. For lenders and banks, EBITDA is replaced by net interest income and pre-provision profit. The card states how many of the filing's own accounting identities hold.
   - *Management changes* name the person, their role and their stated background, then show the strongest route to them through your network.
-  - *Everything else* shows the amount at stake against the company's regulatory materiality line.
+  - *Everything else* shows the amount at stake against the company's regulatory materiality line, and for scale against its market value and operating cash flow.
+  - A filing that landed during trading hours shows what the price and volume did in the next half hour.
   - Each card ends with who to call, and a "why it ranks" panel that adds up the evidence.
 - **Worth a glance.** One line per event. A green dot means you know someone relevant.
 - **Set aside.** Known paperwork, collapsed into counts.
+- **The close.** Once the session is over: what your stocks did against the NIFTY and how much of that was beyond their market exposure, which stocks had a tail day and what was filed, whether index volatility is calm or elevated, each sector against the NIFTY, and the last completed session of ten world indices as daily candles. Where a move is rare (1 in 10 sessions or rarer) and touches something you hold, it ends with a person: "Bank stocks beat the NIFTY by 1.0%, a gap seen 1 in 21 sessions; you hold HDFCBANK. Call…".
 - **Unusual moves.** Stock-days that crossed *your* thresholds (±X% or N× the 20-day average volume), each with how rare it is for that stock and which filing arrived that day. The threshold sheet shows how many alerts a week your setting would have produced over the past year, so you choose a line knowing its cost.
 
 **Ask (pull).** One box, asked the way you would ask a colleague, typed or spoken.
@@ -41,9 +43,14 @@ Each number on screen has a derivation. The short version:
 | Quantity | How it is obtained |
 |---|---|
 | Abnormal return | `e = r - (a + b·m)`, market model fitted on the trailing 250 sessions, out of sample |
-| "Unusual" | Empirical tail frequency in the stock's own last 500 sessions: `p = (1 + #{days at least this extreme}) / (1 + n)`. No normality assumed; reads as "1 in N days" |
-| Category weight | Event study on 11,120 stock-sessions of this portfolio. Ridge-penalised logistic regression of "the market noticed" on which categories were filed that session, so co-filed categories do not share credit wrongly. Results days: 6.5× baseline (90% interval 5.5–7.6). Most other categories: indistinguishable from 1× |
+| Expected size of a move | `s_t`, GARCH(1,1) conditional volatility of `e`, forecast from data up to the previous close and re-estimated every 21 sessions |
+| "Unusual" | Empirical tail frequency of `z = e / s_t` in the stock's own last 500 sessions: `p = (1 + #{days at least this extreme}) / (1 + n)`. No normality assumed; reads as "1 in N days, for the state the stock is in" |
+| Category weight | Event study on 18,402 stock-sessions of this portfolio (five years). Ridge-penalised logistic regression of "the market noticed" on which categories were filed that session, so co-filed categories do not share credit wrongly. Results days: 5.8× baseline (90% interval 5.2–6.6). Most other categories: indistinguishable from 1× |
 | Size | `rho = amount / SEBI materiality line`. The line is Regulation 30(4)(i)(c): the lowest of 2% of turnover, 2% of net worth, 5% of three-year average profit. `rho = 1` is pinned to the "what matters" cut-off |
+| Scale | `amount / market value` and `amount / 3-year average cash from operations`. Shown beside the SEBI ratio; weight 0 in the score |
+| Reaction at the timestamp | `VWAP(30 min after) / VWAP(session before) − 1` from 5-minute bars, and volume against the same window on other days; rarity against every anchor within an hour of that time of day over ~60 sessions. Weight 0 in the score |
+| Portfolio alpha | Mean market-model residual of the holdings (equal weight), with its own tail frequency |
+| Sector rotation | Spearman rank correlation, across nine sector indices, between today's return against the NIFTY and the previous 20 sessions' |
 | The tape | A tail session multiplies an event's odds by `1 + r·(LR − 1)`, where `r` is that event's share of the session's prior odds. The likeliest cause takes the credit; paperwork filed the same day takes almost none |
 | Results | XBRL facts, with four identities checked (income = revenue + other income; PBT = income − expenses; and so on). 20 of 20 portfolio companies pass 4 of 4 |
 | Tie strength | `s = c · 2^(−months/36)`, c from the investor's own closeness rating |
@@ -51,6 +58,8 @@ Each number on screen has a derivation. The short version:
 | Ask | Token similarity `1 − d/len` (Damerau-Levenshtein); concept weights fade by 0.7 per supply-chain link; a person's relevance is `1 − e^(−Σ match·years·seniority·freshness / 6)`, the same form as the expertise map |
 | Who to call | `score = tie × knowledge`, knowledge = relation × freshness × depth × seniority × fit, combined across roles |
 | Promised vs delivered | Quantified full-year commitments on revenue growth and margins are adjudicated in code against reported numbers; the model judges only what code cannot |
+
+What volatility adjustment did and did not do, measured on the same 18,402 sessions. With raw residuals the alert rate drifted with the market's mood: 3.9% of stock-days in the calmer half of sessions and 5.4% in the most turbulent tenth. With `z` it is 5.0% and 5.1%, which is what a 5% line should do. It mostly restores sensitivity in quiet markets; it does not thin out alerts on the day of a market-wide shock (10% of stock-days either way), because no model forecasts volatility for a day whose news has not happened yet.
 
 One honest finding from the event study: apart from results, the *category* of a filing says little about whether it matters. A litigation filing is as likely to be a ₹2 lakh GST notice as a ₹2,000 crore demand. That is why the score leans on what is inside the document (size against the materiality line, the seniority of the person) and not on the label. I also tested whether finer traits (top-role changes, order wins) had a measurable market effect; with 22 top-role changes in three years the standard error was too large to say, so role tiers are stated judgment, and labelled as such in the code.
 
@@ -82,10 +91,12 @@ One honest finding from the event study: apart from results, the *category* of a
 
 ### Data pipelines
 
-- **Prices and volume.** Three years of daily history per stock from Yahoo's chart endpoint; the latest sessions are overwritten from the NSE bhavcopy, the exchange's own end-of-day file.
+- **Prices and volume.** Five years of daily history per stock from Yahoo's chart endpoint; the latest sessions are overwritten from the NSE bhavcopy, the exchange's own end-of-day file.
+- **Indices.** NIFTY and sector history from Yahoo; the latest sessions from the exchange's own index-close file, because Yahoo's daily index bar can lag a session. World indices from Yahoo, each at its last completed session: a market still trading when the job runs is shown at its previous close.
+- **Intraday.** About 60 sessions of 5-minute bars per stock from Yahoo, read in the batch run. Delayed data, used only to time the reaction to a filing after the fact.
 - **Filings.** NSE's corporate-announcements endpoint per symbol. A filing made after 15:30, or on a holiday, is assigned to the next trading session, because that is when the market could first react.
 - **Results.** NSE's integrated-filing index gives the XBRL instance for each quarter. QoQ and YoY each come from that quarter's own filing.
-- **Fundamentals.** screener.in for standardised statement lines and for links to annual reports and transcripts (BSE-hosted PDFs). Screener's ratios are not used; ours are recomputed.
+- **Fundamentals.** screener.in for standardised statement lines, its expense schedule for product cost, and for links to annual reports and transcripts (BSE-hosted PDFs). Screener's ratios are not used; ours are recomputed.
 - **Profiles.** People named in filings come from the filing's own text. The investor's contacts are synthetic (see below).
 - **Linking.** Organisations resolve through an alias table after stripping legal suffixes. People match when surnames are equal and the remaining name parts are compatible (an initial matches a full name); a name-only match is "possible" and becomes "confirmed" only with a shared organisation.
 - **Access.** Every request sends an honest User-Agent, is rate-limited per host and cached on disk. BSE's JSON API refuses automated clients, so it is not used. Nothing bypasses a bot check.
@@ -132,16 +143,25 @@ There is no free-roaming agent. The pipeline is a fixed sequence in which each s
 - **Network on the device.** The cost: no server-side push notification can mention a contact, and a new phone starts empty until sync exists.
 - **Python for data, TypeScript for the network.** Each lives where it runs. The cost is two languages.
 - **Static JSON for push.** The Brief opens instantly and costs nothing per view. The cost is a two-hour refresh, not real time.
-- **Sales as the denominator for all three working-capital days**, so they add up to one cycle figure. Purists would use cost of goods for inventory and payables; screener's standardised lines do not carry it.
+- **Cost of goods for inventory and payable days, revenue for receivable days.** Cost of goods is revenue × the product-cost share of the expense schedule, which is published in whole percentage points, so it carries up to half a point of sales in rounding (under 1% for a manufacturer). The exact figure sits in the annual XBRL; ten years of it would be a second pipeline. Companies with no product cost (services, platforms) stay on revenue, and the page says which basis it used.
+- **Evidence without a weight.** The half-hour reaction and the market-value scale are shown in "why it ranks" at +0.0. Sixty sessions of intraday data cannot calibrate a coefficient, and an uncalibrated one would be an opinion.
 
 ## Deliberately left out
 
 - OS push notifications (needs a push service and stored subscriptions; thresholds and tiers are ready for it).
-- Intraday prices. The brief asks for end of day.
+- A live tick feed. Exchange tick data is licensed, and a static site refreshed every two hours has nowhere to hold a socket. Intraday bars are read after the fact instead.
 - Accounts and sync.
 - Investor presentations as a research source: they are management's framing; commitments go on record in calls and reports.
 - News and broker views on the pull side, by the brief's rule.
 - Scraping LinkedIn.
+
+## Considered and not built
+
+- **A size, value and momentum factor model.** There is no free daily series of Indian factor returns, and the obvious stand-ins fail: Yahoo carries no history for the NSE momentum and value indices, and a sector index is contaminated by its own largest member (HDFC Bank is over a quarter of NIFTY Bank), so regressing on it would absorb the very shock being measured. The market model is already rolling and out of sample.
+- **A hidden Markov regime model.** GARCH already conditions every alert on the volatility state, and the measurement above shows the alert rate is flat across regimes after it. A second regime layer on the same returns would count the same thing twice.
+- **A two-tower contrastive network for promised against delivered.** It needs thousands of labelled guidance-outcome pairs to train; there are a few dozen commitments per company. A cosine threshold between a sentence and a number is also harder to audit than what is here: quantified commitments are adjudicated by arithmetic and shown beside management's verbatim words, and only the rest go to a model.
+- **A discounted cash flow sensitivity as the materiality measure.** It would need a forecast, a discount rate and a terminal value per company, none of which can be derived. The regulator's line stays as the pinned threshold; market value and cash flow give the scale without a forecast.
+- **"Semantic delta" of the day's announcements.** No definition of it could be checked against anything.
 
 ## Where next
 
@@ -149,7 +169,8 @@ There is no free-roaming agent. The pipeline is a fixed sequence in which each s
 - Measure the role and size terms once there is enough history (a wider universe than 20 stocks).
 - Import adapters for the investor's own data exports; encrypted sync.
 - A meeting log: after a call, one line of what you learned, attached to the company and the person.
-- Route alerts through the network: "Dixon moved 9% and you last spoke to its largest customer's sourcing head in October."
+- Calibrate the half-hour reaction into the score once a longer intraday history is held (it needs a licensed source).
+- Position sizes, so "the portfolio" is weighted and not an equal-weight average.
 
 ## Run it
 
@@ -159,6 +180,7 @@ npm ci
 cp .env.example .env.local                     # add GEMINI_API_KEY (free)
 
 set -a; . ./.env.local; set +a
+python -m finn.materiality                     # refit the event study (data/materiality.json)
 python -m finn.digest 35                       # builds public/data/digest.json; log on stdout
 python -m finn.research.dossier KAYNES PIIND   # precompute research dossiers
 python -m finn.server &                        # local stand-in for the serverless function
@@ -176,12 +198,14 @@ Without a key the digest still builds from rules, XBRL and local document readin
 finn/                    Python: everything that touches public data
   http.py                polite cached client
   sources/               nse.py · prices.py · screener.py
-  stats.py               abnormal returns, tail probabilities, ridge logistic
+  stats.py               abnormal returns, GARCH volatility, tail probabilities, ridge logistic
   materiality.py         the event study
   taxonomy.py            categories and rules
   results.py             XBRL results and identity checks
   docs.py                PDF text and OCR
   enrich.py              titles, amounts, people, facts (verified extraction)
+  intraday.py            the half hour after a filing, from 5-minute bars
+  close.py               the close: portfolio alpha, regime, sectors, world indices
   digest.py              the push pipeline and score
   llm.py                 Gemini routing, cache, fallback
   research/              fundamentals.py · documents.py · synthesis.py · dossier.py

@@ -92,7 +92,7 @@ h1, h2, h3, p { margin: 0; }
 /* why it ranks */
 .foot { display: flex; align-items: center; justify-content: space-between; margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--rule); font-size: 12.5px; color: var(--ink-2); }
 .foot button, .link { color: var(--ink-2); text-decoration: underline; text-decoration-color: var(--rule); text-underline-offset: 3px; }
-.ev { margin-top: 10px; display: grid; gap: 8px; }
+.ev { margin-top: 10px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; }
 .ev .line { display: grid; grid-template-columns: 46px 1fr; gap: 10px; font-size: 12.5px; color: var(--ink-2); align-items: start; }
 .ev .d { font: 600 12px/1.5 var(--mono); text-align: right; color: var(--ink); }
 .rho { height: 6px; border-radius: 3px; background: var(--wash); position: relative; margin-top: 8px; }
@@ -188,3 +188,15 @@ h1, h2, h3, p { margin: 0; }
 .readout .lab { font-weight: 600; } .readout i { display: inline-block; width: 8px; height: 8px; border-radius: 2px; margin-right: 4px; }
 .score { display: flex; height: 26px; border-radius: 8px; overflow: hidden; gap: 2px; } .score button { color: #fff; font: 600 11.5px/26px var(--sans); text-align: center; min-width: 26px; opacity: 0.35; } .score button.on { opacity: 1; }
 .two { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; } .pane { border-radius: 11px; padding: 10px 11px; font-size: 13.5px; } .pane p + p { margin-top: 8px; }
+
+/* the close */
+.closing { font: 400 16.5px/1.38 var(--serif); } .closing b { font-weight: 600; }
+.regime { padding: 3px 8px; border-radius: 999px; background: var(--wash); color: var(--ink-2); }
+.regime.elevated { background: var(--matter-wash); color: var(--matter); } .regime.stressed { background: color-mix(in srgb, var(--down) 14%, transparent); color: var(--down); }
+.sectors { display: grid; gap: 5px; margin-top: 8px; }
+.sector { display: grid; grid-template-columns: minmax(0, 1.3fr) 1fr 52px; gap: 8px; align-items: center; } .sector > :last-child { text-align: right; }
+.track { position: relative; height: 8px; border-radius: 4px; background: var(--wash); }
+.track::after { content: ""; position: absolute; left: 50%; top: -2px; bottom: -2px; width: 1px; background: var(--ink-3); }
+.track i { position: absolute; top: 0; bottom: 0; } .track i.pos { left: 50%; background: var(--up); border-radius: 0 4px 4px 0; } .track i.neg { right: 50%; background: var(--down); border-radius: 4px 0 0 4px; }
+.world { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
+.candles { width: 100%; height: 54px; display: block; margin: 6px 0 4px; }

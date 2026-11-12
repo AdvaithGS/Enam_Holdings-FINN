@@ -119,4 +119,6 @@ def company(symbol: str, ttl: float = DAY) -> dict | None:
     if cid:
         for parent in ("Other Assets", "Other Liabilities", "Borrowings"):
             out["schedules"][parent] = _schedule(cid, parent, "balance-sheet", consolidated)
+        # cost lines as a share of sales: the only place the statement splits "Expenses"
+        out["schedules"]["Expenses"] = _schedule(cid, "Expenses", "profit-loss", consolidated)
     return out
