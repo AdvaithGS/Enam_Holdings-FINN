@@ -1,0 +1,4 @@
+{
+  "regions": ["bom1"],
+  "functions": { "api/research.py": { "maxDuration": 60, "excludeFiles": "{node_modules,.next,data/cache/http,public}/**" } }
+}

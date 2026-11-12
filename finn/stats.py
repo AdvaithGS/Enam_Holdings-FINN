@@ -17,14 +17,17 @@ from __future__ import annotations
 
 import math
 
-import numpy as np
+try:  # the serverless research path needs only the scalar helpers below
+    import numpy as np
+except ImportError:  # pragma: no cover
+    np = None
 
 BETA_WINDOW = 250      # sessions used to fit the market model
 RARITY_WINDOW = 500    # sessions that define "normal" for a stock
 VOL_WINDOW = 20
 
 
-def log_returns(prices: np.ndarray) -> np.ndarray:
+def log_returns(prices):
     out = np.full(len(prices), np.nan)
     out[1:] = np.log(prices[1:] / prices[:-1])
     return out

@@ -1,0 +1,2131 @@
+{
+ "synthetic": true,
+ "me": {
+  "id": "me",
+  "name": "You",
+  "headline": "Portfolio manager, Northlight Capital",
+  "roles": [
+   {
+    "org": "kotakie",
+    "title": "Research analyst",
+    "from": 2010,
+    "to": 2014,
+    "fn": "investing",
+    "level": 3
+   },
+   {
+    "org": "northlight",
+    "title": "Portfolio manager",
+    "from": 2014,
+    "to": null,
+    "fn": "investing",
+    "level": 1
+   }
+  ],
+  "education": [
+   {
+    "school": "IIT Kanpur",
+    "degree": "B.Tech",
+    "to": 2006
+   },
+   {
+    "school": "IIM Ahmedabad",
+    "degree": "PGP",
+    "to": 2010
+   }
+  ]
+ },
+ "contacts": [
+  {
+   "id": "c01",
+   "name": "Rhea Kapadia",
+   "headline": "Chief merchant, Aditya Birla Fashion",
+   "city": "Mumbai",
+   "roles": [
+    {
+     "org": "trent",
+     "title": "Head of Merchandising, Westside",
+     "from": 2013,
+     "to": 2021,
+     "fn": "sales",
+     "level": 2
+    },
+    {
+     "org": "abfrl",
+     "title": "Chief Merchandising Officer",
+     "from": 2021,
+     "to": null,
+     "fn": "sales",
+     "level": 1
+    }
+   ],
+   "education": [
+    {
+     "school": "XLRI Jamshedpur",
+     "degree": "PGDM",
+     "to": 2008
+    }
+   ],
+   "tie": {
+    "closeness": 2,
+    "how": "Met at a retail conference; three channel checks since",
+    "since": 2019,
+    "last": "2025-01",
+    "note": "Knows Trent's sourcing and store-opening playbook from the inside."
+   }
+  },
+  {
+   "id": "c02",
+   "name": "Vikram Desai",
+   "headline": "Operating partner; ex-Tata Sons group strategy",
+   "city": "Mumbai",
+   "roles": [
+    {
+     "org": "tatasons",
+     "title": "Vice President, Group Strategy",
+     "from": 2010,
+     "to": 2018,
+     "fn": "strategy",
+     "level": 2
+    },
+    {
+     "org": "mckinsey",
+     "title": "Engagement manager",
+     "from": 2005,
+     "to": 2010,
+     "fn": "strategy",
+     "level": 3
+    }
+   ],
+   "education": [
+    {
+     "school": "IIM Ahmedabad",
+     "degree": "PGP",
+     "to": 2005
+    }
+   ],
+   "tie": {
+    "closeness": 3,
+    "how": "Mentor since your first year on the buy side",
+    "since": 2012,
+    "last": "2026-08",
+    "note": "Sat in on Tata retail capital-allocation reviews."
+   }
+  },
+  {
+   "id": "c03",
+   "name": "Sandeep Kulkarni",
+   "headline": "Sales director, Birla Opus",
+   "city": "Pune",
+   "roles": [
+    {
+     "org": "asianpaint",
+     "title": "Regional Sales Manager, West",
+     "from": 2008,
+     "to": 2019,
+     "fn": "sales",
+     "level": 3
+    },
+    {
+     "org": "birlaopus",
+     "title": "Director, Sales",
+     "from": 2022,
+     "to": null,
+     "fn": "sales",
+     "level": 2
+    },
+    {
+     "org": "berger",
+     "title": "GM Sales",
+     "from": 2019,
+     "to": 2022,
+     "fn": "sales",
+     "level": 2
+    }
+   ],
+   "education": [
+    {
+     "school": "IIM Bangalore",
+     "degree": "PGP",
+     "to": 2008
+    }
+   ],
+   "tie": {
+    "closeness": 2,
+    "how": "Dealer-channel checks on paints",
+    "since": 2020,
+    "last": "2026-05",
+    "note": "Has worked all three: Asian Paints, Berger, Birla Opus."
+   }
+  },
+  {
+   "id": "c04",
+   "name": "Anitha Rao",
+   "headline": "Operations advisor; ex-Kaynes",
+   "city": "Mysuru",
+   "roles": [
+    {
+     "org": "kaynes",
+     "title": "VP Operations",
+     "from": 2016,
+     "to": 2023,
+     "fn": "operations",
+     "level": 2
+    },
+    {
+     "org": "tataelectronics",
+     "title": "Advisor, OSAT ramp",
+     "from": 2023,
+     "to": null,
+     "fn": "operations",
+     "level": 2
+    }
+   ],
+   "education": [
+    {
+     "school": "IIT Madras",
+     "degree": "M.Tech",
+     "to": 2001
+    }
+   ],
+   "tie": {
+    "closeness": 2,
+    "how": "Plant visit to Kaynes Mysuru in 2021",
+    "since": 2021,
+    "last": "2025-09",
+    "note": "Ran the Mysuru plant through the IPO years; knows the working-capital cycle."
+   }
+  },
+  {
+   "id": "c05",
+   "name": "Karthik Subramanian",
+   "headline": "CFO, Syrma SGS",
+   "city": "Chennai",
+   "roles": [
+    {
+     "org": "syrma",
+     "title": "Chief Financial Officer",
+     "from": 2020,
+     "to": null,
+     "fn": "finance",
+     "level": 1
+    },
+    {
+     "org": "dixon",
+     "title": "Financial Controller",
+     "from": 2014,
+     "to": 2020,
+     "fn": "finance",
+     "level": 2
+    }
+   ],
+   "education": [
+    {
+     "school": "ICAI",
+     "degree": "CA",
+     "to": 2006
+    }
+   ],
+   "tie": {
+    "closeness": 2,
+    "how": "Introduced by a common auditor friend",
+    "since": 2021,
+    "last": "2026-06",
+    "note": "Sees EMS pricing and customer credit terms across the sector."
+   }
+  },
+  {
+   "id": "c06",
+   "name": "Deepa Nair",
+   "headline": "Programme lead, Tata Electronics",
+   "city": "Bengaluru",
+   "roles": [
+    {
+     "org": "tataelectronics",
+     "title": "Programme Lead, Semiconductor Assembly",
+     "from": 2022,
+     "to": null,
+     "fn": "technology",
+     "level": 2
+    },
+    {
+     "org": "micron",
+     "title": "Senior Process Engineer",
+     "from": 2015,
+     "to": 2022,
+     "fn": "technology",
+     "level": 3
+    }
+   ],
+   "education": [
+    {
+     "school": "IIT Kanpur",
+     "degree": "B.Tech",
+     "to": 2007
+    }
+   ],
+   "tie": {
+    "closeness": 2,
+    "how": "IIT Kanpur, a year junior; same hall",
+    "since": 2003,
+    "last": "2026-02",
+    "note": "Hands-on with OSAT yields and tool lead times."
+   }
+  },
+  {
+   "id": "c07",
+   "name": "Rohan Bhatia",
+   "headline": "Director of supply chain, Micron India",
+   "city": "Ahmedabad",
+   "roles": [
+    {
+     "org": "micron",
+     "title": "Director, Supply Chain",
+     "from": 2021,
+     "to": null,
+     "fn": "operations",
+     "level": 2
+    },
+    {
+     "org": "samsung",
+     "title": "Senior Manager, Sourcing",
+     "from": 2013,
+     "to": 2021,
+     "fn": "operations",
+     "level": 3
+    }
+   ],
+   "education": [
+    {
+     "school": "BITS Pilani",
+     "degree": "B.E.",
+     "to": 2009
+    },
+    {
+     "school": "ISB Hyderabad",
+     "degree": "PGP",
+     "to": 2013
+    }
+   ],
+   "tie": {
+    "closeness": 1,
+    "how": "Panel together at a semiconductor forum",
+    "since": 2024,
+    "last": "2025-12"
+   }
+  },
+  {
+   "id": "c08",
+   "name": "Suresh Gowda",
+   "headline": "Business head (South), Fusion Finance",
+   "city": "Bengaluru",
+   "roles": [
+    {
+     "org": "creditacc",
+     "title": "Regional Head, Karnataka",
+     "from": 2012,
+     "to": 2020,
+     "fn": "sales",
+     "level": 2
+    },
+    {
+     "org": "fusion",
+     "title": "Business Head, South",
+     "from": 2020,
+     "to": null,
+     "fn": "sales",
+     "level": 2
+    }
+   ],
+   "education": [],
+   "tie": {
+    "closeness": 2,
+    "how": "Field trip to Karnataka branches in 2018",
+    "since": 2018,
+    "last": "2024-11",
+    "note": "Reads borrower stress in Karnataka a quarter before it shows in filings."
+   }
+  },
+  {
+   "id": "c09",
+   "name": "Farah Sheikh",
+   "headline": "Deputy general manager, NABARD",
+   "city": "Mumbai",
+   "roles": [
+    {
+     "org": "nabard",
+     "title": "Deputy General Manager, Microfinance",
+     "from": 2011,
+     "to": null,
+     "fn": "risk",
+     "level": 2
+    }
+   ],
+   "education": [
+    {
+     "school": "SRCC Delhi",
+     "degree": "B.Com",
+     "to": 2004
+    }
+   ],
+   "tie": {
+    "closeness": 1,
+    "how": "Met at an RBI financial-inclusion roundtable",
+    "since": 2023,
+    "last": "2026-03"
+   }
+  },
+  {
+   "id": "c10",
+   "name": "Manoj Tiwari",
+   "headline": "Head of MFI lending, HDFC Bank",
+   "city": "Mumbai",
+   "roles": [
+    {
+     "org": "hdfcbank",
+     "title": "Head, Microfinance Institution Lending",
+     "from": 2017,
+     "to": null,
+     "fn": "risk",
+     "level": 2
+    },
+    {
+     "org": "icici",
+     "title": "Credit Manager",
+     "from": 2009,
+     "to": 2017,
+     "fn": "risk",
+     "level": 3
+    }
+   ],
+   "education": [
+    {
+     "school": "IIM Ahmedabad",
+     "degree": "PGP",
+     "to": 2009
+    }
+   ],
+   "tie": {
+    "closeness": 2,
+    "how": "IIM-A, a batch senior",
+    "since": 2008,
+    "last": "2026-07",
+    "note": "Decides how much banks lend to microfinance companies."
+   }
+  },
+  {
+   "id": "c11",
+   "name": "Hemant Joshi",
+   "headline": "Consultant; ex-SRF plant head",
+   "city": "Vadodara",
+   "roles": [
+    {
+     "org": "srf",
+     "title": "Plant Head, Fluorochemicals, Dahej",
+     "from": 2005,
+     "to": 2019,
+     "fn": "operations",
+     "level": 2
+    },
+    {
+     "org": "navin",
+     "title": "Technical Advisor",
+     "from": 2019,
+     "to": 2023,
+     "fn": "operations",
+     "level": 2
+    }
+   ],
+   "education": [
+    {
+     "school": "ICT Mumbai",
+     "degree": "B.Chem.Engg",
+     "to": 1996
+    }
+   ],
+   "tie": {
+    "closeness": 2,
+    "how": "Expert call in 2020; kept in touch",
+    "since": 2020,
+    "last": "2025-03",
+    "note": "Knows refrigerant-gas economics and what a capex announcement really takes to commission."
+   }
+  },
+  {
+   "id": "c12",
+   "name": "Priya Venkataraman",
+   "headline": "Head of procurement, PI Industries",
+   "city": "Gurugram",
+   "roles": [
+    {
+     "org": "piind",
+     "title": "Head, Strategic Procurement",
+     "from": 2018,
+     "to": null,
+     "fn": "operations",
+     "level": 2
+    },
+    {
+     "org": "upl",
+     "title": "Sourcing Manager",
+     "from": 2010,
+     "to": 2018,
+     "fn": "operations",
+     "level": 3
+    }
+   ],
+   "education": [
+    {
+     "school": "ICT Mumbai",
+     "degree": "B.Tech",
+     "to": 2006
+    },
+    {
+     "school": "IIM Bangalore",
+     "degree": "PGP",
+     "to": 2010
+    }
+   ],
+   "tie": {
+    "closeness": 2,
+    "how": "Introduced by Shruti",
+    "since": 2022,
+    "last": "2026-09",
+    "note": "Buys intermediates from SRF and Deepak Nitrite; sees their pricing first."
+   }
+  },
+  {
+   "id": "c13",
+   "name": "Nikhil Shah",
+   "headline": "CFO, Aarti Industries",
+   "city": "Mumbai",
+   "roles": [
+    {
+     "org": "aarti",
+     "title": "Chief Financial Officer",
+     "from": 2021,
+     "to": null,
+     "fn": "finance",
+     "level": 1
+    },
+    {
+     "org": "navin",
+     "title": "Head of Finance",
+     "from": 2014,
+     "to": 2021,
+     "fn": "finance",
+     "level": 2
+    }
+   ],
+   "education": [
+    {
+     "school": "ICAI",
+     "degree": "CA",
+     "to": 2005
+    }
+   ],
+   "tie": {
+    "closeness": 1,
+    "how": "Investor day conversation",
+    "since": 2023,
+    "last": "2026-01"
+   }
+  },
+  {
+   "id": "c14",
+   "name": "Gaurav Sethi",
+   "headline": "Sourcing head, Samsung India",
+   "city": "Noida",
+   "roles": [
+    {
+     "org": "samsung",
+     "title": "Head, Contract Manufacturing",
+     "from": 2018,
+     "to": null,
+     "fn": "operations",
+     "level": 2
+    },
+    {
+     "org": "dixon",
+     "title": "Key Account Manager",
+     "from": 2012,
+     "to": 2018,
+     "fn": "sales",
+     "level": 3
+    }
+   ],
+   "education": [
+    {
+     "school": "IIT Kanpur",
+     "degree": "B.Tech",
+     "to": 2006
+    }
+   ],
+   "tie": {
+    "closeness": 3,
+    "how": "IIT Kanpur batchmate",
+    "since": 2002,
+    "last": "2026-10",
+    "note": "On the customer side of Dixon's largest contracts."
+   }
+  },
+  {
+   "id": "c15",
+   "name": "Meera Iyer",
+   "headline": "Chief credit officer (retail), ICICI Bank",
+   "city": "Mumbai",
+   "roles": [
+    {
+     "org": "hdfcbank",
+     "title": "Senior VP, Retail Credit Risk",
+     "from": 2009,
+     "to": 2020,
+     "fn": "risk",
+     "level": 2
+    },
+    {
+     "org": "icici",
+     "title": "Chief Credit Officer, Retail",
+     "from": 2020,
+     "to": null,
+     "fn": "risk",
+     "level": 1
+    }
+   ],
+   "education": [
+    {
+     "school": "IIM Ahmedabad",
+     "degree": "PGP",
+     "to": 2009
+    }
+   ],
+   "tie": {
+    "closeness": 2,
+    "how": "IIM-A alumni circle",
+    "since": 2011,
+    "last": "2025-06",
+    "note": "Built HDFC Bank's unsecured-loan scorecards."
+   }
+  },
+  {
+   "id": "c16",
+   "name": "Aditya Pandey",
+   "headline": "Founder, a collections-analytics startup",
+   "city": "Pune",
+   "roles": [
+    {
+     "org": "bajfinance",
+     "title": "National Head, Collections Analytics",
+     "from": 2015,
+     "to": 2022,
+     "fn": "risk",
+     "level": 2
+    }
+   ],
+   "education": [
+    {
+     "school": "IIT Bombay",
+     "degree": "B.Tech",
+     "to": 2010
+    }
+   ],
+   "tie": {
+    "closeness": 1,
+    "how": "Pitched his startup to you",
+    "since": 2023,
+    "last": "2026-04"
+   }
+  },
+  {
+   "id": "c17",
+   "name": "Tanvi Agarwal",
+   "headline": "Category head, Reliance Retail",
+   "city": "Mumbai",
+   "roles": [
+    {
+     "org": "relianceretail",
+     "title": "Category Head, Fashion & Lifestyle",
+     "from": 2019,
+     "to": null,
+     "fn": "sales",
+     "level": 2
+    },
+    {
+     "org": "trent",
+     "title": "Buyer, Zudio",
+     "from": 2015,
+     "to": 2019,
+     "fn": "sales",
+     "level": 3
+    }
+   ],
+   "education": [
+    {
+     "school": "IIM Ahmedabad",
+     "degree": "PGP",
+     "to": 2010
+    }
+   ],
+   "tie": {
+    "closeness": 3,
+    "how": "IIM-A batchmate, same section",
+    "since": 2008,
+    "last": "2026-10",
+    "note": "Was on the founding buying team at Zudio."
+   }
+  },
+  {
+   "id": "c18",
+   "name": "Imran Qureshi",
+   "headline": "Finance director, Bharti Airtel",
+   "city": "Gurugram",
+   "roles": [
+    {
+     "org": "jio",
+     "title": "General Manager, Finance",
+     "from": 2016,
+     "to": 2022,
+     "fn": "finance",
+     "level": 2
+    },
+    {
+     "org": "bharti",
+     "title": "Director, Business Finance",
+     "from": 2022,
+     "to": null,
+     "fn": "finance",
+     "level": 2
+    }
+   ],
+   "education": [
+    {
+     "school": "ICAI",
+     "degree": "CA",
+     "to": 2008
+    }
+   ],
+   "tie": {
+    "closeness": 2,
+    "how": "Ex-colleague's brother-in-law; two long lunches",
+    "since": 2021,
+    "last": "2025-02",
+    "note": "Worked on Jio's 2020 fund-raise numbers."
+   }
+  },
+  {
+   "id": "c19",
+   "name": "Kabir Malhotra",
+   "headline": "City GM, Swiggy Instamart",
+   "city": "Bengaluru",
+   "roles": [
+    {
+     "org": "eternal",
+     "title": "City Head, Bengaluru",
+     "from": 2018,
+     "to": 2022,
+     "fn": "operations",
+     "level": 3
+    },
+    {
+     "org": "swiggy",
+     "title": "General Manager, Instamart",
+     "from": 2022,
+     "to": null,
+     "fn": "operations",
+     "level": 2
+    }
+   ],
+   "education": [
+    {
+     "school": "ISB Hyderabad",
+     "degree": "PGP",
+     "to": 2018
+    }
+   ],
+   "tie": {
+    "closeness": 1,
+    "how": "Quick-commerce dark-store visit",
+    "since": 2024,
+    "last": "2026-06"
+   }
+  },
+  {
+   "id": "c20",
+   "name": "Sneha Reddy",
+   "headline": "Compliance lead, PhonePe",
+   "city": "Bengaluru",
+   "roles": [
+    {
+     "org": "paytm",
+     "title": "AVP, Payments Compliance",
+     "from": 2017,
+     "to": 2023,
+     "fn": "legal",
+     "level": 2
+    },
+    {
+     "org": "phonepe",
+     "title": "Director, Regulatory Compliance",
+     "from": 2023,
+     "to": null,
+     "fn": "legal",
+     "level": 2
+    }
+   ],
+   "education": [],
+   "tie": {
+    "closeness": 2,
+    "how": "Helped you read the RBI order on Paytm Payments Bank",
+    "since": 2024,
+    "last": "2025-08",
+    "note": "Knows how regulator conversations at Paytm actually run."
+   }
+  },
+  {
+   "id": "c21",
+   "name": "Alok Banerjee",
+   "headline": "Regulatory consultant; ex-Sun Pharma",
+   "city": "Vadodara",
+   "roles": [
+    {
+     "org": "sunpharma",
+     "title": "Head, US Regulatory Affairs",
+     "from": 2008,
+     "to": 2021,
+     "fn": "legal",
+     "level": 2
+    },
+    {
+     "org": "drreddy",
+     "title": "Advisor, Quality",
+     "from": 2021,
+     "to": 2024,
+     "fn": "legal",
+     "level": 2
+    }
+   ],
+   "education": [],
+   "tie": {
+    "closeness": 2,
+    "how": "Expert call on a USFDA inspection",
+    "since": 2019,
+    "last": "2025-10",
+    "note": "Has sat through US FDA inspections at Halol."
+   }
+  },
+  {
+   "id": "c22",
+   "name": "Harpreet Sandhu",
+   "headline": "Key-account director, Motherson",
+   "city": "Gurugram",
+   "roles": [
+    {
+     "org": "motherson",
+     "title": "Director, Key Accounts (Maruti Suzuki)",
+     "from": 2014,
+     "to": null,
+     "fn": "sales",
+     "level": 2
+    }
+   ],
+   "education": [],
+   "tie": {
+    "closeness": 1,
+    "how": "Auto-ancillary conference",
+    "since": 2022,
+    "last": "2026-02"
+   }
+  },
+  {
+   "id": "c23",
+   "name": "Rajesh Pillai",
+   "headline": "Independent advisor; ex-L&T",
+   "city": "Chennai",
+   "roles": [
+    {
+     "org": "lt",
+     "title": "Project Director, Hydrocarbon",
+     "from": 2001,
+     "to": 2020,
+     "fn": "operations",
+     "level": 2
+    }
+   ],
+   "education": [],
+   "tie": {
+    "closeness": 2,
+    "how": "Your uncle's former colleague",
+    "since": 2015,
+    "last": "2025-11",
+    "note": "Knows how L&T books and executes Gulf orders."
+   }
+  },
+  {
+   "id": "c24",
+   "name": "Lakshmi Narayanan",
+   "headline": "Delivery head (BFSI), Infosys",
+   "city": "Bengaluru",
+   "roles": [
+    {
+     "org": "tcs",
+     "title": "Delivery Head, BFSI North America",
+     "from": 2006,
+     "to": 2019,
+     "fn": "technology",
+     "level": 2
+    },
+    {
+     "org": "infosys",
+     "title": "SVP, Financial Services",
+     "from": 2019,
+     "to": null,
+     "fn": "technology",
+     "level": 1
+    }
+   ],
+   "education": [],
+   "tie": {
+    "closeness": 1,
+    "how": "Sell-side hosted dinner",
+    "since": 2022,
+    "last": "2026-05"
+   }
+  },
+  {
+   "id": "c25",
+   "name": "Devika Menon",
+   "headline": "Marketing director, Hindustan Unilever",
+   "city": "Mumbai",
+   "roles": [
+    {
+     "org": "itc",
+     "title": "Brand Manager, Foods",
+     "from": 2011,
+     "to": 2017,
+     "fn": "sales",
+     "level": 3
+    },
+    {
+     "org": "hul",
+     "title": "Marketing Director, Foods",
+     "from": 2017,
+     "to": null,
+     "fn": "sales",
+     "level": 2
+    }
+   ],
+   "education": [
+    {
+     "school": "IIM Ahmedabad",
+     "degree": "PGP",
+     "to": 2011
+    }
+   ],
+   "tie": {
+    "closeness": 2,
+    "how": "IIM-A, a batch junior",
+    "since": 2010,
+    "last": "2026-09"
+   }
+  },
+  {
+   "id": "c26",
+   "name": "Sameer Khanna",
+   "headline": "Telecom consultant; ex-Airtel",
+   "city": "Gurugram",
+   "roles": [
+    {
+     "org": "bharti",
+     "title": "VP, Network Planning",
+     "from": 2009,
+     "to": 2021,
+     "fn": "technology",
+     "level": 2
+    }
+   ],
+   "education": [],
+   "tie": {
+    "closeness": 1,
+    "how": "Expert call on 5G capex",
+    "since": 2022,
+    "last": "2024-12"
+   }
+  },
+  {
+   "id": "c27",
+   "name": "Pooja Bansal",
+   "headline": "Merchandising head, Kalyan Jewellers",
+   "city": "Thrissur",
+   "roles": [
+    {
+     "org": "kalyan",
+     "title": "Head of Merchandising",
+     "from": 2019,
+     "to": null,
+     "fn": "sales",
+     "level": 2
+    },
+    {
+     "org": "titan",
+     "title": "Category Manager, Tanishq",
+     "from": 2012,
+     "to": 2019,
+     "fn": "sales",
+     "level": 3
+    }
+   ],
+   "education": [],
+   "tie": {
+    "closeness": 2,
+    "how": "Jewellery-channel checks every Akshaya Tritiya",
+    "since": 2020,
+    "last": "2026-04",
+    "note": "Tracks Tanishq's studded mix and gold-exchange schemes."
+   }
+  },
+  {
+   "id": "c28",
+   "name": "Ankit Jain",
+   "headline": "Fund manager, a domestic mutual fund",
+   "city": "Mumbai",
+   "roles": [
+    {
+     "org": "kotakie",
+     "title": "Research analyst",
+     "from": 2010,
+     "to": 2016,
+     "fn": "investing",
+     "level": 3
+    }
+   ],
+   "education": [
+    {
+     "school": "SRCC Delhi",
+     "degree": "B.Com",
+     "to": 2007
+    },
+    {
+     "school": "ICAI",
+     "degree": "CA",
+     "to": 2009
+    }
+   ],
+   "tie": {
+    "closeness": 3,
+    "how": "Shared a desk at Kotak for four years",
+    "since": 2010,
+    "last": "2026-11"
+   }
+  },
+  {
+   "id": "c29",
+   "name": "Shruti Deshpande",
+   "headline": "Partner, McKinsey (chemicals)",
+   "city": "Mumbai",
+   "roles": [
+    {
+     "org": "mckinsey",
+     "title": "Partner, Chemicals & Agriculture",
+     "from": 2010,
+     "to": null,
+     "fn": "strategy",
+     "level": 1
+    }
+   ],
+   "education": [
+    {
+     "school": "ICT Mumbai",
+     "degree": "B.Tech",
+     "to": 2006
+    },
+    {
+     "school": "IIM Ahmedabad",
+     "degree": "PGP",
+     "to": 2010
+    }
+   ],
+   "tie": {
+    "closeness": 3,
+    "how": "IIM-A batchmate",
+    "since": 2008,
+    "last": "2026-10",
+    "note": "Has advised most Indian specialty-chemical boards."
+   }
+  },
+  {
+   "id": "c30",
+   "name": "Varun Saxena",
+   "headline": "Director, CRISIL Ratings",
+   "city": "Mumbai",
+   "roles": [
+    {
+     "org": "crisil",
+     "title": "Director, Financial Sector Ratings",
+     "from": 2012,
+     "to": null,
+     "fn": "risk",
+     "level": 2
+    }
+   ],
+   "education": [
+    {
+     "school": "IIT Kanpur",
+     "degree": "B.Tech",
+     "to": 2006
+    }
+   ],
+   "tie": {
+    "closeness": 2,
+    "how": "IIT Kanpur batchmate",
+    "since": 2002,
+    "last": "2026-01",
+    "note": "Rates microfinance lenders and NBFCs."
+   }
+  },
+  {
+   "id": "c31",
+   "name": "Venkat Raman",
+   "headline": "Strategy head, Tube Investments",
+   "city": "Chennai",
+   "roles": [
+    {
+     "org": "tubeinv",
+     "title": "Head of Strategy & M&A",
+     "from": 2017,
+     "to": null,
+     "fn": "strategy",
+     "level": 2
+    },
+    {
+     "org": "cholafin",
+     "title": "Corporate Planning Manager",
+     "from": 2011,
+     "to": 2017,
+     "fn": "strategy",
+     "level": 3
+    }
+   ],
+   "education": [
+    {
+     "school": "IIM Bangalore",
+     "degree": "PGP",
+     "to": 2011
+    }
+   ],
+   "tie": {
+    "closeness": 1,
+    "how": "Met when Murugappa bought CG Power",
+    "since": 2021,
+    "last": "2025-05",
+    "note": "Worked on the CG Power turnaround plan."
+   }
+  },
+  {
+   "id": "c32",
+   "name": "Ishita Roy",
+   "headline": "Sales head, an industrial motors firm",
+   "city": "Kolkata",
+   "roles": [
+    {
+     "org": "cgpower",
+     "title": "National Sales Head, Motors",
+     "from": 2014,
+     "to": 2022,
+     "fn": "sales",
+     "level": 2
+    }
+   ],
+   "education": [],
+   "tie": {
+    "closeness": 1,
+    "how": "Channel check on industrial motors",
+    "since": 2023,
+    "last": "2026-03"
+   }
+  },
+  {
+   "id": "c33",
+   "name": "Ajay Thakur",
+   "headline": "Defence procurement advisor; retired Wing Commander",
+   "city": "New Delhi",
+   "roles": [
+    {
+     "org": "mod",
+     "title": "Wing Commander, UAV procurement",
+     "from": 2004,
+     "to": 2021,
+     "fn": "operations",
+     "level": 2
+    }
+   ],
+   "education": [],
+   "tie": {
+    "closeness": 1,
+    "how": "Introduced at a defence-tech demo day",
+    "since": 2024,
+    "last": "2026-07",
+    "note": "Ran UAV trials; knows what the forces actually order."
+   }
+  },
+  {
+   "id": "c34",
+   "name": "Nandini Krishnan",
+   "headline": "Independent director; ex-HDFC Bank treasurer",
+   "city": "Mumbai",
+   "roles": [
+    {
+     "org": "hdfcbank",
+     "title": "Group Head, Treasury",
+     "from": 2004,
+     "to": 2018,
+     "fn": "finance",
+     "level": 1
+    },
+    {
+     "org": "bandhan",
+     "title": "Independent Director",
+     "from": 2020,
+     "to": null,
+     "fn": "board",
+     "level": 1
+    }
+   ],
+   "education": [
+    {
+     "school": "IIM Ahmedabad",
+     "degree": "PGP",
+     "to": 1994
+    }
+   ],
+   "tie": {
+    "closeness": 2,
+    "how": "Family friend",
+    "since": 2009,
+    "last": "2026-06",
+    "note": "Sits on boards; reads management quality well."
+   }
+  }
+ ],
+ "orgs": [
+  {
+   "id": "reliance",
+   "name": "Reliance Industries",
+   "size": "large",
+   "themes": [
+    "energy"
+   ],
+   "ticker": "RELIANCE",
+   "group": "Reliance",
+   "aliases": [
+    "RIL"
+   ]
+  },
+  {
+   "id": "relianceretail",
+   "name": "Reliance Retail",
+   "size": "large",
+   "themes": [
+    "retail"
+   ],
+   "parent": "reliance",
+   "group": "Reliance",
+   "competitors": [
+    "trent",
+    "abfrl"
+   ],
+   "aliases": [
+    "Reliance Retail Ventures",
+    "Reliance Brands"
+   ]
+  },
+  {
+   "id": "jio",
+   "name": "Jio Platforms",
+   "size": "large",
+   "themes": [
+    "telecom"
+   ],
+   "parent": "reliance",
+   "group": "Reliance",
+   "competitors": [
+    "bharti"
+   ],
+   "aliases": [
+    "Reliance Jio",
+    "Reliance Jio Infocomm"
+   ]
+  },
+  {
+   "id": "hdfcbank",
+   "name": "HDFC Bank",
+   "size": "large",
+   "themes": [
+    "banking"
+   ],
+   "ticker": "HDFCBANK",
+   "competitors": [
+    "icici"
+   ]
+  },
+  {
+   "id": "tcs",
+   "name": "Tata Consultancy Services",
+   "size": "large",
+   "themes": [
+    "it-services"
+   ],
+   "ticker": "TCS",
+   "group": "Tata",
+   "competitors": [
+    "infosys"
+   ]
+  },
+  {
+   "id": "bharti",
+   "name": "Bharti Airtel",
+   "size": "large",
+   "themes": [
+    "telecom"
+   ],
+   "ticker": "BHARTIARTL",
+   "competitors": [
+    "jio"
+   ],
+   "aliases": [
+    "Airtel"
+   ]
+  },
+  {
+   "id": "itc",
+   "name": "ITC",
+   "size": "large",
+   "themes": [
+    "fmcg"
+   ],
+   "ticker": "ITC",
+   "competitors": [
+    "hul"
+   ]
+  },
+  {
+   "id": "lt",
+   "name": "Larsen & Toubro",
+   "size": "large",
+   "themes": [
+    "infrastructure"
+   ],
+   "ticker": "LT",
+   "aliases": [
+    "L&T",
+    "Larsen and Toubro"
+   ]
+  },
+  {
+   "id": "sunpharma",
+   "name": "Sun Pharma",
+   "size": "large",
+   "themes": [
+    "pharma"
+   ],
+   "ticker": "SUNPHARMA",
+   "competitors": [
+    "drreddy"
+   ],
+   "aliases": [
+    "Sun Pharmaceutical Industries"
+   ]
+  },
+  {
+   "id": "maruti",
+   "name": "Maruti Suzuki",
+   "size": "large",
+   "themes": [
+    "autos"
+   ],
+   "ticker": "MARUTI",
+   "suppliers": [
+    "motherson"
+   ],
+   "aliases": [
+    "Maruti Suzuki India"
+   ]
+  },
+  {
+   "id": "titan",
+   "name": "Titan",
+   "size": "large",
+   "themes": [
+    "jewellery",
+    "retail"
+   ],
+   "ticker": "TITAN",
+   "group": "Tata",
+   "competitors": [
+    "kalyan"
+   ],
+   "aliases": [
+    "Titan Company"
+   ]
+  },
+  {
+   "id": "bajfinance",
+   "name": "Bajaj Finance",
+   "size": "large",
+   "themes": [
+    "consumer-lending"
+   ],
+   "ticker": "BAJFINANCE",
+   "competitors": [
+    "cholafin"
+   ]
+  },
+  {
+   "id": "asianpaint",
+   "name": "Asian Paints",
+   "size": "large",
+   "themes": [
+    "paints"
+   ],
+   "ticker": "ASIANPAINT",
+   "competitors": [
+    "berger",
+    "birlaopus"
+   ],
+   "suppliers": [
+    "deepak"
+   ]
+  },
+  {
+   "id": "eternal",
+   "name": "Eternal (Zomato)",
+   "size": "mid",
+   "themes": [
+    "quick-commerce"
+   ],
+   "ticker": "ETERNAL",
+   "competitors": [
+    "swiggy"
+   ],
+   "aliases": [
+    "Zomato",
+    "Eternal",
+    "Blinkit"
+   ]
+  },
+  {
+   "id": "trent",
+   "name": "Trent",
+   "size": "mid",
+   "themes": [
+    "retail"
+   ],
+   "ticker": "TRENT",
+   "group": "Tata",
+   "competitors": [
+    "abfrl",
+    "relianceretail"
+   ],
+   "aliases": [
+    "Westside",
+    "Zudio"
+   ]
+  },
+  {
+   "id": "dixon",
+   "name": "Dixon Technologies",
+   "size": "mid",
+   "themes": [
+    "electronics-manufacturing"
+   ],
+   "ticker": "DIXON",
+   "competitors": [
+    "kaynes",
+    "syrma"
+   ],
+   "customers": [
+    "samsung"
+   ],
+   "aliases": [
+    "Dixon Technologies (India)"
+   ]
+  },
+  {
+   "id": "kaynes",
+   "name": "Kaynes Technology",
+   "size": "small",
+   "themes": [
+    "electronics-manufacturing",
+    "semiconductors"
+   ],
+   "ticker": "KAYNES",
+   "competitors": [
+    "dixon",
+    "syrma"
+   ],
+   "suppliers": [
+    "micron"
+   ],
+   "customers": [
+    "maruti"
+   ],
+   "aliases": [
+    "Kaynes Technology India",
+    "Kaynes Semicon"
+   ]
+  },
+  {
+   "id": "cgpower",
+   "name": "CG Power",
+   "size": "mid",
+   "themes": [
+    "electricals",
+    "semiconductors"
+   ],
+   "ticker": "CGPOWER",
+   "group": "Murugappa",
+   "competitors": [
+    "tataelectronics"
+   ],
+   "aliases": [
+    "CG Power and Industrial Solutions",
+    "CG Semi",
+    "Axiro Semiconductor"
+   ]
+  },
+  {
+   "id": "srf",
+   "name": "SRF",
+   "size": "mid",
+   "themes": [
+    "specialty-chemicals"
+   ],
+   "ticker": "SRF",
+   "competitors": [
+    "navin",
+    "deepak"
+   ],
+   "customers": [
+    "piind"
+   ]
+  },
+  {
+   "id": "deepak",
+   "name": "Deepak Nitrite",
+   "size": "mid",
+   "themes": [
+    "specialty-chemicals"
+   ],
+   "ticker": "DEEPAKNTR",
+   "competitors": [
+    "aarti",
+    "srf"
+   ],
+   "customers": [
+    "piind",
+    "asianpaint"
+   ],
+   "aliases": [
+    "Deepak Chem Tech"
+   ]
+  },
+  {
+   "id": "creditacc",
+   "name": "CreditAccess Grameen",
+   "size": "small",
+   "themes": [
+    "rural-lending"
+   ],
+   "ticker": "CREDITACC",
+   "competitors": [
+    "fusion",
+    "bandhan"
+   ],
+   "suppliers": [
+    "hdfcbank"
+   ],
+   "aliases": [
+    "Grameen Koota"
+   ]
+  },
+  {
+   "id": "paytm",
+   "name": "Paytm",
+   "size": "mid",
+   "themes": [
+    "fintech"
+   ],
+   "ticker": "PAYTM",
+   "competitors": [
+    "phonepe"
+   ],
+   "aliases": [
+    "One 97 Communications",
+    "One97"
+   ]
+  },
+  {
+   "id": "piind",
+   "name": "PI Industries",
+   "size": "mid",
+   "themes": [
+    "specialty-chemicals",
+    "agrochemicals"
+   ],
+   "ticker": "PIIND",
+   "competitors": [
+    "upl"
+   ],
+   "suppliers": [
+    "srf",
+    "deepak"
+   ]
+  },
+  {
+   "id": "ideaforge",
+   "name": "ideaForge",
+   "size": "small",
+   "themes": [
+    "drones"
+   ],
+   "ticker": "IDEAFORGE",
+   "aliases": [
+    "Ideaforge Technology"
+   ]
+  },
+  {
+   "id": "hul",
+   "name": "Hindustan Unilever",
+   "size": "large",
+   "themes": [
+    "fmcg"
+   ],
+   "competitors": [
+    "itc"
+   ],
+   "aliases": [
+    "HUL"
+   ]
+  },
+  {
+   "id": "infosys",
+   "name": "Infosys",
+   "size": "large",
+   "themes": [
+    "it-services"
+   ],
+   "competitors": [
+    "tcs"
+   ]
+  },
+  {
+   "id": "icici",
+   "name": "ICICI Bank",
+   "size": "large",
+   "themes": [
+    "banking"
+   ],
+   "competitors": [
+    "hdfcbank"
+   ]
+  },
+  {
+   "id": "navin",
+   "name": "Navin Fluorine",
+   "size": "small",
+   "themes": [
+    "specialty-chemicals"
+   ],
+   "competitors": [
+    "srf"
+   ],
+   "aliases": [
+    "Navin Fluorine International"
+   ]
+  },
+  {
+   "id": "aarti",
+   "name": "Aarti Industries",
+   "size": "mid",
+   "themes": [
+    "specialty-chemicals"
+   ],
+   "competitors": [
+    "deepak"
+   ]
+  },
+  {
+   "id": "syrma",
+   "name": "Syrma SGS",
+   "size": "small",
+   "themes": [
+    "electronics-manufacturing"
+   ],
+   "competitors": [
+    "kaynes",
+    "dixon"
+   ],
+   "aliases": [
+    "Syrma SGS Technology"
+   ]
+  },
+  {
+   "id": "tataelectronics",
+   "name": "Tata Electronics",
+   "size": "mid",
+   "themes": [
+    "semiconductors",
+    "electronics-manufacturing"
+   ],
+   "group": "Tata",
+   "competitors": [
+    "cgpower"
+   ]
+  },
+  {
+   "id": "micron",
+   "name": "Micron India",
+   "size": "mid",
+   "themes": [
+    "semiconductors"
+   ],
+   "customers": [
+    "kaynes"
+   ],
+   "aliases": [
+    "Micron Technology"
+   ]
+  },
+  {
+   "id": "fusion",
+   "name": "Fusion Finance",
+   "size": "small",
+   "themes": [
+    "rural-lending"
+   ],
+   "competitors": [
+    "creditacc"
+   ],
+   "aliases": [
+    "Fusion Micro Finance"
+   ]
+  },
+  {
+   "id": "bandhan",
+   "name": "Bandhan Bank",
+   "size": "mid",
+   "themes": [
+    "rural-lending",
+    "banking"
+   ],
+   "competitors": [
+    "creditacc"
+   ]
+  },
+  {
+   "id": "nabard",
+   "name": "NABARD",
+   "size": "mid",
+   "themes": [
+    "rural-lending"
+   ]
+  },
+  {
+   "id": "cholafin",
+   "name": "Cholamandalam Finance",
+   "size": "mid",
+   "themes": [
+    "rural-lending",
+    "consumer-lending"
+   ],
+   "group": "Murugappa",
+   "competitors": [
+    "bajfinance"
+   ],
+   "aliases": [
+    "Cholamandalam Investment and Finance"
+   ]
+  },
+  {
+   "id": "tubeinv",
+   "name": "Tube Investments",
+   "size": "mid",
+   "themes": [
+    "electricals"
+   ],
+   "group": "Murugappa",
+   "aliases": [
+    "Tube Investments of India",
+    "TII"
+   ]
+  },
+  {
+   "id": "berger",
+   "name": "Berger Paints",
+   "size": "mid",
+   "themes": [
+    "paints"
+   ],
+   "competitors": [
+    "asianpaint"
+   ]
+  },
+  {
+   "id": "birlaopus",
+   "name": "Birla Opus (Grasim)",
+   "size": "mid",
+   "themes": [
+    "paints"
+   ],
+   "competitors": [
+    "asianpaint"
+   ],
+   "aliases": [
+    "Grasim Industries",
+    "Birla Opus"
+   ]
+  },
+  {
+   "id": "swiggy",
+   "name": "Swiggy",
+   "size": "mid",
+   "themes": [
+    "quick-commerce"
+   ],
+   "competitors": [
+    "eternal"
+   ],
+   "aliases": [
+    "Swiggy Instamart"
+   ]
+  },
+  {
+   "id": "abfrl",
+   "name": "Aditya Birla Fashion",
+   "size": "mid",
+   "themes": [
+    "retail"
+   ],
+   "competitors": [
+    "trent"
+   ],
+   "aliases": [
+    "Aditya Birla Fashion and Retail",
+    "ABFRL"
+   ]
+  },
+  {
+   "id": "kalyan",
+   "name": "Kalyan Jewellers",
+   "size": "mid",
+   "themes": [
+    "jewellery"
+   ],
+   "competitors": [
+    "titan"
+   ]
+  },
+  {
+   "id": "motherson",
+   "name": "Samvardhana Motherson",
+   "size": "large",
+   "themes": [
+    "autos"
+   ],
+   "customers": [
+    "maruti"
+   ],
+   "aliases": [
+    "Motherson"
+   ]
+  },
+  {
+   "id": "samsung",
+   "name": "Samsung India",
+   "size": "large",
+   "themes": [
+    "electronics-manufacturing"
+   ],
+   "suppliers": [
+    "dixon"
+   ],
+   "aliases": [
+    "Samsung India Electronics"
+   ]
+  },
+  {
+   "id": "phonepe",
+   "name": "PhonePe",
+   "size": "mid",
+   "themes": [
+    "fintech"
+   ],
+   "competitors": [
+    "paytm"
+   ]
+  },
+  {
+   "id": "drreddy",
+   "name": "Dr. Reddy's",
+   "size": "large",
+   "themes": [
+    "pharma"
+   ],
+   "competitors": [
+    "sunpharma"
+   ],
+   "aliases": [
+    "Dr Reddys Laboratories"
+   ]
+  },
+  {
+   "id": "upl",
+   "name": "UPL",
+   "size": "large",
+   "themes": [
+    "agrochemicals"
+   ],
+   "competitors": [
+    "piind"
+   ],
+   "suppliers": [
+    "srf"
+   ]
+  },
+  {
+   "id": "tatasons",
+   "name": "Tata Sons",
+   "size": "mid",
+   "themes": [
+    "retail"
+   ],
+   "group": "Tata"
+  },
+  {
+   "id": "mckinsey",
+   "name": "McKinsey & Company",
+   "size": "mid",
+   "themes": [],
+   "aliases": [
+    "McKinsey"
+   ]
+  },
+  {
+   "id": "kotakie",
+   "name": "Kotak Institutional Equities",
+   "size": "small",
+   "themes": [],
+   "aliases": [
+    "Kotak Securities"
+   ]
+  },
+  {
+   "id": "crisil",
+   "name": "CRISIL",
+   "size": "mid",
+   "themes": [],
+   "aliases": [
+    "CRISIL Ratings"
+   ]
+  },
+  {
+   "id": "northlight",
+   "name": "Northlight Capital",
+   "size": "small",
+   "themes": []
+  },
+  {
+   "id": "mod",
+   "name": "Ministry of Defence",
+   "size": "large",
+   "themes": [
+    "drones"
+   ],
+   "customers": [
+    "ideaforge"
+   ],
+   "aliases": [
+    "Indian Air Force"
+   ]
+  }
+ ],
+ "schools": [
+  {
+   "id": "iitk",
+   "name": "IIT Kanpur",
+   "aliases": [
+    "Indian Institute of Technology Kanpur",
+    "IIT-K"
+   ],
+   "cohort": "large"
+  },
+  {
+   "id": "iima",
+   "name": "IIM Ahmedabad",
+   "aliases": [
+    "Indian Institute of Management Ahmedabad",
+    "IIM-A",
+    "IIMA"
+   ],
+   "cohort": "small"
+  },
+  {
+   "id": "iimb",
+   "name": "IIM Bangalore",
+   "aliases": [
+    "Indian Institute of Management Bangalore",
+    "IIMB"
+   ],
+   "cohort": "small"
+  },
+  {
+   "id": "iitb",
+   "name": "IIT Bombay",
+   "aliases": [
+    "Indian Institute of Technology Bombay"
+   ],
+   "cohort": "large"
+  },
+  {
+   "id": "iitm",
+   "name": "IIT Madras",
+   "aliases": [
+    "Indian Institute of Technology Madras"
+   ],
+   "cohort": "large"
+  },
+  {
+   "id": "ict",
+   "name": "ICT Mumbai",
+   "aliases": [
+    "Institute of Chemical Technology",
+    "UDCT"
+   ],
+   "cohort": "small"
+  },
+  {
+   "id": "srcc",
+   "name": "SRCC Delhi",
+   "aliases": [
+    "Shri Ram College of Commerce"
+   ],
+   "cohort": "large"
+  },
+  {
+   "id": "icai",
+   "name": "ICAI",
+   "aliases": [
+    "Institute of Chartered Accountants of India",
+    "Chartered Accountant"
+   ],
+   "cohort": "large"
+  },
+  {
+   "id": "xlri",
+   "name": "XLRI Jamshedpur",
+   "aliases": [
+    "XLRI"
+   ],
+   "cohort": "small"
+  },
+  {
+   "id": "isb",
+   "name": "ISB Hyderabad",
+   "aliases": [
+    "Indian School of Business"
+   ],
+   "cohort": "small"
+  },
+  {
+   "id": "bits",
+   "name": "BITS Pilani",
+   "aliases": [],
+   "cohort": "large"
+  }
+ ],
+ "themes": [
+  {
+   "id": "specialty-chemicals",
+   "label": "Specialty chemicals"
+  },
+  {
+   "id": "rural-lending",
+   "label": "Rural lending"
+  },
+  {
+   "id": "semiconductors",
+   "label": "Semiconductors"
+  },
+  {
+   "id": "electronics-manufacturing",
+   "label": "Electronics manufacturing"
+  },
+  {
+   "id": "retail",
+   "label": "Retail"
+  },
+  {
+   "id": "paints",
+   "label": "Paints"
+  },
+  {
+   "id": "pharma",
+   "label": "Pharma"
+  },
+  {
+   "id": "it-services",
+   "label": "IT services"
+  },
+  {
+   "id": "telecom",
+   "label": "Telecom"
+  },
+  {
+   "id": "banking",
+   "label": "Banking"
+  },
+  {
+   "id": "fintech",
+   "label": "Fintech"
+  },
+  {
+   "id": "autos",
+   "label": "Autos"
+  },
+  {
+   "id": "fmcg",
+   "label": "Consumer staples"
+  },
+  {
+   "id": "quick-commerce",
+   "label": "Quick commerce"
+  },
+  {
+   "id": "infrastructure",
+   "label": "Infrastructure"
+  },
+  {
+   "id": "energy",
+   "label": "Energy"
+  },
+  {
+   "id": "jewellery",
+   "label": "Jewellery"
+  },
+  {
+   "id": "consumer-lending",
+   "label": "Consumer lending"
+  },
+  {
+   "id": "agrochemicals",
+   "label": "Agrochemicals"
+  },
+  {
+   "id": "drones",
+   "label": "Drones & defence"
+  },
+  {
+   "id": "electricals",
+   "label": "Electricals"
+  }
+ ]
+}
