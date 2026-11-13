@@ -63,6 +63,21 @@ export function peopleFromDigest(digest: Digest, graph: Graph): Person[] {
 }
 export const personKey = (fp: FiledPerson) => "p:" + nameTokens(fp.name).join("-");
 
+const SEEN_KEY = "finn.seen.v1";
+/** If the investor allowed notifications, tell them about events that matter and are new to this device. */
+function announce(d: Digest) {
+  try {
+    const seen = new Set<string>(JSON.parse(localStorage.getItem(SEEN_KEY) ?? "[]"));
+    const first = seen.size === 0;
+    const fresh = d.events.filter((e) => e.tier === "act" && !seen.has(e.id));
+    localStorage.setItem(SEEN_KEY, JSON.stringify(d.events.filter((e) => e.tier === "act").map((e) => e.id)));
+    if (first || !fresh.length || typeof Notification === "undefined" || Notification.permission !== "granted") return;
+    const title = fresh.length === 1 ? `${fresh[0].symbol}: ${fresh[0].title}` : `${fresh.length} filings need you`;
+    const body = fresh.length === 1 ? (fresh[0].summary ?? fresh[0].label) : fresh.slice(0, 3).map((e) => `${e.symbol} ${e.title}`).join("\n");
+    navigator.serviceWorker?.ready.then((reg) => reg.showNotification(title, { body, tag: "finn-act", data: `/#${fresh[0].id}`, icon: "/icon.svg" })).catch(() => new Notification(title, { body }));
+  } catch { /* storage or notifications unavailable */ }
+}
+
 export function StoreProvider({ children }: { children: React.ReactNode }) {
   const [digest, setDigest] = useState<Digest | null>(null);
   const [market, setMarket] = useState<Market | null>(null);
@@ -72,8 +87,14 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const [prefs, setP] = useState<Prefs>(DEFAULT_PREFS);
 
   useEffect(() => {
-    fetch("/data/digest.json").then((r) => (r.ok ? r.json() : Promise.reject(new Error(String(r.status)))))
-      .then(setDigest).catch(() => setError("The brief could not be loaded."));
+    const load = () => fetch("/data/digest.json", { cache: "no-cache" }).then((r) => (r.ok ? r.json() : Promise.reject(new Error(String(r.status)))))
+      .then((d: Digest) => { setDigest((old) => (old?.generated_at === d.generated_at ? old : d)); announce(d); })
+      .catch(() => setDigest((old) => { if (!old) setError("The brief could not be loaded."); return old; }));
+    load();
+    // coming back to the app is the moment to look for a newer brief
+    const onShow = () => { if (document.visibilityState === "visible") load(); };
+    document.addEventListener("visibilitychange", onShow);
+    if (process.env.NODE_ENV === "production" && "serviceWorker" in navigator) navigator.serviceWorker.register("/sw.js").catch(() => {});
     try {
       const saved = localStorage.getItem(PREF_KEY);
       if (saved) setP({ ...DEFAULT_PREFS, ...JSON.parse(saved) });

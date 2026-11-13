@@ -49,6 +49,8 @@ export function Moves({ start }: { start: Date }) {
   const { market, digest, prefs, setPrefs, loadMarket } = useStore();
   const [sheet, setSheet] = useState(false);
   const [more, setMore] = useState(false);
+  const [perm, setPerm] = useState<NotificationPermission>("default");
+  useEffect(() => { if (typeof Notification !== "undefined") setPerm(Notification.permission); }, []);
   useEffect(loadMarket, [loadMarket]);
   const moves = useMemo(() => (market && digest ? findMoves(market, digest, start, prefs.move, prefs.volume) : []), [market, digest, start, prefs.move, prefs.volume]);
   const hist = useMemo(() => (market ? fireCount(market, prefs.move, prefs.volume) : null), [market, prefs.move, prefs.volume]);
@@ -103,6 +105,12 @@ export function Moves({ start }: { start: Date }) {
               return <button key={k} className={`chip ${on ? "on" : ""}`} aria-pressed={on} onClick={() => setPrefs({ alertOn: on ? prefs.alertOn.filter((x) => x !== k) : [...prefs.alertOn, k] })}>{label}</button>;
             })}
           </div>
+          {typeof Notification !== "undefined" && (
+            <div className="note row between">
+              <span className="grow">{perm === "granted" ? "This device will be notified when a new filing of these kinds needs you." : perm === "denied" ? "Notifications are blocked for FINN in this browser’s settings." : "Get a notification on this device when a new filing needs you."}</span>
+              {perm === "default" && <button className="btn" onClick={() => Notification.requestPermission().then(setPerm)}>Allow</button>}
+            </div>
+          )}
           <p className="tiny faint" style={{ marginTop: 18 }}>“This unusual 1 in N days” is the stock’s own history: the share of its last 500 sessions with a market-adjusted move, measured against its expected volatility that day, or a relative volume at least this large.</p>
         </Sheet>
       )}

@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { Chart, Seg } from "@/components/Chart";
+import { Spark } from "@/components/Moves";
 import { Avatar } from "@/components/People";
 import { Sheet, useOpenPerson } from "@/components/Shell";
 import { crore, num, oneIn, pct, tone } from "@/lib/client/format";
@@ -97,6 +98,7 @@ export default function Book() {
                     : <div className="cover none">No one in your network covers this</div>}
                 </div>
                 <button style={{ textAlign: "right" }} onClick={() => setEdit(p)} aria-label={`Edit ${p.symbol}`}>
+                  <span style={{ display: "block", width: 72, marginLeft: "auto" }}><Spark data={market.series[p.symbol].close.slice(-60)} up={p.ret >= 0} /></span>
                   <b className={`num ${tone(p.ret)}`}>{pct(p.ret, 1)}</b>
                   <span className="tiny faint" style={{ display: "block" }}>NIFTY {p.bench === null ? "–" : pct(p.bench, 1)}</span>
                   <span className={`tiny ${p.gap >= 0 ? "up" : "down"}`} style={{ display: "block" }}>{p.gap >= 0 ? "ahead" : "behind"} {cr(Math.abs(p.gap))}</span>

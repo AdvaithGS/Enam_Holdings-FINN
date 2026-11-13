@@ -17,6 +17,22 @@ export default function NetworkPage() {
   const [settings, setSettings] = useState(false);
   const [draft, setDraft] = useState("");
   const [bad, setBad] = useState<string | null>(null);
+  const [pass, setPass] = useState("");
+  const [vault, setVault] = useState<string | null>(null);
+  async function backup() {
+    const { seal, collect } = await import("@/lib/client/vault");
+    const data = collect();
+    if (!data["finn.network.v1"] && net) data["finn.network.v1"] = JSON.stringify(net);
+    const url = URL.createObjectURL(new Blob([await seal(data, pass)], { type: "application/json" }));
+    Object.assign(document.createElement("a"), { href: url, download: "backup.finn" }).click();
+    URL.revokeObjectURL(url);
+    setVault("Saved backup.finn. Keep the passphrase; it cannot be recovered.");
+  }
+  async function recover(file: File) {
+    const { open: unseal, restore } = await import("@/lib/client/vault");
+    try { const n = restore(await unseal(await file.text(), pass)); setVault(`Restored ${n} item${n === 1 ? "" : "s"}. Reloading.`); setTimeout(() => location.reload(), 700); }
+    catch (e) { setVault(e instanceof Error ? e.message : "Could not open that file."); }
+  }
 
   const noticed = useMemo(() => {
     if (!net || !graph || !digest) return [];
@@ -166,6 +182,14 @@ export default function NetworkPage() {
             Contacts live in this browser’s storage and nowhere else. Matching them to filings happens on this device; FINN’s servers send public
             company data down and never receive a name from your network. {net.synthetic ? "You are looking at a synthetic demo network: invented people, real companies." : "You are using your own network."}
           </p>
+          <div className="caps" style={{ marginTop: 18 }}>Encrypted backup</div>
+          <p className="muted small" style={{ marginTop: 4 }}>Move your network, holdings and settings to another device. The file is encrypted here with your passphrase (AES-256, key stretched 310,000 times); without it the file is noise, to us as well.</p>
+          <input className="textarea" style={{ minHeight: 0, marginTop: 8, fontSize: 16 }} type="password" placeholder="Passphrase, 10 characters or more" value={pass} onChange={(e) => setPass(e.target.value)} aria-label="Passphrase" autoComplete="new-password" />
+          <div className="row wrap" style={{ marginTop: 8 }}>
+            <button className="btn" disabled={pass.length < 10} onClick={backup}>Save backup</button>
+            <label className="btn ghost" style={{ cursor: "pointer" }}>Restore from file<input type="file" accept=".finn,application/json" hidden onChange={(e) => e.target.files?.[0] && recover(e.target.files[0])} /></label>
+          </div>
+          {vault && <p className="small" style={{ marginTop: 6 }}>{vault}</p>}
           <div className="caps" style={{ marginTop: 18 }}>Bring your own</div>
           <p className="muted small" style={{ marginTop: 4 }}>Paste a network file (same shape as <a className="link" href="/data/network.seed.json" target="_blank">the demo file</a>): yourself, your contacts with roles and years, and when you last spoke.</p>
           <textarea className="textarea" style={{ marginTop: 8 }} value={draft} onChange={(e) => setDraft(e.target.value)} placeholder='{"me": {...}, "contacts": [...], "orgs": [...], "schools": [...], "themes": [...]}' aria-label="Network JSON" />
