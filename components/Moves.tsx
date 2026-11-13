@@ -90,9 +90,9 @@ function MoveRow({ m }: { m: Move }) {
   return (
     <div className="move" style={{ display: "block" }}>
       <div className="row between"><b><span className="tick">{m.symbol}</span> <span className={`num ${tone(m.change)}`}>{pct(m.change, 1)}</span>
-        {m.note?.parts && <span className="small muted" style={{ fontWeight: 400 }}> · {pct(m.note.parts.own, 1)} its own, {pct(m.note.parts.market, 1)} the market</span>}</b><span className="tiny faint">{day(m.date)}</span></div>
+        {m.note?.parts && <span className="small muted" style={{ fontWeight: 400 }}> · {pct(m.note.parts.market, 1)} market{m.note.parts.sector !== undefined ? `, ${pct(m.note.parts.sector, 1)} sector` : ""}, {pct(m.note.parts.own, 1)} its own</span>}</b><span className="tiny faint">{day(m.date)}</span></div>
       <div className="small muted" style={{ marginTop: 3 }}>
-        {m.vol !== null ? `${m.vol.toFixed(1)}× its usual volume${m.volMkt ? ` (your book ran at ${m.volMkt.toFixed(1)}×)` : ""}` : ""}
+        {m.vol !== null ? `${m.vol.toFixed(1)}× its usual volume${m.volMkt ? ` (the NIFTY 500 traded ${m.volMkt.toFixed(1)}× its own)` : ""}` : ""}
         {m.p !== null ? ` · for its volatility and that day’s volume, ${oneIn(m.p)} sessions` : ""}
       </div>
       <MoveChart px={m.px} vols={m.vols} up={m.change >= 0} />

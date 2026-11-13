@@ -115,6 +115,10 @@ def index_closes(day: dt.date) -> dict[str, dict] | None:
                                             "l": float(r["Low Index Value"]), "c": float(r["Closing Index Value"])}
         except (KeyError, ValueError):
             continue  # indices without an intraday range carry "-" in those columns
+        try:  # rupees crore traded in the index's constituents that session
+            out[r["Index Name"].strip()]["t"] = float(r["Turnover (Rs. Cr.)"])
+        except (KeyError, ValueError):
+            pass
     return out or None
 
 

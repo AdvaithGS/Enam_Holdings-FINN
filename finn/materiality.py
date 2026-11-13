@@ -55,7 +55,7 @@ def signals(bars: list[dict], market: list[dict]) -> dict[str, dict]:
     m = np.array([mk[b["date"]] for b in rows])
     vol = np.array([b["volume"] for b in rows], dtype=float)
     r, rm = stats.log_returns(px), stats.log_returns(m)
-    e, beta = stats.abnormal_returns(r, rm)
+    e, beta = stats.ew_abnormal_returns(r, rm)
     vr = stats.volume_ratio(vol)
     sigma = stats.garch_vol(e)
     z = np.abs(e) / sigma
@@ -114,14 +114,17 @@ def fit(panel: list[tuple[dict[str, dict], list[dict]]]) -> dict:
     return model
 
 
-def adjust_volume(sigs: list[dict[str, dict]]) -> None:
+def adjust_volume(sigs: list[dict[str, dict]], market: dict[str, float] | None = None) -> None:
     """Take the market's own volume out of each stock's volume.
 
     On an index-rebalance or expiry day everything trades heavily; that is not news about
-    any one company. v_mkt(t) is the median relative volume across the stocks we hold that
-    session (a proxy for the market with 20 names, and stated as such), and
+    any one company. v_mkt(t) is the NIFTY 500's turnover that session over its own
+    20-session average (sectors.market_volume, from the exchange's daily index file), and
 
         v_rel = v_t / v_mkt(t)
+
+    Where the exchange file is missing for a date, v_mkt falls back to the median relative
+    volume across the stocks held.
 
     is the stock's volume against the day's norm. p_vol is recomputed on v_rel, so "the
     market noticed" and every "1 in N" for volume mean unusual *for that day*.
@@ -132,6 +135,7 @@ def adjust_volume(sigs: list[dict[str, dict]]) -> None:
             if g["vol_ratio"] is not None:
                 by_date.setdefault(d, []).append(g["vol_ratio"])
     med = {d: float(np.median(v)) for d, v in by_date.items() if len(v) >= 5}
+    med.update({d: v for d, v in (market or {}).items() if v and v > 0})
     for sig in sigs:
         ds = sorted(sig)
         rel = np.array([sig[d]["vol_ratio"] / med[d] if sig[d]["vol_ratio"] is not None and med.get(d) else np.nan for d in ds])
@@ -147,8 +151,9 @@ def panel(years: int = 5) -> list[tuple[dict[str, dict], list[dict]]]:
     market = prices.history(prices.NIFTY, years=years)
     today = dt.datetime.now(prices.IST).date()
     out = []
+    from . import sectors
     sigs = {p["symbol"]: signals(prices.history(p["symbol"], years=years), market) for p in cfg["portfolio"]}
-    adjust_volume(list(sigs.values()))
+    adjust_volume(list(sigs.values()), sectors.market_volume(sectors.panel([b["date"] for b in market])["turnover"]))
     for p in cfg["portfolio"]:
         sig = sigs[p["symbol"]]
         first = min((d for d, g in sig.items() if g["p_ret"] is not None), default=None)

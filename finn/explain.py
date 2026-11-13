@@ -7,10 +7,11 @@ reports the ones the data supports. Nothing here is a model's guess.
 
   1. The market.   r = beta * m + e. The part beta * m is the market's; if it is at least
                    half the move, the move is systematic, not the stock's.
-  2. The sector.   The stock's NSE sector index against the NIFTY that day.
+  2. The sector.   e = g * f + u, f = the stock's sector index net of the market, the
+                   sector and its loading g chosen and tested on the 250 sessions before
+                   the window (sectors.py). g * f is the sector's share of the residual.
   3. Breadth.      How many holdings had a tail session the same day (a macro day shows
                    up as many at once; volatility scaling alone cannot see that).
-  4. Peers.        Other holdings in the same field moving the same way beyond the market.
   5. Deals.        Bulk and block deals reported to the exchange for that day, sized
                    against the day's traded volume.
   6. Calendar.     A board meeting to consider results within the next week, results
@@ -27,22 +28,13 @@ from __future__ import annotations
 import datetime as dt
 import urllib.parse
 
-from . import http
-from .sources import nse, prices
+import numpy as np
 
-SECTOR = {
-    "HDFCBANK": ("Nifty Bank", "^NSEBANK"), "BAJFINANCE": ("Nifty Financial Services", "^CNXFIN"), "PAYTM": ("Nifty Financial Services", "^CNXFIN"),
-    "CREDITACC": ("Nifty Financial Services", "^CNXFIN"), "TCS": ("Nifty IT", "^CNXIT"), "MARUTI": ("Nifty Auto", "^CNXAUTO"),
-    "SUNPHARMA": ("Nifty Pharma", "^CNXPHARMA"), "ITC": ("Nifty FMCG", "^CNXFMCG"), "RELIANCE": ("Nifty Energy", "^CNXENERGY"),
-    "LT": ("Nifty Infrastructure", "^CNXINFRA"), "BHARTIARTL": ("Nifty Infrastructure", "^CNXINFRA"), "CGPOWER": ("Nifty Infrastructure", "^CNXINFRA"),
-}
+from . import http, sectors
+from .sources import nse
+
 MOVE, VOL, RARE, TAIL = 0.02, 2.0, 0.10, 0.05
 BROAD = 0.3   # share of holdings with a tail session at once before the day is called broad (expected by chance: about 0.1)
-
-
-def _returns(ysym: str) -> dict[str, float]:
-    bars = prices.history(ysym, years=1)
-    return {b["date"]: b["close"] / a["close"] - 1 for a, b in zip(bars, bars[1:]) if a["close"]}
 
 
 def deals(symbol: str, start: dt.date, end: dt.date) -> dict[str, list[dict]]:
@@ -80,7 +72,10 @@ def results_meetings(symbol: str) -> list[str]:
     return out
 
 
-def build(companies: dict, events: list[dict], start: dt.date, today: dt.date, log=print) -> dict:
+def build(companies: dict, events: list[dict], start: dt.date, today: dt.date, log=print, idx_panel: dict | None = None,
+          market: list[dict] | None = None) -> dict:
+    facs = sectors.factors(idx_panel["close"], market) if idx_panel and market else {}
+    members = sectors.membership() if facs else {}
     seen = {(e["symbol"], e["session"]): e for e in events if e["tier"] != "aside"}
     by_day: dict[tuple, list[dict]] = {}
     for e in events:
@@ -92,7 +87,6 @@ def build(companies: dict, events: list[dict], start: dt.date, today: dt.date, l
         for d, g in sig[s].items():
             if rare(g) <= TAIL:
                 breadth[d] = breadth.get(d, 0) + 1
-    sector_cache: dict[str, dict] = {}
     out: dict[str, dict] = {}
     n = 0
     for s, c in companies.items():
@@ -101,6 +95,8 @@ def build(companies: dict, events: list[dict], start: dt.date, today: dt.date, l
         if not days:
             continue
         dl = deals(s, start, today)
+        own_e = {d: float(np.log1p(g["abnormal"])) for d, g in sig[s].items() if g.get("abnormal") is not None}
+        sec = sectors.sector_of(own_e, facs, start.isoformat(), members.get(s)) if facs else None
         meetings = results_meetings(s)
         ses = c["sessions"]
         for d in days:
@@ -113,24 +109,17 @@ def build(companies: dict, events: list[dict], start: dt.date, today: dt.date, l
                 parts = {"market": round(m_part, 4), "own": round(ch - m_part, 4)}
                 if abs(ch) >= 0.01 and m_part * ch > 0 and abs(m_part) >= 0.5 * abs(ch):
                     why.append({"k": "market", "text": f"Mostly the market: NIFTY {mkt:+.1%} at this stock's beta of {beta:.2f} accounts for {m_part:+.1%} of the {ch:+.1%}."})
-            if s in SECTOR and mkt is not None:
-                label, ysym = SECTOR[s]
-                try:
-                    if ysym not in sector_cache:
-                        sector_cache[ysym] = _returns(ysym)
-                    sr = sector_cache[ysym].get(d)
-                except Exception:
-                    sr = None
-                if sr is not None and (sr - mkt) * ch > 0 and abs(sr - mkt) >= 0.008:
-                    why.append({"k": "sector", "text": f"Its sector moved with it: {label} {'beat' if sr > mkt else 'lagged'} the NIFTY by {abs(sr - mkt):.1%} ({sr:+.1%} against {mkt:+.1%})."})
+            own = g.get("abnormal")
+            if sec and own is not None and d in facs[sec["name"]]:
+                f_d = facs[sec["name"]][d]
+                s_part = float(np.expm1(sec["g"] * f_d))
+                if parts:
+                    parts.update(sector=round(s_part, 4), own=round(own - s_part, 4), sector_name=sec["name"])
+                if s_part * own > 0 and abs(s_part) >= 0.005 and abs(s_part) >= 0.4 * abs(own):
+                    why.append({"k": "sector", "text": f"Sector-wide: {sec['name']}{'' if sec['basis'] == 'member' else ' (closest by co-movement; the stock is in no listed sector index)'} moved {np.expm1(f_d):+.1%} beyond the market. At this stock's loading of {sec['g']:.2f} "
+                                                       f"(t = {sec['t']:.1f} over the {sec['n']} sessions before) that accounts for {s_part:+.1%} of its {own:+.1%} beyond the market."})
             if breadth.get(d, 0) >= BROAD * len(companies):
                 why.append({"k": "breadth", "text": f"A broad day: {breadth[d]} of your {len(companies)} holdings had a tail session at once, which points at macro, not at this company."})
-            own = g.get("abnormal")
-            if own is not None and abs(own) >= 0.015:
-                peers = [(o, sig[o][d]["abnormal"]) for o, oc in companies.items() if o != s and oc["sector"].split(" ")[-1] == c["sector"].split(" ")[-1]
-                         and d in sig[o] and sig[o][d].get("abnormal") is not None and sig[o][d]["abnormal"] * own > 0 and abs(sig[o][d]["abnormal"]) >= 0.015]
-                if peers:
-                    why.append({"k": "peers", "text": "Peers you hold moved the same way beyond the market: " + ", ".join(f"{o} {a:+.1%}" for o, a in peers) + "."})
             for x in sorted(dl.get(d, []), key=lambda x: -x["qty"])[:2]:
                 share = x["qty"] / g["volume"] if g.get("volume") else None
                 why.append({"k": "deal", "text": f"{x['kind'].title()} deal: {x['who']} {'bought' if x['side'] == 'buy' else 'sold'} {x['qty'] / 1e5:,.1f} lakh shares at ₹{x['price']:,.0f} "
@@ -149,7 +138,7 @@ def build(companies: dict, events: list[dict], start: dt.date, today: dt.date, l
                 why.append({"k": "shape", "text": f"{g['vol_ratio']:.1f}x volume with the price barely moving beyond the market ({own:+.1%}): the shape of a negotiated or index-related trade, not of news."})
             found = bool(why)
             if not found:
-                why.append({"k": "none", "text": "No public explanation holds: not the market, not its sector, no peers, no reported deals, nothing on the calendar. That is a reason to ask someone."})
+                why.append({"k": "none", "text": "No public explanation holds: not the market, not its sector, no reported deals, nothing on the calendar. That is a reason to ask someone."})
             out.setdefault(s, {})[d] = {"parts": parts, "why": why, "found": found, "broad": breadth.get(d, 0)}
             n += 1
     log(f"moves without a filing: {n} examined, {sum(1 for s in out.values() for x in s.values() if x['found'])} with a supported explanation")
