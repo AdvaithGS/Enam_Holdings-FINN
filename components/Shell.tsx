@@ -10,6 +10,7 @@ export const useOpenPerson = () => useContext(SheetCtx);
 
 const TABS = [
   { href: "/", label: "Brief", sub: "what changed" },
+  { href: "/book", label: "Book", sub: "what you hold" },
   { href: "/ask", label: "Ask", sub: "dig in" },
   { href: "/network", label: "People", sub: "who knows" },
 ];

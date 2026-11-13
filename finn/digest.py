@@ -206,7 +206,7 @@ def build(days: int = 35, today: dt.date | None = None) -> dict:
                      "change": [r4(r["change"]) for r in rows], "abnormal": [r4(r["abnormal"]) for r in rows],
                      "vol_ratio": [None if r["vol_ratio"] is None else round(r["vol_ratio"], 2) for r in rows],
                      "p_ret": [r4(r["p_ret"]) for r in rows], "p_vol": [r4(r["p_vol"]) for r in rows]}
-        companies[s] = {"symbol": s, "name": p["name"], "legal_name": co.get("name"), "sector": p["sector"],
+        companies[s] = {"symbol": s, "name": p["name"], "legal_name": co.get("name"), "sector": p["sector"], "weight": p.get("weight"),
                         "industry": (co.get("industry") or [None])[-1], "mcap_cr": co.get("market_cap"),
                         "line": line, "_cfo": cfo_3y(co) if co else None, "beta": next((r4(r["beta"]) for r in reversed(rows) if r.get("beta") is not None), None),
                         "sessions": ses + tail, "_sig": {d: r for d, r in zip(dates, rows)}}
@@ -476,7 +476,9 @@ def build(days: int = 35, today: dt.date | None = None) -> dict:
     }
     OUT.mkdir(parents=True, exist_ok=True)
     (OUT / "digest.json").write_text(json.dumps(digest, ensure_ascii=False, separators=(",", ":")))
-    (OUT / "market.json").write_text(json.dumps({"as_of": as_of, "series": series}, separators=(",", ":")))
+    (OUT / "market.json").write_text(json.dumps({"as_of": as_of, "series": series,
+                                                    "index": {"name": "NIFTY 50", "dates": [b["date"] for b in market[-520:]],
+                                                              "close": [round(b["close"], 2) for b in market[-520:]]}}, separators=(",", ":")))
 
     log("")
     for tier, name in (("act", "WHAT MATTERS"), ("glance", "WORTH A GLANCE")):

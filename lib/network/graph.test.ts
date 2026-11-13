@@ -70,6 +70,15 @@ test("reach: a two-step path is tie x link and never exceeds either", () => {
   assert.ok(["Rhea Kapadia", "Tanvi Agarwal"].includes(r[0].via!.name));
 });
 
+test("connectors: PageRank is a probability distribution and rewards bridges", () => {
+  const target: Person = { id: "t", name: "Noel N. Tata", headline: "", education: [],
+    roles: [{ org: "trent", title: "Chairman", from: 0, to: 2026, fn: "board", level: 1 }] };
+  const c = g.connectors([target], 40);
+  assert.ok(c.every((x) => x.score > 0 && x.score < 1));
+  assert.ok(c.reduce((a, x) => a + x.score, 0) < 1);
+  assert.ok(c[0].doors.some((p) => p.name === "Noel N. Tata"));
+});
+
 test("expertise: the theme map ranks practitioners first", () => {
   const e = g.expertise("specialty-chemicals");
   assert.ok(e.length >= 3);

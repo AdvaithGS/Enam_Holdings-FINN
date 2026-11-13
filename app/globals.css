@@ -111,7 +111,7 @@ h1, h2, h3, p { margin: 0; }
 
 /* nav */
 .nav { position: fixed; left: 0; right: 0; bottom: 0; background: color-mix(in srgb, var(--paper) 88%, transparent); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border-top: 1px solid var(--rule); padding-bottom: env(safe-area-inset-bottom); z-index: 20; }
-.nav div { max-width: 520px; margin: 0 auto; display: grid; grid-template-columns: repeat(3, 1fr); }
+.nav div { max-width: 520px; margin: 0 auto; display: grid; grid-template-columns: repeat(4, 1fr); }
 .nav a { padding: 11px 0 12px; text-align: center; font-size: 12px; color: var(--ink-3); font-weight: 500; }
 .nav a b { display: block; font: 600 17px/1.15 var(--serif); color: inherit; }
 .nav a.on { color: var(--ink); }
@@ -200,3 +200,11 @@ h1, h2, h3, p { margin: 0; }
 .track i { position: absolute; top: 0; bottom: 0; } .track i.pos { left: 50%; background: var(--up); border-radius: 0 4px 4px 0; } .track i.neg { right: 50%; background: var(--down); border-radius: 4px 0 0 4px; }
 .world { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
 .candles { width: 100%; height: 54px; display: block; margin: 6px 0 4px; }
+
+/* book */
+.hold { display: grid; grid-template-columns: 1fr auto; gap: 4px 10px; padding: 12px 0; border-top: 1px solid var(--rule); width: 100%; } .hold:first-of-type { border-top: 0; }
+.wbar { height: 4px; border-radius: 2px; background: var(--wash); margin-top: 6px; } .wbar i { display: block; height: 100%; border-radius: 2px; background: var(--blue); }
+.cover { font-size: 12.5px; color: var(--people); margin-top: 5px; } .cover.none { color: var(--matter); }
+.field { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; } .field label { font-size: 12px; color: var(--ink-2); }
+.field input { display: block; width: 100%; margin-top: 4px; padding: 9px 10px; border-radius: 9px; border: 1px solid var(--rule); background: var(--card); font-size: 16px; }
+.gauge { height: 10px; border-radius: 5px; background: var(--wash); position: relative; margin-top: 8px; overflow: hidden; } .gauge i { position: absolute; top: 0; bottom: 0; }

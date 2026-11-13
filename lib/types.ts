@@ -26,7 +26,7 @@ export interface FinnEvent {
 }
 export interface Company {
   symbol: string; name: string; legal_name?: string; sector: string; industry?: string; mcap_cr?: number;
-  line?: { cr: number; leg: string } | null; beta?: number | null;
+  line?: { cr: number; leg: string } | null; beta?: number | null; weight?: number | null;
 }
 export interface Digest {
   generated_at: string; as_of: string; window_days: number;
@@ -50,4 +50,4 @@ export interface CloseBrief {
   rotation: number | null; world: WorldIndex[]; filed: { act: number; glance: number; aside: number }; act: string[];
 }
 export interface Series { dates: string[]; close: number[]; change: (number | null)[]; abnormal: (number | null)[]; vol_ratio: (number | null)[]; p_ret: (number | null)[]; p_vol: (number | null)[] }
-export interface Market { as_of: string; series: Record<string, Series> }
+export interface Market { as_of: string; series: Record<string, Series>; index?: { name: string; dates: string[]; close: number[] } }

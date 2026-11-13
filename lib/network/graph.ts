@@ -258,6 +258,43 @@ export class Graph {
     return { person: best.person, confidence: best.corroborated || best.m === 2 ? "confirmed" : "possible" };
   }
 
+  /**
+   * Who opens the most doors? Personalised PageRank from the investor.
+   * Nodes: you, your contacts, and `others` (people named in filings). Edge weights:
+   * your tie to a contact; P(two people know each other) between everyone else. A walk
+   * starts at you, follows edges in proportion to weight, and returns to you with
+   * probability 1 - d each step (d = 0.85). A contact's score is the share of time the
+   * walk spends on them: high when they are close to you AND lead on to many others.
+   */
+  connectors(others: Person[] = [], limit = 4): { person: Person; score: number; doors: Person[] }[] {
+    const nodes: Person[] = [this.net.me, ...this.net.contacts, ...others];
+    const n = nodes.length, nc = this.net.contacts.length;
+    const W = Array.from({ length: n }, () => new Array<number>(n).fill(0));
+    for (let i = 1; i <= nc; i++) W[0][i] = W[i][0] = tieStrength(nodes[i], this.now);
+    for (let i = 1; i < n; i++) for (let j = i + 1; j < n; j++) {
+      if (i > nc && j > nc) continue; // two strangers knowing each other opens nothing for you
+      const p = this.knows(nodes[i], nodes[j]).p;
+      if (p >= 0.05) W[i][j] = W[j][i] = p;
+    }
+    const out = W.map((row) => row.reduce((a, b) => a + b, 0));
+    let r = new Array<number>(n).fill(1 / n);
+    const d = 0.85;
+    for (let it = 0; it < 50; it++) {
+      const next = new Array<number>(n).fill(0);
+      let lost = 0;
+      for (let i = 0; i < n; i++) {
+        if (out[i] === 0) { lost += r[i]; continue; }
+        for (let j = 0; j < n; j++) if (W[i][j]) next[j] += (d * r[i] * W[i][j]) / out[i];
+      }
+      next[0] += 1 - d + d * lost; // restart, and dead ends, go back to the investor
+      r = next;
+    }
+    return this.net.contacts.map((person, k) => ({
+      person, score: r[k + 1],
+      doors: nodes.filter((_, j) => j > nc && W[k + 1][j] >= 0.2),
+    })).filter((x) => x.doors.length > 0 || x.score > 0).sort((a, b) => b.doors.length - a.doors.length || b.score - a.score).slice(0, limit);
+  }
+
   themesOf(orgId: string): string[] {
     return this.orgs.get(orgId)?.themes ?? [];
   }

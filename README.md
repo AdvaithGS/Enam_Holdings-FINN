@@ -29,6 +29,12 @@ A mobile-first investment agent for a 20-stock NSE portfolio. It tells you what 
 - The research page opens with who you know at the company, a competitor, a supplier or a customer.
 - Demo companies are precomputed. Any other NSE symbol is read live in stages, and the page shows what is being read.
 
+**Book (your holdings).** Shares, entry prices, dates and targets, editable and stored on the device; a ₹10 crore demo book to start.
+
+- *Against what you expected.* You set a return (15% a year by default). Each position is held to `cost × (1+E)^(days/365)`; the book is so many rupees ahead or behind, with no annualising of short holdings.
+- *Risk.* 95% historical VaR and expected shortfall over 250 sessions at today's weights, volatility, beta, alpha, tracking error, and rolling 60-session alpha to show whether the edge is fading. Each position is also compared with the same rupees put into the NIFTY on its entry date.
+- *Coverage.* Every holding shows the person best placed to explain it, heaviest first, and the share of the book with nobody to call.
+
 **People (network).** Not a contact list.
 
 - *A reason to call:* a contact you have not spoken to in nine months whose company just filed something that matters.
@@ -56,6 +62,9 @@ Each number on screen has a derivation. The short version:
 | Tie strength | `s = c · 2^(−months/36)`, c from the investor's own closeness rating |
 | "Did they know each other" | `p = 1 − (1 − q)^years`, q set by organisation size, seniority and function; classmates by cohort size; evidence combined by noisy-OR |
 | Ask | Token similarity `1 − d/len` (Damerau-Levenshtein); concept weights fade by 0.7 per supply-chain link; a person's relevance is `1 − e^(−Σ match·years·seniority·freshness / 6)`, the same form as the expertise map |
+| Book risk | `VaR = −(5th percentile of r_p)`, `r_p = Σ w_i r_i` at today's weights; alpha `= (mean r_p − β·mean r_m)·252`; expectation gap `= value − cost·(1+E)^(days/365)` |
+| A field moving | Mean market-adjusted return of the holdings in one field, summed over 5 sessions, ranked against every earlier 5-session stretch of the same stocks |
+| Door-openers | Personalised PageRank from the investor (restart 0.15) over tie strengths and acquaintance probabilities |
 | Who to call | `score = tie × knowledge`, knowledge = relation × freshness × depth × seniority × fit, combined across roles |
 | Promised vs delivered | Quantified full-year commitments on revenue growth and margins are adjudicated in code against reported numbers; the model judges only what code cannot |
 
@@ -160,6 +169,9 @@ There is no free-roaming agent. The pipeline is a fixed sequence in which each s
 - **A size, value and momentum factor model.** There is no free daily series of Indian factor returns, and the obvious stand-ins fail: Yahoo carries no history for the NSE momentum and value indices, and a sector index is contaminated by its own largest member (HDFC Bank is over a quarter of NIFTY Bank), so regressing on it would absorb the very shock being measured. The market model is already rolling and out of sample.
 - **A hidden Markov regime model.** GARCH already conditions every alert on the volatility state, and the measurement above shows the alert rate is flat across regimes after it. A second regime layer on the same returns would count the same thing twice.
 - **A two-tower contrastive network for promised against delivered.** It needs thousands of labelled guidance-outcome pairs to train; there are a few dozen commitments per company. A cosine threshold between a sentence and a number is also harder to audit than what is here: quantified commitments are adjudicated by arithmetic and shown beside management's verbatim words, and only the rest go to a model.
+- **Passive ingestion of email and calendar over OAuth.** It needs a real workspace account, a verified OAuth app and consent from the people in the headers; none of that exists in a demo, and it would move the network off the device. The tie model takes a last-contact date today and would take a contact log unchanged.
+- **A graph neural network for link prediction.** There are no observed edges to train on. "Did they know each other" is already an explicit link model whose every factor can be read; PageRank, which needs no training, is used for "who opens the most doors".
+- **A feed of analyses written by contacts.** There is no such content to rank without scraping it or inventing it, and invented research notes about real companies would be the opposite of this product. A meeting log written by the investor is the honest version and is listed under next steps.
 - **A discounted cash flow sensitivity as the materiality measure.** It would need a forecast, a discount rate and a terminal value per company, none of which can be derived. The regulator's line stays as the pinned threshold; market value and cash flow give the scale without a forecast.
 - **"Semantic delta" of the day's announcements.** No definition of it could be checked against anything.
 
@@ -211,6 +223,7 @@ finn/                    Python: everything that touches public data
   research/              fundamentals.py · documents.py · synthesis.py · dossier.py
 api/research.py          serverless entry, one stage per request
 lib/network/             TypeScript: the on-device network engine, query engine (search.ts) and tests
+lib/portfolio/           TypeScript: on-device holdings maths (risk.ts) and tests
 lib/client/              store, formatting, staged research client
 app/ · components/       Brief, Ask, People, research page
 scripts/make_network.py  the synthetic demo network

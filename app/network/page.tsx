@@ -1,5 +1,7 @@
 "use client";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { oneIn, pct } from "@/lib/client/format";
+import { fieldMove } from "@/lib/portfolio/risk.ts";
 import { Avatar, Meter, ReachPath } from "@/components/People";
 import { Sheet, useOpenPerson } from "@/components/Shell";
 import { ago, day } from "@/lib/client/format";
@@ -8,7 +10,8 @@ import { monthsSince, strengthWord, tieStrength } from "@/lib/network/graph.ts";
 import type { Network } from "@/lib/network/types.ts";
 
 export default function NetworkPage() {
-  const { net, graph, digest, publicPeople, replaceNetwork, custom } = useStore();
+  const { net, graph, digest, publicPeople, replaceNetwork, custom, market, loadMarket } = useStore();
+  useEffect(loadMarket, [loadMarket]);
   const open = useOpenPerson();
   const [theme, setTheme] = useState("specialty-chemicals");
   const [settings, setSettings] = useState(false);
@@ -30,6 +33,17 @@ export default function NetworkPage() {
     }
     return out.sort((a, b) => b.weight - a.weight).slice(0, 4);
   }, [net, graph, digest]);
+  // a whole field moving: two or more holdings in one field, together, beyond the market
+  const shifts = useMemo(() => {
+    if (!net || !graph || !digest || !market) return [];
+    return net.themes.map((t) => {
+      const syms = Object.keys(digest.companies).filter((s) => graph.themesOf(graph.orgId(s) ?? "").includes(t.id));
+      const mv = fieldMove(syms, market);
+      const expert = graph.expertise(t.id, 1)[0];
+      return mv && mv.p <= 0.1 && expert ? { t, syms, mv, expert } : null;
+    }).filter((x): x is NonNullable<typeof x> => !!x).sort((a, b) => a.mv.p - b.mv.p).slice(0, 3);
+  }, [net, graph, digest, market]);
+  const doors = useMemo(() => (graph ? graph.connectors(publicPeople, 3).filter((c) => c.doors.length > 0) : []), [graph, publicPeople]);
   const experts = useMemo(() => (graph ? graph.expertise(theme, 5) : []), [graph, theme]);
   const themes = useMemo(() => (net && graph ? net.themes.filter((t) => graph.expertise(t.id, 1).length) : []), [net, graph]);
   const inNews = useMemo(() => (graph ? publicPeople.map((p) => ({ p, routes: graph.reach(p) })).filter((x) => x.routes.length).sort((a, b) => b.routes[0].strength - a.routes[0].strength).slice(0, 4) : []), [graph, publicPeople]);
@@ -69,6 +83,34 @@ export default function NetworkPage() {
               </span>
             </button>
           ))}
+        </section>
+      )}
+
+      {shifts.length > 0 && (
+        <section className="section">
+          <div className="head"><span className="caps" style={{ color: "var(--matter)" }}>A field is moving</span></div>
+          {shifts.map(({ t, syms, mv, expert }) => (
+            <button key={t.id} className="card" style={{ width: "100%", display: "block" }} onClick={() => open(expert.person.id)}>
+              <span style={{ display: "block" }}><b>{t.label}:</b> {syms.join(" and ")} have moved <b className={mv.move >= 0 ? "up" : "down"}>{pct(mv.move, 1)}</b> against the market over five sessions, together. A stretch like that comes {oneIn(mv.p)} times.</span>
+              <span className="row" style={{ marginTop: 9, gap: 9 }}><Avatar person={expert.person} /><span className="grow small"><b style={{ color: "var(--people)" }}>Ask {expert.person.name}</b><span className="muted" style={{ display: "block" }}>{expert.years} years in the field · {expert.roles[0].title}, {graph.orgName(expert.roles[0].org)}</span></span></span>
+            </button>
+          ))}
+        </section>
+      )}
+
+      {doors.length > 0 && (
+        <section className="section">
+          <div className="head"><span className="caps">Who opens the most doors</span></div>
+          <div className="card" style={{ padding: "2px 14px" }}>
+            {doors.map((c) => (
+              <button key={c.person.id} className="hit" onClick={() => open(c.person.id)}>
+                <Avatar person={c.person} />
+                <span className="grow"><b>{c.person.name}</b><span className="small muted" style={{ display: "block" }}>Likely knows {c.doors.slice(0, 3).map((p) => p.name).join(", ")}{c.doors.length > 3 ? ` and ${c.doors.length - 3} more` : ""}</span></span>
+                <span className="tiny faint">{c.doors.length} in filings</span>
+              </button>
+            ))}
+          </div>
+          <p className="tiny faint" style={{ marginTop: 8 }}>Ranked by a random walk from you through your ties and their likely acquaintances (personalised PageRank), counting people named in this month’s filings.</p>
         </section>
       )}
 
