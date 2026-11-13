@@ -52,4 +52,4 @@ export interface CloseBrief {
   rotation: number | null; world: WorldIndex[]; filed: { act: number; glance: number; aside: number }; act: string[];
 }
 export interface Series { dates: string[]; close: number[]; change: (number | null)[]; abnormal: (number | null)[]; vol_ratio: (number | null)[]; vol_mkt?: (number | null)[]; p_ret: (number | null)[]; p_vol: (number | null)[] }
-export interface Market { as_of: string; series: Record<string, Series>; index?: { name: string; dates: string[]; close: number[] } }
+export interface Market { risk?: { symbols: string[]; sessions: number; modes: number; cov: number[][] } | null; as_of: string; series: Record<string, Series>; index?: { name: string; dates: string[]; close: number[] } }

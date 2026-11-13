@@ -104,6 +104,25 @@ export function risk(pos: Position[], market: Market, window = 250, roll = 60): 
 }
 
 /**
+ * Where the risk sits. With covariance S (noise eigenvalues flattened, stats.rmt_clean)
+ * and weights w, the book's variance is w'Sw and holding i contributes
+ *     c_i = w_i (S w)_i / w'Sw ,      sum_i c_i = 1.
+ * A holding whose c_i exceeds its weight is carrying more than its share of the risk.
+ */
+export function contributions(pos: Position[], market: Market): { symbol: string; weight: number; share: number }[] | null {
+  const r = market.risk;
+  if (!r) return null;
+  const at = new Map(r.symbols.map((s, i) => [s, i]));
+  const held = pos.filter((p) => at.has(p.symbol));
+  const total = held.reduce((a, p) => a + p.weight, 0);
+  if (held.length < 2 || total <= 0) return null;
+  const w = held.map((p) => p.weight / total), k = held.map((p) => at.get(p.symbol)!);
+  const Sw = k.map((i) => k.reduce((a, j, n) => a + r.cov[i][j] * w[n], 0));
+  const v = w.reduce((a, x, i) => a + x * Sw[i], 0);
+  return held.map((p, i) => ({ symbol: p.symbol, weight: w[i], share: (w[i] * Sw[i]) / v })).sort((a, b) => b.share - a.share);
+}
+
+/**
  * Is a whole field moving? For a set of stocks, the mean of their market-adjusted
  * returns summed over the last `span` sessions, ranked against every earlier
  * `span`-session stretch of the same stocks: p = (1 + #{as extreme}) / (1 + n).

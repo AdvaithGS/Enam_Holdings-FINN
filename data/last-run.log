@@ -1,31 +1,35 @@
-FINN digest  2026-11-13 17:51 IST  window 2026-10-09 .. 2026-11-13
+FINN digest  2026-11-14 02:56 IST  window 2026-10-10 .. 2026-11-14
 baseline P(noticed | no filing) = 0.071; 'what matters' cut-off = 3x = 0.214
 market volume: 600 sessions from constituent medians (bhavcopy), 1235 with aggregate NIFTY 500 turnover as fallback
 prices: 20 stocks, latest session 2026-11-13; fx {'USD': 94.23, 'EUR': 104.1995, 'GBP': 124.6644}
-filings: 294 in window
+filings: 289 in window
 opaque titles opened locally: 78 (OCR pages: 4)
-events after folding: 213
-intraday: 26 filings timed during trading hours
-  sector factor TCS: Nifty IT [INFY, COFORGE, HCLTECH, TECHM, PERSISTENT...] PC1 60% of variance (eigenvalue 5.41 vs noise edge 1.43), loading t = 19.1
-  sector factor ITC: Nifty FMCG [HINDUNILVR, RADICO, PATANJALI, VBL, MARICO...] PC1 25% of variance (eigenvalue 2.51 vs noise edge 1.45), loading t = 3.7
-  sector factor LT: Nifty Infrastructure [RELIANCE, BHARTIARTL, GVT&D, INDIGO, CUMMINSIND...] PC1 20% of variance (eigenvalue 1.97 vs noise edge 1.45), loading t = 2.7
-  sector factor SUNPHARMA: Nifty Healthcare Index [DIVISLAB, LAURUSLABS, APOLLOHOSP, AUROPHARMA, ALKEM...] PC1 32% of variance (eigenvalue 3.24 vs noise edge 1.45), loading t = 7.3
-  sector factor MARUTI: Nifty Auto [M&M, EICHERMOT, TVSMOTOR, HEROMOTOCO, BAJAJ-AUTO...] PC1 30% of variance (eigenvalue 3.02 vs noise edge 1.45), loading t = 7.9
-  sector factor TITAN: Nifty Consumer Durables [AMBER, KALYANKJIL, DIXON, VOLTAS, HAVELLS...] PC1 32% of variance (eigenvalue 2.86 vs noise edge 1.43), loading t = 3.3
-  sector factor BAJFINANCE: Nifty Financial Services [HDFCBANK, ICICIBANK, SBIN, BSE, SHRIRAMFIN...] PC1 19% of variance (eigenvalue 1.88 vs noise edge 1.45), loading t = 5.8
-  sector factor ASIANPAINT: its direct competitors [BERGEPAINT, KANSAINER, INDIGOPNTS, PIDILITIND] PC1 41% of variance (eigenvalue 1.63 vs noise edge 1.28), loading t = 6.8
-  sector factor ETERNAL: its direct competitors [SWIGGY, NYKAA, POLICYBZR, DELHIVERY, NAUKRI...] PC1 25% of variance (eigenvalue 1.53 vs noise edge 1.34), loading t = 7.7
-  sector factor TRENT: its direct competitors [DMART, ABFRL, SHOPERSTOP, VMART, ARVINDFASN...] PC1 25% of variance (eigenvalue 1.77 vs noise edge 1.37), loading t = 4.0
-  sector factor DIXON: Nifty Consumer Durables [AMBER, KALYANKJIL, TITAN, VOLTAS, HAVELLS...] PC1 30% of variance (eigenvalue 2.72 vs noise edge 1.43), loading t = 6.2
-  sector factor KAYNES: its direct competitors [SYRMA, CYIENTDLM, AVALON, PGEL, AMBER...] PC1 33% of variance (eigenvalue 2.32 vs noise edge 1.37), loading t = 8.5
-  sector factor CGPOWER: its direct competitors [SIEMENS, ABB, BHEL, POWERINDIA, THERMAX...] PC1 37% of variance (eigenvalue 3.71 vs noise edge 1.45), loading t = 13.7
-  sector factor SRF: Nifty Chemicals [NAVINFLUOR, SOLARINDS, UPL, PIDILITIND, PIIND...] PC1 18% of variance (eigenvalue 1.79 vs noise edge 1.45), loading t = 6.5
-  sector factor DEEPAKNTR: Nifty Chemicals [NAVINFLUOR, SOLARINDS, UPL, PIDILITIND, PIIND...] PC1 19% of variance (eigenvalue 1.85 vs noise edge 1.45), loading t = 4.9
-  sector factor CREDITACC: its direct competitors [FUSION, SPANDANA, UJJIVANSFB, BANDHANBNK, EQUITASBNK...] PC1 34% of variance (eigenvalue 2.38 vs noise edge 1.37), loading t = 5.6
-  sector factor PAYTM: Nifty Financial Services Ex-Bank [BAJFINANCE, MCX, BSE, POLICYBZR, SHRIRAMFIN...] PC1 24% of variance (eigenvalue 2.41 vs noise edge 1.45), loading t = 4.4
-moves without a filing: 127 examined, 87 with a supported explanation
+events after folding: 209
+intraday: 25 filings timed during trading hours
+  sector model RELIANCE: no peer factor passes
+  sector model HDFCBANK: no peer factor passes
+  sector model TCS (R2 63%, 1 of 1 tested): its Computers - Software & Consulting peers [INFY, HCLTECH, WIPRO, TECHM...] t = 19.8, PC1 66%
+  sector model BHARTIARTL: no peer factor passes
+  sector model ITC (R2 6%, 1 of 1 tested): its Nifty FMCG peers [HINDUNILVR, RADICO, PATANJALI, VBL...] t = 3.8, PC1 25%
+  sector model LT (R2 3%, 1 of 1 tested): its Civil Construction peers [RVNL, CEMPRO, KPIL, IRB...] t = 2.6, PC1 35%
+  sector model SUNPHARMA (R2 13%, 1 of 1 tested): its Pharmaceuticals peers [DIVISLAB, TORNTPHARM, LAURUSLABS, ZYDUSLIFE...] t = 6.1, PC1 39%
+  sector model MARUTI (R2 10%, 1 of 1 tested): its Passenger Cars & Utility Vehicles peers [M&M, HYUNDAI, TMPV, FORCEMOT...] t = 5.0, PC1 30%
+  sector model TITAN (R2 19%, 1 of 1 tested): its Gems, Jewellery And Watches peers [KALYANKJIL, SKYGOLD, PCJEWELLER, THANGAMAYL...] t = 7.2, PC1 36%
+  sector model BAJFINANCE (R2 19%, 1 of 1 tested): its Non Banking Financial Company (NBFC) peers [SHRIRAMFIN, CHOLAFIN, MUTHOOTFIN, LTF...] t = 7.4, PC1 42%
+  sector model ASIANPAINT (R2 9%, 1 of 1 tested): its Paints peers [BERGEPAINT, KANSAINER, JSWDULUX, INDIGOPNTS...] t = 4.8, PC1 30%
+  sector model ETERNAL (R2 20%, 1 of 1 tested): its named peers [SWIGGY, NYKAA, POLICYBZR, DELHIVERY...] t = 7.7, PC1 25%
+  sector model TRENT (R2 6%, 1 of 1 tested): its named peers [DMART, ABFRL, SHOPERSTOP, VMART...] t = 4.0, PC1 25%
+  sector model DIXON (R2 6%, 1 of 1 tested): its Consumer Electronics peers [HAVELLS, PGEL, IKIO, ONIDA...] t = 3.8, PC1 29%
+  sector model KAYNES (R2 12%, 1 of 1 tested): its Industrial Products peers [CPPLUS, SYRMA, HONAUT, JYOTICNC] t = 5.6, PC1 32%
+  sector model CGPOWER (R2 41%, 1 of 1 tested): its Heavy Electrical Equipment peers [BHEL, ABB, POWERINDIA, SIEMENS...] t = 12.9, PC1 50%
+  sector model SRF (R2 5%, 1 of 1 tested): its Commodity Chemicals peers [DEEPAKFERT, TATACHEM, GNFC, GUJALKALI...] t = 3.6, PC1 33%
+  sector model DEEPAKNTR (R2 4%, 1 of 1 tested): its Specialty Chemicals peers [PIDILITIND, FLUOROCHEM, NAVINFLUOR, AETHER...] t = 3.0, PC1 28%
+  sector model CREDITACC (R2 11%, 1 of 1 tested): its Microfinance Institutions peers [SATIN, MUTHOOTMF, FUSION, SPANDANA] t = 5.4, PC1 39%
+  sector model PAYTM (R2 8%, 1 of 1 tested): its Nifty Financial Services Ex-Bank peers [BAJFINANCE, MCX, BSE, POLICYBZR...] t = 4.5, PC1 24%
+moves without a filing: 122 examined, 81 with a supported explanation
+risk: 20x20 covariance over 250 sessions, 1 eigenvalue(s) above the Marchenko-Pastur edge kept, the rest flattened
 
---- WHAT MATTERS (22)
+--- WHAT MATTERS (21)
   0.94 RELIANCE   2026-10-30 Results          Q2 FY27: revenue +29%, PAT +34% YoY
          . The stock moved +9.8% vs market on 5.8x volume that session; for its volatility at the time, a day this unusual comes about 1 in 501. This event carries 88% of the credit among 2 that session.
   0.90 DEEPAKNTR  2026-10-29 Results          Q2 FY27: revenue +62%, PAT +235% YoY
@@ -37,8 +41,6 @@ moves without a filing: 127 examined, 87 with a supported explanation
          . The stock moved +4.0% vs market on 3.2x volume that session; for its volatility at the time, a day this unusual comes about 1 in 167. This event carries 88% of the credit among 2 that session.
   0.79 DIXON      2026-10-30 Results          Q2 FY27: revenue +47%, PAT -45% YoY
          . The stock moved +9.8% vs market on 6.0x volume that session; for its volatility at the time, a day this unusual comes about 1 in 125. This event carries 79% of the credit among 3 that session.
-  0.77 TCS        2026-10-09 Other            Statement of the Company regarding the announcement by the US Government on the Permanent 
-         . The stock moved +3.0% vs market on 3.5x volume that session; for its volatility at the time, a day this unusual comes about 1 in 501.
   0.75 TITAN      2026-11-05 Results          Q2 FY27: revenue +10%, PAT +114% YoY
          . The stock moved +1.3% vs market on 5.6x volume that session; for its volatility at the time, a day this unusual comes about 1 in 125. This event carries 61% of the credit among 4 that session.
   0.67 SRF        2026-10-21 Results          Q2 FY27: revenue +35%, PAT +31% YoY
@@ -150,7 +152,6 @@ moves without a filing: 127 examined, 87 with a supported explanation
          . Filed at 14:28. In the next 30 minutes the volume-weighted price moved +1.15% against the session so far on 13.5x the usual volume for that time of day: a half hour like that comes about 1 in 1124 at that time of day (n=1,125). Shown as evidence; not in the score.
   0.09 BAJFINANCE 2026-10-19 Management       (the ‘SEBI Listing Regulations, 2015’) –Change in Senior Management Personnel
   0.09 BAJFINANCE 2026-11-10 Fund raise       Allotment of 5,74,25,740 securities pursuant to Preferential Issue at its meeting held on 
-         . Filed at 12:14. In the next 30 minutes the volume-weighted price moved -0.27% against the session so far on 1.0x the usual volume for that time of day: nothing unusual for that time of day (n=1,471). Shown as evidence; not in the score.
   0.09 SUNPHARMA  2026-10-12 Management       Resignation of Director of the Company
   0.09 TRENT      2026-10-19 Management       Resignation of Director/KMP/SMP
   0.09 HDFCBANK   2026-10-31 Management       Change in Management
@@ -166,7 +167,7 @@ moves without a filing: 127 examined, 87 with a supported explanation
          . Filed at 12:30. In the next 30 minutes the volume-weighted price moved -0.28% against the session so far on 1.4x the usual volume for that time of day: nothing unusual for that time of day (n=1,472). Shown as evidence; not in the score.
 --- THE CLOSE 2026-11-13: portfolio -0.42%, NIFTY -0.61%, alpha +0.21% (1 in 2); 7 up, 12 down; regime normal; rotation -0.72
     sectors vs NIFTY: Energy +0.64%, FMCG +0.61%, Infra +0.26%, Pharma +0.13%, IT -0.11%, Bank -0.18%, Metal -0.37%, Auto -0.46%, Realty -0.78%
-    world: Nikkei 225 +0.53% (11-13), Hang Seng -1.55% (11-13), Shanghai -0.59% (11-13), KOSPI -0.98% (11-13), NIFTY 50 -0.61% (11-13), DAX +0.41% (11-12), Euro Stoxx 50 +0.09% (11-12), FTSE 100 +0.25% (11-12), S&P 500 -0.35% (11-12), Nasdaq -0.39% (11-12)
---- SET ASIDE (126 events, 141 filings)
+    world: Nikkei 225 +0.53% (11-13), Hang Seng -1.55% (11-13), Shanghai -0.59% (11-13), KOSPI -0.98% (11-13), NIFTY 50 -0.61% (11-13), DAX -0.08% (11-13), Euro Stoxx 50 -0.19% (11-13), FTSE 100 +0.36% (11-13), S&P 500 -0.40% (11-13), Nasdaq -0.91% (11-13)
+--- SET ASIDE (123 events, 138 filings)
 
-run: {'filings': 294, 'events': 213, 'documents_read': 0, 'llm': {'calls': 0, 'cache_hits': 0, 'input_tokens': 0, 'output_tokens': 0, 'by_tier': {}}, 'http': {'fetched': 139, 'cached': 2405, 'bytes': 6290818}, 'seconds': 187.0, 'ocr_pages': 7, 'llm_available': False}
+run: {'filings': 289, 'events': 209, 'documents_read': 0, 'llm': {'calls': 0, 'cache_hits': 0, 'input_tokens': 0, 'output_tokens': 0, 'by_tier': {}}, 'http': {'fetched': 43, 'cached': 2562, 'bytes': 235730}, 'seconds': 72.4, 'ocr_pages': 7, 'llm_available': False}

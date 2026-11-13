@@ -62,6 +62,32 @@ def _schedule(company_id: str, parent: str, section: str, consolidated: bool) ->
             for k, row in data.items() if isinstance(row, dict)}
 
 
+def peers(symbol: str) -> tuple[str | None, list[str]]:
+    """Companies screener lists in the same basic industry (the exchange's industry classification)."""
+    for path in (f"/company/{symbol}/consolidated/", f"/company/{symbol}/"):
+        try:
+            soup = BeautifulSoup(http.get_text(BASE + path, ttl=DAY), "lxml")
+        except http.FetchError:
+            continue
+        info = soup.find(id="company-info")
+        wid = info.get("data-warehouse-id") if info else None
+        if not wid:
+            continue
+        box = soup.select_one("#peers")
+        industry = [a.get_text(strip=True) for a in box.select("a[href^='/market/']")] if box else []
+        try:
+            table = BeautifulSoup(http.get_text(f"{BASE}/api/company/{wid}/peers/", ttl=7 * DAY), "lxml")
+        except http.FetchError:
+            return (industry[-1] if industry else None), []
+        out = []
+        for a in table.select("a[href^='/company/']"):
+            m = re.match(r"/company/([^/]+)/", a["href"])
+            if m and m.group(1) != symbol and not m.group(1).isdigit():
+                out.append(m.group(1))
+        return (industry[-1] if industry else None), out
+    return None, []
+
+
 def company(symbol: str, ttl: float = DAY) -> dict | None:
     """Statements + document links for one company. Consolidated when available."""
     html, consolidated = None, True

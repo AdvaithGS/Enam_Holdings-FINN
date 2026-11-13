@@ -7,11 +7,12 @@ Market volume.  The typical stock's volume against its own norm:
                 Before the bhavcopy archive in this format begins (and as a fallback), the
                 NIFTY 500's aggregate turnover over its own 20-session mean is used.
 
-Sector factor.  Who are the stock's peers?
-                  1. a named basket of direct competitors, where the investor has set one
-                     (portfolio.json "peers": CG Power against Siemens, ABB, BHEL...), else
-                  2. the constituents of the narrowest NSE sector index that lists the
-                     stock (the exchange's own list files), largest ten by turnover.
+Sector factor.  Who are the stock's peers? In order (peer_sets):
+                  1. sets named in portfolio.json, for the cases a classification cannot
+                     express (a conglomerate is several businesses: one set per business);
+                  2. its basic-industry peers, found programmatically from the exchange's
+                     industry classification (CG Power -> BHEL, ABB, Siemens, Hitachi Energy);
+                  3. the narrowest NSE sector index that lists it, largest ten by turnover.
                 The stock itself is never in its own factor. Each peer's return is taken
                 net of the market (same conditional beta as everywhere), standardised on
                 the N_FIT sessions before the window, and the factor is the first principal
@@ -21,8 +22,9 @@ Sector factor.  Who are the stock's peers?
                 (1 + sqrt(n/T))^2, the largest eigenvalue pure noise would produce.
                 The stock's residual is then regressed on f over the same sessions,
                     e_t = g f_t + u_t ,
-                and the sector is accepted at |t(g)| >= T_MIN = 2.58 (1%, one pre-specified
-                factor, so no multiple-testing correction). Weights, scaling and loading are
+                and the sector is accepted at t(g) >= 2.58 (1%, one pre-specified factor).
+                With several sets (sector_model) the regression is joint, each loading is
+                partial, and the bar rises to the 1% level shared across the sets tested. Weights, scaling and loading are
                 all fixed before the window; inside it, g f_d is out of sample.
 
 Why not regress on the cap-weighted sector index: a large stock IS a large part of its
@@ -68,16 +70,34 @@ def _lists() -> dict[str, list[str]]:
     return out
 
 
-def peers_of(symbol: str, basket: list[str] | None, lists: dict[str, list[str]], size: dict[str, float]) -> dict | None:
-    """The stock's peer set: a named basket if given, else its narrowest sector list."""
-    if basket:
-        return {"name": "its direct competitors", "basis": "basket", "peers": [p for p in basket if p != symbol][:TOP]}
+def peer_sets(symbol: str, given, lists: dict[str, list[str]], size: dict[str, float]) -> list[list[dict]]:
+    """Candidate peer sets, in the order they are tried. Each entry is a list of sets
+    that are tested TOGETHER (one set: a single factor; several: a multi-factor model).
+
+      1. sets named in portfolio.json: a list (one basket) or {business: [symbols]} for a
+         company that is several businesses at once;
+      2. the company's basic-industry peers (screener's peer list, which follows the
+         exchange's industry classification): found programmatically, no hand input;
+      3. the narrowest NSE sector index that lists the stock.
+    """
+    out: list[list[dict]] = []
+    if isinstance(given, dict):
+        out.append([{"name": k, "basis": "basket", "peers": [p for p in v if p != symbol][:TOP]} for k, v in given.items()])
+    elif given:
+        out.append([{"name": "its named peers", "basis": "basket", "peers": [p for p in given if p != symbol][:TOP]}])
+    try:
+        from .sources import screener
+        industry, found = screener.peers(symbol)
+    except Exception:
+        industry, found = None, []
+    if len(found) >= MIN_PEERS:
+        out.append([{"name": f"its {industry} peers" if industry else "its industry peers", "basis": "industry", "peers": found[:TOP]}])
     mine = [(n in BROAD, len(v), n) for n, v in lists.items() if symbol in v]
-    if not mine:
-        return None
-    name = min(mine)[2]   # sector-specific lists before broad ones, then the smallest
-    ranked = sorted((p for p in lists[name] if p != symbol), key=lambda p: -size.get(p, 0.0))
-    return {"name": name, "basis": "member", "peers": ranked[:TOP]}
+    if mine:
+        name = min(mine)[2]   # sector-specific lists before broad ones, then the smallest
+        ranked = sorted((p for p in lists[name] if p != symbol), key=lambda p: -size.get(p, 0.0))
+        out.append([{"name": f"its {name} peers", "basis": "member", "peers": ranked[:TOP]}])
+    return out
 
 
 def nifty500() -> list[str]:
@@ -144,8 +164,8 @@ def _residuals(symbol: str, market: list[dict]) -> dict[str, float]:
     return {b["date"]: float(x) for b, x in zip(bars, e) if not np.isnan(x)}
 
 
-def sector_factor(e: dict[str, float], peer_set: dict, market: list[dict], before: str, cache: dict) -> dict | None:
-    """First principal component of the peers' residuals, and the stock's tested loading on it."""
+def _pc1(peer_set: dict, fit_days: list[str], market: list[dict], cache: dict) -> dict | None:
+    """First principal component of one peer set on the fit sessions, if it is a real factor."""
     res = {}
     for p in peer_set["peers"]:
         if p not in cache:
@@ -155,27 +175,57 @@ def sector_factor(e: dict[str, float], peer_set: dict, market: list[dict], befor
                 cache[p] = {}
         if cache[p]:
             res[p] = cache[p]
-    fit = [d for d in sorted(e) if d < before][-N_FIT:]
-    names = [p for p in res if sum(d in res[p] for d in fit) >= 0.9 * len(fit)]
-    fit = [d for d in fit if all(d in res[p] for p in names)]
-    if len(names) < MIN_PEERS or len(fit) < 0.8 * N_FIT:
+    names = [p for p in res if sum(d in res[p] for d in fit_days) >= 0.9 * len(fit_days)]
+    days = [d for d in fit_days if all(d in res[p] for p in names)]
+    if len(names) < MIN_PEERS or len(days) < 0.8 * N_FIT:
         return None
-    X = np.array([[res[p][d] for p in names] for d in fit])
+    X = np.array([[res[p][d] for p in names] for d in days])
     mu, sd = X.mean(0), X.std(0)
     w, V = np.linalg.eigh(np.corrcoef(((X - mu) / sd).T))
     lam, v = float(w[-1]), V[:, -1]
-    edge = (1 + math.sqrt(len(names) / len(fit))) ** 2
+    edge = (1 + math.sqrt(len(names) / len(days))) ** 2
     if lam <= edge:
         return None   # the peers share no factor beyond what noise would show
     v = v if v.sum() > 0 else -v
-    f_fit = ((X - mu) / sd) @ v
-    y = np.array([e[d] for d in fit])
-    g = float(f_fit @ y) / float(f_fit @ f_fit)
-    u = y - g * f_fit
-    se = math.sqrt(float(u @ u) / (len(fit) - 1) / float(f_fit @ f_fit))
-    t = g / se if se > 0 else 0.0
-    if g <= 0 or t < T_MIN:
-        return None
-    later = [d for d in sorted(e) if d >= before and all(d in res[p] for p in names)]
-    f = {d: float(((np.array([res[p][d] for p in names]) - mu) / sd) @ v) for d in later}
-    return {**peer_set, "peers": names, "g": g, "t": t, "n": len(fit), "share": lam / len(names), "edge": edge, "lam": lam, "f": f}
+    score = lambda d: float(((np.array([res[p][d] for p in names]) - mu) / sd) @ v)  # noqa: E731
+    return {**peer_set, "peers": names, "lam": lam, "edge": edge, "share": lam / len(names), "days": set(days), "score": score,
+            "has": lambda d: all(d in res[p] for p in names)}
+
+
+def t_min(k: int) -> float:
+    """Two-sided 1% critical value shared across k factors tested together (Bonferroni)."""
+    from statistics import NormalDist
+    return NormalDist().inv_cdf(1 - 0.005 / max(1, k))
+
+
+def sector_model(e: dict[str, float], sets: list[dict], market: list[dict], before: str, cache: dict) -> dict | None:
+    """The stock's residual on the principal components of its peer sets, jointly.
+
+        e_t = sum_k g_k f_k,t + u_t          f_k = PC1 of peer set k (stock excluded)
+
+    Ordinary least squares on the N_FIT sessions before `before`; each g_k is a partial
+    loading (what set k explains that the others do not). A factor is kept when its
+    partial t clears t_min(k); the model is refitted on the survivors. One set is the
+    single-factor case. Returns None when nothing survives.
+    """
+    fit = [d for d in sorted(e) if d < before][-N_FIT:]
+    pcs = [p for p in (_pc1(s, fit, market, cache) for s in sets) if p]
+    while pcs:
+        days = [d for d in fit if all(d in p["days"] for p in pcs)]
+        if len(days) < 0.8 * N_FIT:
+            return None
+        F = np.array([[p["score"](d) for p in pcs] for d in days])
+        y = np.array([e[d] for d in days])
+        G = np.linalg.inv(F.T @ F)
+        g = G @ F.T @ y
+        u = y - F @ g
+        se = np.sqrt(np.diag(G) * float(u @ u) / (len(days) - len(pcs)))
+        t = g / se
+        keep = [i for i in range(len(pcs)) if g[i] > 0 and t[i] >= t_min(len(sets))]
+        if len(keep) == len(pcs):
+            later = [d for d in sorted(e) if d >= before and all(p["has"](d) for p in pcs)]
+            return {"n": len(days), "r2": 1 - float(u @ u) / float(y @ y), "tested": len(sets),
+                    "factors": [{"name": p["name"], "basis": p["basis"], "peers": p["peers"], "g": float(g[i]), "t": float(t[i]), "share": p["share"],
+                                 "lam": p["lam"], "edge": p["edge"], "f": {d: p["score"](d) for d in later}} for i, p in enumerate(pcs)]}
+        pcs = [pcs[i] for i in keep]
+    return None

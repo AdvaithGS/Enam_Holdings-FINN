@@ -216,6 +216,30 @@ def ridge_logistic(X: np.ndarray, y: np.ndarray, lam: float = 1.0, iters: int = 
     return w, se
 
 
+def rmt_clean(X: np.ndarray) -> tuple[np.ndarray, int]:
+    """Covariance of the columns of X (T x N returns) with its noise eigenvalues flattened.
+
+    A correlation matrix estimated from T observations of N series has, even when the
+    series are independent, eigenvalues spread over the Marchenko-Pastur band up to
+        edge = (1 + sqrt(N/T))^2 .
+    Eigenvalues inside the band cannot be told from noise; their eigenvectors are the
+    directions an optimiser or a risk attribution will overfit. Following Laloux et al.
+    they are replaced by their mean (which preserves the trace); those above the edge,
+    the market and any real sector modes, are kept. Returns (covariance, modes kept).
+    """
+    sd = X.std(0, ddof=1)
+    C = np.corrcoef(X.T)
+    w, V = np.linalg.eigh(C)
+    edge = (1 + math.sqrt(X.shape[1] / X.shape[0])) ** 2
+    bulk = w <= edge
+    if bulk.any():
+        w = w.copy()
+        w[bulk] = w[bulk].mean()
+    Cc = V @ np.diag(w) @ V.T
+    d = np.sqrt(np.diag(Cc))
+    return (Cc / np.outer(d, d)) * np.outer(sd, sd), int((~bulk).sum())
+
+
 def logit(p: float) -> float:
     p = min(max(p, 1e-6), 1 - 1e-6)
     return math.log(p / (1 - p))

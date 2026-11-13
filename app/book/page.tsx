@@ -8,7 +8,7 @@ import { Sheet, useOpenPerson } from "@/components/Shell";
 import { crore, num, oneIn, pct, tone } from "@/lib/client/format";
 import { useHoldings } from "@/lib/client/holdings";
 import { useStore } from "@/lib/client/store";
-import { type Holding, positions, risk } from "@/lib/portfolio/risk.ts";
+import { contributions, type Holding, positions, risk } from "@/lib/portfolio/risk.ts";
 
 const P1 = (v: number) => `${(v * 100).toFixed(1)}%`;
 const cr = (rupees: number) => `₹${crore(rupees / 1e7)}`;
@@ -24,6 +24,7 @@ export default function Book() {
 
   const pos = useMemo(() => (holdings && market ? positions(holdings, market, expect) : []), [holdings, market, expect]);
   const r = useMemo(() => (market && pos.length ? risk(pos, market) : null), [pos, market]);
+  const contrib = useMemo(() => (market && pos.length ? contributions(pos, market) : null), [pos, market]);
   // coverage, business by business: a company is covered only as far as its businesses are
   const cover = useMemo(() => new Map(pos.map((p) => {
     const org = graph?.orgId(p.symbol);
@@ -79,6 +80,21 @@ export default function Book() {
               ? <Chart key="v" labels={r.dates} height={140} series={[{ name: "Book", color: "var(--blue)", values: r.curve, kind: "area", fmt: (v) => pct(v, 1) }, { name: "NIFTY", color: "var(--ink-3)", values: r.benchCurve, kind: "line", fmt: (v) => pct(v, 1) }]} />
               : <Chart key="a" labels={r.dates} height={140} series={[{ name: "Alpha, trailing 60 sessions", color: "var(--violet)", values: r.rolling, kind: "area", fmt: (v) => pct(v, 0) }]} />}
             <p className="tiny faint" style={{ marginTop: 6 }}>{view === "value" ? "What today’s book would have returned, held at today’s weights. Drag to read a date." : "Annualised return beyond market exposure over each trailing 60 sessions. A falling line is an edge decaying."}</p>
+          </div>
+        </section>
+      )}
+
+      {contrib && (
+        <section className="section">
+          <div className="head"><span className="caps">Where the risk sits</span><span className="tiny faint">share of risk vs share of money</span></div>
+          <div className="card">
+            {contrib.slice(0, 6).map((c) => (
+              <div key={c.symbol} style={{ marginTop: 8 }}>
+                <div className="row between small"><span><b>{c.symbol}</b> <span className="muted">{(c.weight * 100).toFixed(1)}% of the money</span></span>
+                  <b className={c.share > c.weight * 1.25 ? "down" : ""}>{(c.share * 100).toFixed(1)}% of the risk</b></div>
+                <div className="gauge" style={{ height: 6, marginTop: 4 }}><i style={{ left: 0, width: `${Math.min(100, c.share * 100 * 4)}%`, background: "var(--rose)" }} /><i style={{ left: `${Math.min(100, c.weight * 100 * 4)}%`, width: 2, background: "var(--ink)" }} /></div>
+              </div>))}
+            <p className="tiny faint" style={{ marginTop: 10 }}>The bar is the holding’s share of the book’s variance; the tick is its weight. Covariance over {market.risk?.sessions} sessions with noise eigenvalues flattened (Marchenko-Pastur); {market.risk?.modes} real mode{market.risk?.modes === 1 ? "" : "s"} kept.</p>
           </div>
         </section>
       )}

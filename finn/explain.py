@@ -98,11 +98,15 @@ def build(companies: dict, events: list[dict], start: dt.date, today: dt.date, l
         own_e = {d: float(np.log1p(g["abnormal"])) for d, g in sig[s].items() if g.get("abnormal") is not None}
         sec = None
         if idx_panel and market:
-            ps = sectors.peers_of(s, (baskets or {}).get(s), lists, idx_panel["size"])
-            sec = sectors.sector_factor(own_e, ps, market, start.isoformat(), peer_cache) if ps else None
+            for sets in sectors.peer_sets(s, (baskets or {}).get(s), lists, idx_panel["size"]):
+                sec = sectors.sector_model(own_e, sets, market, start.isoformat(), peer_cache)
+                if sec:
+                    break
             if sec:
-                log(f"  sector factor {s}: {sec['name']} [{', '.join(sec['peers'][:5])}{'...' if len(sec['peers']) > 5 else ''}] "
-                    f"PC1 {sec['share']:.0%} of variance (eigenvalue {sec['lam']:.2f} vs noise edge {sec['edge']:.2f}), loading t = {sec['t']:.1f}")
+                log(f"  sector model {s} (R2 {sec['r2']:.0%}, {len(sec['factors'])} of {sec['tested']} tested): " + "; ".join(
+                    f"{f['name']} [{', '.join(f['peers'][:4])}{'...' if len(f['peers']) > 4 else ''}] t = {f['t']:.1f}, PC1 {f['share']:.0%}" for f in sec["factors"]))
+            else:
+                log(f"  sector model {s}: no peer factor passes")
         meetings = results_meetings(s)
         ses = c["sessions"]
         for d in days:
@@ -116,16 +120,17 @@ def build(companies: dict, events: list[dict], start: dt.date, today: dt.date, l
                 if abs(ch) >= 0.01 and m_part * ch > 0 and abs(m_part) >= 0.5 * abs(ch):
                     why.append({"k": "market", "text": f"Mostly the market: NIFTY {mkt:+.1%} at this stock's beta of {beta:.2f} accounts for {m_part:+.1%} of the {ch:+.1%}."})
             own = g.get("abnormal")
-            if sec and own is not None and d in sec["f"]:
-                f_d = sec["f"][d]
-                s_part = float(np.expm1(sec["g"] * f_d))
+            if sec and own is not None and all(d in f["f"] for f in sec["factors"]):
+                each = [(f, float(np.expm1(f["g"] * f["f"][d]))) for f in sec["factors"]]
+                s_part = sum(x for _, x in each)
                 if parts:
-                    parts.update(sector=round(s_part, 4), own=round(own - s_part, 4), sector_name=sec["name"])
+                    parts.update(sector=round(s_part, 4), own=round(own - s_part, 4), sector_name=" + ".join(f["name"].replace("its ", "") for f, _ in each))
                 if s_part * own > 0 and abs(s_part) >= 0.005 and abs(s_part) >= 0.4 * abs(own):
-                    who = ", ".join(sec["peers"][:3]) + (f" and {len(sec['peers']) - 3} more" if len(sec["peers"]) > 3 else "")
-                    label = "its direct competitors" if sec["basis"] == "basket" else f"its {sec['name']} peers"
-                    why.append({"k": "sector", "text": f"Sector-wide: the common factor of {label} ({who}; this stock excluded) moved {f_d:+.1f} standard deviations, "
-                                                       f"which at its loading (t = {sec['t']:.1f} over the {sec['n']} sessions before) accounts for {s_part:+.1%} of its {own:+.1%} beyond the market."})
+                    f, x = max(each, key=lambda fx: abs(fx[1]))
+                    who = ", ".join(f["peers"][:3]) + (f" and {len(f['peers']) - 3} more" if len(f["peers"]) > 3 else "")
+                    more = "" if len(each) == 1 else " Jointly with " + ", ".join(f"{g['name'].replace('its ', '')} ({y:+.1%})" for g, y in each if g is not f) + "."
+                    why.append({"k": "sector", "text": f"Sector-wide: the common factor of {f['name']} ({who}; this stock excluded) moved {f['f'][d]:+.1f} standard deviations, "
+                                                       f"which at its loading (t = {f['t']:.1f} over the {sec['n']} sessions before) accounts for {x:+.1%} of its {own:+.1%} beyond the market.{more}"})
             if breadth.get(d, 0) >= BROAD * len(companies):
                 why.append({"k": "breadth", "text": f"A broad day: {breadth[d]} of your {len(companies)} holdings had a tail session at once, which points at macro, not at this company."})
             for x in sorted(dl.get(d, []), key=lambda x: -x["qty"])[:2]:

@@ -486,7 +486,20 @@ def build(days: int = 35, today: dt.date | None = None) -> dict:
     }
     OUT.mkdir(parents=True, exist_ok=True)
     (OUT / "digest.json").write_text(json.dumps(digest, ensure_ascii=False, separators=(",", ":")))
-    (OUT / "market.json").write_text(json.dumps({"as_of": as_of, "series": series,
+    # covariance of the holdings for risk attribution on the phone, noise eigenvalues flattened
+    risk_block = None
+    try:
+        import numpy as np
+        syms = list(series)
+        common = sorted(set.intersection(*[{b["date"] for b in bars[s]} for s in syms]))[-251:]
+        idx = {s: {b["date"]: b["adj"] for b in bars[s]} for s in syms}
+        X = np.diff(np.log(np.array([[idx[s][d] for s in syms] for d in common])), axis=0)
+        cov, modes = stats.rmt_clean(X)
+        risk_block = {"symbols": syms, "sessions": int(X.shape[0]), "modes": modes, "cov": [[round(float(v), 8) for v in row] for row in cov]}
+        log(f"risk: {len(syms)}x{len(syms)} covariance over {X.shape[0]} sessions, {modes} eigenvalue(s) above the Marchenko-Pastur edge kept, the rest flattened")
+    except Exception as ex:
+        log(f"  ! risk covariance: {ex!r}")
+    (OUT / "market.json").write_text(json.dumps({"as_of": as_of, "series": series, "risk": risk_block,
                                                     "index": {"name": "NIFTY 50", "dates": [b["date"] for b in market[-520:]],
                                                               "close": [round(b["close"], 2) for b in market[-520:]]}}, separators=(",", ":")))
 

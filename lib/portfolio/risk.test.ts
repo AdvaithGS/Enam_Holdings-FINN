@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { test } from "node:test";
 import type { Market } from "../types.ts";
-import { beta, defaults, fieldMove, positions, quantile, risk } from "./risk.ts";
+import { beta, contributions, defaults, fieldMove, positions, quantile, risk } from "./risk.ts";
 
 const market = JSON.parse(readFileSync(new URL("../../public/data/market.json", import.meta.url), "utf8")) as Market;
 const digest = JSON.parse(readFileSync(new URL("../../public/data/digest.json", import.meta.url), "utf8"));
@@ -37,6 +37,12 @@ test("risk: VaR is a loss the book exceeded on about 1 day in 20, and shortfall 
   assert.ok(r.sessions >= 200 && r.var95 > 0.003 && r.var95 < 0.05, String(r.var95));
   assert.ok(r.shortfall >= r.var95 && r.beta > 0.5 && r.beta < 1.6 && r.te > 0);
   assert.equal(r.rolling.filter((x) => x !== null).length, r.sessions - 59);
+});
+
+test("risk contributions add up to the whole and a volatile holding carries more than its weight", () => {
+  const c = contributions(positions(defaults(market, weights), market, 0.15), market)!;
+  assert.ok(Math.abs(c.reduce((a, x) => a + x.share, 0) - 1) < 1e-9);
+  assert.ok(c[0].share > c[0].weight && c.every((x) => x.share > -0.05));
 });
 
 test("a field move is ranked against the same stocks' own history", () => {
