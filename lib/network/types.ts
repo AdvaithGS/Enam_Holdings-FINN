@@ -8,7 +8,10 @@ export interface Role {
   to: number | null; // null = present
   fn: Fn;
   level: Seniority;
+  /** which business of the organisation the role sat in, when it has several */
+  seg?: string;
 }
+export interface Segment { id: string; label: string; themes: string[]; unit?: string }
 export interface Study { school: string; degree?: string; from?: number; to: number }
 
 export interface Person {
@@ -33,6 +36,8 @@ export interface Org {
   size: OrgSize;
   themes: string[];
   group?: string;
+  /** the businesses a company is made of; knowing one is not knowing the company */
+  segments?: Segment[];
   /** an unlisted business inside a listed parent (Reliance Retail inside Reliance Industries) */
   parent?: string;
   /** directed business relations: this org's competitors, suppliers, customers */

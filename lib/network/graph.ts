@@ -36,7 +36,7 @@
  *      knowledge = 1 - prod(1 - knowledge_role),     score = s * knowledge.
  */
 import { nameMatch, orgKey } from "./names.ts";
-import type { Fn, Network, Org, Person, Role } from "./types.ts";
+import type { Fn, Network, Org, Person, Role, Segment } from "./types.ts";
 
 export const CLOSENESS = { 1: 0.4, 2: 0.65, 3: 0.9 } as const;
 const HALF_LIFE_MONTHS = 36;
@@ -256,6 +256,50 @@ export class Graph {
     }
     if (!best) return null;
     return { person: best.person, confidence: best.corroborated || best.m === 2 ? "confirmed" : "possible" };
+  }
+
+  /**
+   * Coverage of a company, business by business.
+   *
+   * A contact covers a segment through a role that sat inside it (the role's own segment,
+   * or a role at the segment's unlisted unit), or through a role at another organisation
+   * working in the segment's field (a competitor, supplier or customer of that business).
+   * A role at the company with no segment attached (group finance, strategy, the board)
+   * is "group level": useful, and counted separately, because it is not knowledge of any
+   * one business. Each lead is scored exactly as in whoToCall, with the relation weight
+   * 1 inside the segment and 0.5 across the table.
+   */
+  coverage(orgId: string, perSegment = 2): { segments: { segment: Segment; leads: Lead[] }[]; group: Lead[]; covered: number } {
+    const org = this.orgs.get(orgId);
+    const segs: Segment[] = org?.segments?.length ? org.segments : [{ id: "all", label: org?.name ?? orgId, themes: org?.themes ?? [] }];
+    const single = segs.length === 1;
+    const now = yearFrac(this.now);
+    const score = (c: Person, r: Role, w: number, label: string): Lead => {
+      const end = r.to === null ? now : r.to + 1, fresh = Math.pow(2, -Math.max(0, now - end) / KNOWLEDGE_HALF_LIFE), depth = 1 - Math.exp(-(end - r.from) / 2);
+      const knowledge = w * fresh * depth * LEVEL_W[r.level], tie = tieStrength(c, this.now);
+      return { person: c, role: r, relation: label, knowledge, tie, score: tie * knowledge, insider: (r.org === orgId || this.orgs.get(r.org)?.parent === orgId) && r.to === null,
+        factors: { relation: w, freshness: fresh, depth, seniority: LEVEL_W[r.level], fit: 1 }, why: this.leadReason(c, r, label, orgId) };
+    };
+    const best = (leads: Lead[]) => {
+      const by = new Map<string, Lead>();
+      for (const l of leads) if (l.knowledge >= 0.15 && l.score >= 0.05 && (!by.has(l.person.id) || by.get(l.person.id)!.score < l.score)) by.set(l.person.id, l);
+      return [...by.values()].sort((a, b) => b.score - a.score);
+    };
+    const group: Lead[] = [];
+    const out = segs.map((segment) => {
+      const leads: Lead[] = [];
+      for (const c of this.net.contacts) for (const r of c.roles) {
+        const o = this.orgs.get(r.org);
+        if (r.org === orgId) { if (single || r.seg === segment.id) leads.push(score(c, r, 1, "inside")); continue; }
+        if (segment.unit && r.org === segment.unit) { leads.push(score(c, r, 1, "inside")); continue; }
+        if (o?.parent === orgId || r.fn === "board") continue;
+        const rel = this.relation(r.org, segment.unit ?? orgId);
+        if (o && rel && rel.w >= 0.5 && (single || o.themes.some((t) => segment.themes.includes(t)))) leads.push(score(c, r, 0.5, rel.label));
+      }
+      return { segment, leads: best(leads).slice(0, perSegment) };
+    });
+    if (!single) for (const c of this.net.contacts) for (const r of c.roles) if (r.org === orgId && !r.seg) group.push(score(c, r, 1, "inside"));
+    return { segments: out, group: best(group).slice(0, 2), covered: out.filter((s) => s.leads.length).length / out.length };
   }
 
   /**

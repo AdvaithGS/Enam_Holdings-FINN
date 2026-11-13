@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { Chart, Seg } from "@/components/Chart";
 import { Spark } from "@/components/Moves";
-import { Avatar } from "@/components/People";
+import { initials } from "@/components/People";
 import { Sheet, useOpenPerson } from "@/components/Shell";
 import { crore, num, oneIn, pct, tone } from "@/lib/client/format";
 import { useHoldings } from "@/lib/client/holdings";
@@ -20,21 +20,22 @@ export default function Book() {
   const [edit, setEdit] = useState<Holding | null>(null);
   const [view, setView] = useState<"value" | "alpha">("value");
   const [settings, setSettings] = useState(false);
+  const [openCov, setOpenCov] = useState<string | null>(null);
 
   const pos = useMemo(() => (holdings && market ? positions(holdings, market, expect) : []), [holdings, market, expect]);
   const r = useMemo(() => (market && pos.length ? risk(pos, market) : null), [pos, market]);
-  // coverage: for every holding, the person best placed to explain it, or nobody
+  // coverage, business by business: a company is covered only as far as its businesses are
   const cover = useMemo(() => new Map(pos.map((p) => {
     const org = graph?.orgId(p.symbol);
-    const lead = org ? graph!.whoToCall(org, [], 1).find((l) => l.knowledge >= 0.3 && l.score >= 0.1) : undefined;
-    return [p.symbol, lead] as const;
+    return [p.symbol, org && graph ? graph.coverage(org) : null] as const;
   })), [pos, graph]);
 
   if (!digest || !market || !holdings) return <div className="top"><div className="brand">Book<i>.</i></div><div style={{ marginTop: 24 }}><div className="skel" /><div className="skel" /></div></div>;
   const value = pos.reduce((a, p) => a + p.value, 0), cost = pos.reduce((a, p) => a + p.cost, 0), gap = pos.reduce((a, p) => a + p.gap, 0);
   const benchValue = pos.reduce((a, p) => a + p.cost * (1 + (p.bench ?? 0)), 0);
-  const covered = pos.filter((p) => cover.get(p.symbol)).reduce((a, p) => a + p.weight, 0);
-  const blind = pos.filter((p) => !cover.get(p.symbol));
+  const covered = pos.reduce((a, p) => a + p.weight * (cover.get(p.symbol)?.covered ?? 0), 0);
+  const blind = pos.map((p) => ({ p, miss: (cover.get(p.symbol)?.segments ?? []).filter((x) => !x.leads.length) })).filter((x) => x.miss.length)
+    .sort((a, b) => b.p.weight * b.miss.length / Math.max(1, cover.get(b.p.symbol)!.segments.length) - a.p.weight * a.miss.length / Math.max(1, cover.get(a.p.symbol)!.segments.length));
   const fading = r && r.alphaNow !== null && r.alphaBefore !== null ? r.alphaNow < r.alphaBefore : null;
 
   return (
@@ -83,19 +84,33 @@ export default function Book() {
       )}
 
       <section className="section">
-        <div className="head"><span className="caps" style={{ color: "var(--people)" }}>Coverage · {P1(covered)} of the book has a person</span></div>
+        <div className="head"><span className="caps" style={{ color: "var(--people)" }}>Coverage · {P1(covered)} of the book, business by business</span></div>
         {blind.length > 0 && <p className="small" style={{ marginBottom: 10 }}>
-          <b style={{ color: "var(--matter)" }}>No one to call on {P1(1 - covered)} of the book:</b> {blind.slice(0, 5).map((p) => `${p.symbol} ${(p.weight * 100).toFixed(0)}%`).join(", ")}{blind.length > 5 ? ` and ${blind.length - 5} more` : ""}.</p>}
+          <b style={{ color: "var(--matter)" }}>Largest blind spots:</b> {blind.slice(0, 4).map(({ p, miss }) => `${p.symbol} (${(p.weight * 100).toFixed(0)}% of the book): ${miss.map((m) => m.segment.label.toLowerCase()).slice(0, 3).join(", ")}`).join(" · ")}.</p>}
         <div className="card" style={{ padding: "2px 14px" }}>
           {pos.map((p) => {
-            const lead = cover.get(p.symbol);
+            const cv = cover.get(p.symbol), isOpen = openCov === p.symbol;
+            const have = cv?.segments.filter((x) => x.leads.length).length ?? 0;
             return (
               <div className="hold" key={p.symbol}>
                 <div style={{ minWidth: 0 }}>
                   <Link href={`/research/${p.symbol}`} className="tick">{p.symbol}</Link> <span className="small muted">{(p.weight * 100).toFixed(1)}% · {num(p.qty)} @ ₹{num(p.entry, p.entry < 1000 ? 1 : 0)}</span>
                   <div className="wbar"><i style={{ width: `${Math.min(100, p.weight * 100 * 8)}%` }} /></div>
-                  {lead ? <button className="cover row" onClick={() => openPerson(lead.person.id)} style={{ gap: 6 }}><Avatar person={lead.person} /><span><b>{lead.person.name}</b> · {lead.relation === "inside" ? (lead.insider ? "works there" : "worked there") : lead.relation.split(" (")[0]}</span></button>
-                    : <div className="cover none">No one in your network covers this</div>}
+                  {cv && <button className="segs" onClick={() => setOpenCov(isOpen ? null : p.symbol)} aria-expanded={isOpen}>
+                    {cv.segments.map((x) => <span key={x.segment.id} className={`segp ${x.leads.length ? "on" : ""}`} title={x.segment.label}>{x.leads.length ? initials(x.leads[0].person.name) : "–"}</span>)}
+                    <span className={`cover ${have === 0 ? "none" : ""}`} style={{ marginTop: 0 }}>{cv.segments.length === 1 ? (have ? cv.segments[0].leads[0].person.name : "No one covers this")
+                      : `${have} of ${cv.segments.length} businesses covered`}</span>
+                  </button>}
+                  {cv && isOpen && <div style={{ marginTop: 6 }}>
+                    {cv.segments.map((x) => (
+                      <div key={x.segment.id} className="segrow">
+                        <span className={x.leads.length ? "" : "cover none"} style={{ marginTop: 0 }}>{x.segment.label}</span>
+                        <span>{x.leads.length ? x.leads.map((l) => (
+                          <button key={l.person.id} className="cover" style={{ display: "block", marginTop: 0, textAlign: "right" }} onClick={() => openPerson(l.person.id)}>
+                            <b>{l.person.name}</b> · {l.relation === "inside" ? (l.insider ? "there now" : `was there to ${l.role.to}`) : l.relation.split(" (")[0]}</button>)) : <span className="cover none" style={{ marginTop: 0 }}>no one</span>}</span>
+                      </div>))}
+                    {cv.group.length > 0 && <div className="segrow"><span className="muted">Group level</span><span>{cv.group.map((l) => <button key={l.person.id} className="cover" style={{ display: "block", marginTop: 0 }} onClick={() => openPerson(l.person.id)}><b>{l.person.name}</b></button>)}</span></div>}
+                  </div>}
                 </div>
                 <button style={{ textAlign: "right" }} onClick={() => setEdit(p)} aria-label={`Edit ${p.symbol}`}>
                   <span style={{ display: "block", width: 72, marginLeft: "auto" }}><Spark data={market.series[p.symbol].close.slice(-60)} up={p.ret >= 0} /></span>

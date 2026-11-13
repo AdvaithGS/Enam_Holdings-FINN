@@ -79,6 +79,18 @@ test("connectors: PageRank is a probability distribution and rewards bridges", (
   assert.ok(c[0].doors.some((p) => p.name === "Noel N. Tata"));
 });
 
+test("coverage is by business: Reliance is five businesses and one contact does not cover them", () => {
+  const c = g.coverage("reliance");
+  assert.equal(c.segments.length, 5);
+  const by = Object.fromEntries(c.segments.map((s) => [s.segment.id, s.leads.map((l) => l.person.name)]));
+  assert.ok(by.retail.includes("Tanvi Agarwal") && !by.digital.includes("Tanvi Agarwal"));
+  assert.ok(by.digital.includes("Imran Qureshi"));
+  assert.deepEqual(by.o2c, []);
+  assert.ok(c.covered < 1 && c.covered > 0);
+  const lt = g.coverage("lt");
+  assert.deepEqual(lt.segments.filter((s) => s.leads.length).map((s) => s.segment.id), ["hydrocarbon"]);
+});
+
 test("expertise: the theme map ranks practitioners first", () => {
   const e = g.expertise("specialty-chemicals");
   assert.ok(e.length >= 3);

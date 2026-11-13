@@ -48,7 +48,8 @@
      "from": 2013,
      "to": 2021,
      "fn": "sales",
-     "level": 2
+     "level": 2,
+     "seg": "westside"
     },
     {
      "org": "abfrl",
@@ -124,7 +125,8 @@
      "from": 2008,
      "to": 2019,
      "fn": "sales",
-     "level": 3
+     "level": 3,
+     "seg": "decorative"
     },
     {
      "org": "birlaopus",
@@ -170,7 +172,8 @@
      "from": 2016,
      "to": 2023,
      "fn": "operations",
-     "level": 2
+     "level": 2,
+     "seg": "ems"
     },
     {
      "org": "tataelectronics",
@@ -216,7 +219,8 @@
      "from": 2014,
      "to": 2020,
      "fn": "finance",
-     "level": 2
+     "level": 2,
+     "seg": "consumer"
     }
    ],
    "education": [
@@ -326,7 +330,8 @@
      "from": 2012,
      "to": 2020,
      "fn": "sales",
-     "level": 2
+     "level": 2,
+     "seg": "jlg"
     },
     {
      "org": "fusion",
@@ -387,7 +392,8 @@
      "from": 2017,
      "to": null,
      "fn": "risk",
-     "level": 2
+     "level": 2,
+     "seg": "wholesale"
     },
     {
      "org": "icici",
@@ -425,7 +431,8 @@
      "from": 2005,
      "to": 2019,
      "fn": "operations",
-     "level": 2
+     "level": 2,
+     "seg": "chem"
     },
     {
      "org": "navin",
@@ -551,7 +558,8 @@
      "from": 2012,
      "to": 2018,
      "fn": "sales",
-     "level": 3
+     "level": 3,
+     "seg": "mobile"
     }
    ],
    "education": [
@@ -581,7 +589,8 @@
      "from": 2009,
      "to": 2020,
      "fn": "risk",
-     "level": 2
+     "level": 2,
+     "seg": "retail"
     },
     {
      "org": "icici",
@@ -619,7 +628,8 @@
      "from": 2015,
      "to": 2022,
      "fn": "risk",
-     "level": 2
+     "level": 2,
+     "seg": "consumer"
     }
    ],
    "education": [
@@ -656,7 +666,8 @@
      "from": 2015,
      "to": 2019,
      "fn": "sales",
-     "level": 3
+     "level": 3,
+     "seg": "zudio"
     }
    ],
    "education": [
@@ -724,7 +735,8 @@
      "from": 2018,
      "to": 2022,
      "fn": "operations",
-     "level": 3
+     "level": 3,
+     "seg": "food"
     },
     {
      "org": "swiggy",
@@ -761,7 +773,8 @@
      "from": 2017,
      "to": 2023,
      "fn": "legal",
-     "level": 2
+     "level": 2,
+     "seg": "payments"
     },
     {
      "org": "phonepe",
@@ -793,7 +806,8 @@
      "from": 2008,
      "to": 2021,
      "fn": "legal",
-     "level": 2
+     "level": 2,
+     "seg": "us"
     },
     {
      "org": "drreddy",
@@ -848,7 +862,8 @@
      "from": 2001,
      "to": 2020,
      "fn": "operations",
-     "level": 2
+     "level": 2,
+     "seg": "hydrocarbon"
     }
    ],
    "education": [],
@@ -872,7 +887,8 @@
      "from": 2006,
      "to": 2019,
      "fn": "technology",
-     "level": 2
+     "level": 2,
+     "seg": "bfsi"
     },
     {
      "org": "infosys",
@@ -903,7 +919,8 @@
      "from": 2011,
      "to": 2017,
      "fn": "sales",
-     "level": 3
+     "level": 3,
+     "seg": "fmcg"
     },
     {
      "org": "hul",
@@ -940,7 +957,8 @@
      "from": 2009,
      "to": 2021,
      "fn": "technology",
-     "level": 2
+     "level": 2,
+     "seg": "mobile"
     }
    ],
    "education": [],
@@ -971,7 +989,8 @@
      "from": 2012,
      "to": 2019,
      "fn": "sales",
-     "level": 3
+     "level": 3,
+     "seg": "jewellery"
     }
    ],
    "education": [],
@@ -1132,7 +1151,8 @@
      "from": 2014,
      "to": 2022,
      "fn": "sales",
-     "level": 2
+     "level": 2,
+     "seg": "industrial"
     }
    ],
    "education": [],
@@ -1179,7 +1199,8 @@
      "from": 2004,
      "to": 2018,
      "fn": "finance",
-     "level": 1
+     "level": 1,
+     "seg": "treasury"
     },
     {
      "org": "bandhan",
@@ -1213,6 +1234,43 @@
    "size": "large",
    "themes": [
     "energy"
+   ],
+   "segments": [
+    {
+     "id": "o2c",
+     "label": "Refining & petrochemicals",
+     "themes": [
+      "energy"
+     ]
+    },
+    {
+     "id": "upstream",
+     "label": "Oil & gas exploration",
+     "themes": [
+      "energy"
+     ]
+    },
+    {
+     "id": "retail",
+     "label": "Retail",
+     "themes": [
+      "retail"
+     ],
+     "unit": "relianceretail"
+    },
+    {
+     "id": "digital",
+     "label": "Jio / digital",
+     "themes": [
+      "telecom"
+     ],
+     "unit": "jio"
+    },
+    {
+     "id": "newenergy",
+     "label": "New energy",
+     "themes": []
+    }
    ],
    "ticker": "RELIANCE",
    "group": "Reliance",
@@ -1262,6 +1320,27 @@
    "themes": [
     "banking"
    ],
+   "segments": [
+    {
+     "id": "retail",
+     "label": "Retail lending",
+     "themes": [
+      "consumer-lending"
+     ]
+    },
+    {
+     "id": "wholesale",
+     "label": "Wholesale & rural banking",
+     "themes": [
+      "rural-lending"
+     ]
+    },
+    {
+     "id": "treasury",
+     "label": "Treasury",
+     "themes": []
+    }
+   ],
    "ticker": "HDFCBANK",
    "competitors": [
     "icici"
@@ -1273,6 +1352,22 @@
    "size": "large",
    "themes": [
     "it-services"
+   ],
+   "segments": [
+    {
+     "id": "bfsi",
+     "label": "Banking & financial services",
+     "themes": [
+      "it-services"
+     ]
+    },
+    {
+     "id": "other",
+     "label": "Other verticals",
+     "themes": [
+      "it-services"
+     ]
+    }
    ],
    "ticker": "TCS",
    "group": "Tata",
@@ -1286,6 +1381,27 @@
    "size": "large",
    "themes": [
     "telecom"
+   ],
+   "segments": [
+    {
+     "id": "mobile",
+     "label": "India mobile",
+     "themes": [
+      "telecom"
+     ]
+    },
+    {
+     "id": "africa",
+     "label": "Airtel Africa",
+     "themes": []
+    },
+    {
+     "id": "enterprise",
+     "label": "Enterprise & homes",
+     "themes": [
+      "telecom"
+     ]
+    }
    ],
    "ticker": "BHARTIARTL",
    "competitors": [
@@ -1302,6 +1418,27 @@
    "themes": [
     "fmcg"
    ],
+   "segments": [
+    {
+     "id": "cigarettes",
+     "label": "Cigarettes",
+     "themes": []
+    },
+    {
+     "id": "fmcg",
+     "label": "Packaged foods & FMCG",
+     "themes": [
+      "fmcg"
+     ]
+    },
+    {
+     "id": "agri",
+     "label": "Agri & paperboards",
+     "themes": [
+      "agrochemicals"
+     ]
+    }
+   ],
    "ticker": "ITC",
    "competitors": [
     "hul"
@@ -1313,6 +1450,43 @@
    "size": "large",
    "themes": [
     "infrastructure"
+   ],
+   "segments": [
+    {
+     "id": "infra",
+     "label": "Infrastructure projects",
+     "themes": [
+      "infrastructure"
+     ]
+    },
+    {
+     "id": "hydrocarbon",
+     "label": "Energy & hydrocarbon projects",
+     "themes": [
+      "energy"
+     ]
+    },
+    {
+     "id": "it",
+     "label": "IT & technology services",
+     "themes": [
+      "it-services"
+     ]
+    },
+    {
+     "id": "heavy",
+     "label": "Heavy engineering & defence",
+     "themes": [
+      "drones"
+     ]
+    },
+    {
+     "id": "finserv",
+     "label": "Financial services",
+     "themes": [
+      "consumer-lending"
+     ]
+    }
    ],
    "ticker": "LT",
    "aliases": [
@@ -1326,6 +1500,22 @@
    "size": "large",
    "themes": [
     "pharma"
+   ],
+   "segments": [
+    {
+     "id": "us",
+     "label": "US generics & specialty",
+     "themes": [
+      "pharma"
+     ]
+    },
+    {
+     "id": "india",
+     "label": "India branded",
+     "themes": [
+      "pharma"
+     ]
+    }
    ],
    "ticker": "SUNPHARMA",
    "competitors": [
@@ -1341,6 +1531,20 @@
    "size": "large",
    "themes": [
     "autos"
+   ],
+   "segments": [
+    {
+     "id": "cars",
+     "label": "Passenger vehicles",
+     "themes": [
+      "autos"
+     ]
+    },
+    {
+     "id": "exports",
+     "label": "Exports & EVs",
+     "themes": []
+    }
    ],
    "ticker": "MARUTI",
    "suppliers": [
@@ -1358,6 +1562,25 @@
     "jewellery",
     "retail"
    ],
+   "segments": [
+    {
+     "id": "jewellery",
+     "label": "Jewellery",
+     "themes": [
+      "jewellery"
+     ]
+    },
+    {
+     "id": "watches",
+     "label": "Watches & wearables",
+     "themes": []
+    },
+    {
+     "id": "eyecare",
+     "label": "Eyecare",
+     "themes": []
+    }
+   ],
    "ticker": "TITAN",
    "group": "Tata",
    "competitors": [
@@ -1374,6 +1597,27 @@
    "themes": [
     "consumer-lending"
    ],
+   "segments": [
+    {
+     "id": "consumer",
+     "label": "Consumer & personal loans",
+     "themes": [
+      "consumer-lending"
+     ]
+    },
+    {
+     "id": "sme",
+     "label": "SME & commercial",
+     "themes": []
+    },
+    {
+     "id": "deposits",
+     "label": "Deposits & funding",
+     "themes": [
+      "banking"
+     ]
+    }
+   ],
    "ticker": "BAJFINANCE",
    "competitors": [
     "cholafin"
@@ -1385,6 +1629,25 @@
    "size": "large",
    "themes": [
     "paints"
+   ],
+   "segments": [
+    {
+     "id": "decorative",
+     "label": "Decorative paints",
+     "themes": [
+      "paints"
+     ]
+    },
+    {
+     "id": "industrial",
+     "label": "Industrial coatings",
+     "themes": []
+    },
+    {
+     "id": "home",
+     "label": "Home decor",
+     "themes": []
+    }
    ],
    "ticker": "ASIANPAINT",
    "competitors": [
@@ -1401,6 +1664,27 @@
    "size": "mid",
    "themes": [
     "quick-commerce"
+   ],
+   "segments": [
+    {
+     "id": "food",
+     "label": "Food delivery",
+     "themes": [
+      "quick-commerce"
+     ]
+    },
+    {
+     "id": "blinkit",
+     "label": "Blinkit quick commerce",
+     "themes": [
+      "quick-commerce"
+     ]
+    },
+    {
+     "id": "hyperpure",
+     "label": "Hyperpure B2B",
+     "themes": []
+    }
    ],
    "ticker": "ETERNAL",
    "competitors": [
@@ -1419,6 +1703,27 @@
    "themes": [
     "retail"
    ],
+   "segments": [
+    {
+     "id": "westside",
+     "label": "Westside",
+     "themes": [
+      "retail"
+     ]
+    },
+    {
+     "id": "zudio",
+     "label": "Zudio",
+     "themes": [
+      "retail"
+     ]
+    },
+    {
+     "id": "star",
+     "label": "Star grocery",
+     "themes": []
+    }
+   ],
    "ticker": "TRENT",
    "group": "Tata",
    "competitors": [
@@ -1436,6 +1741,29 @@
    "size": "mid",
    "themes": [
     "electronics-manufacturing"
+   ],
+   "segments": [
+    {
+     "id": "mobile",
+     "label": "Mobile phones",
+     "themes": [
+      "electronics-manufacturing"
+     ]
+    },
+    {
+     "id": "consumer",
+     "label": "Consumer electronics & appliances",
+     "themes": [
+      "electronics-manufacturing"
+     ]
+    },
+    {
+     "id": "components",
+     "label": "Components & displays",
+     "themes": [
+      "semiconductors"
+     ]
+    }
    ],
    "ticker": "DIXON",
    "competitors": [
@@ -1456,6 +1784,27 @@
    "themes": [
     "electronics-manufacturing",
     "semiconductors"
+   ],
+   "segments": [
+    {
+     "id": "ems",
+     "label": "Electronics manufacturing",
+     "themes": [
+      "electronics-manufacturing"
+     ]
+    },
+    {
+     "id": "osat",
+     "label": "Semiconductor assembly (OSAT)",
+     "themes": [
+      "semiconductors"
+     ]
+    },
+    {
+     "id": "pcb",
+     "label": "Bare PCBs",
+     "themes": []
+    }
    ],
    "ticker": "KAYNES",
    "competitors": [
@@ -1481,6 +1830,29 @@
     "electricals",
     "semiconductors"
    ],
+   "segments": [
+    {
+     "id": "industrial",
+     "label": "Industrial motors & drives",
+     "themes": [
+      "electricals"
+     ]
+    },
+    {
+     "id": "power",
+     "label": "Transformers & switchgear",
+     "themes": [
+      "electricals"
+     ]
+    },
+    {
+     "id": "semis",
+     "label": "Semiconductor assembly",
+     "themes": [
+      "semiconductors"
+     ]
+    }
+   ],
    "ticker": "CGPOWER",
    "group": "Murugappa",
    "competitors": [
@@ -1499,6 +1871,25 @@
    "themes": [
     "specialty-chemicals"
    ],
+   "segments": [
+    {
+     "id": "chem",
+     "label": "Fluorochemicals & specialty chemicals",
+     "themes": [
+      "specialty-chemicals"
+     ]
+    },
+    {
+     "id": "films",
+     "label": "Packaging films",
+     "themes": []
+    },
+    {
+     "id": "textiles",
+     "label": "Technical textiles",
+     "themes": []
+    }
+   ],
    "ticker": "SRF",
    "competitors": [
     "navin",
@@ -1514,6 +1905,23 @@
    "size": "mid",
    "themes": [
     "specialty-chemicals"
+   ],
+   "segments": [
+    {
+     "id": "phenol",
+     "label": "Phenolics",
+     "themes": [
+      "specialty-chemicals"
+     ]
+    },
+    {
+     "id": "intermediates",
+     "label": "Advanced intermediates",
+     "themes": [
+      "specialty-chemicals",
+      "agrochemicals"
+     ]
+    }
    ],
    "ticker": "DEEPAKNTR",
    "competitors": [
@@ -1535,6 +1943,20 @@
    "themes": [
     "rural-lending"
    ],
+   "segments": [
+    {
+     "id": "jlg",
+     "label": "Group microfinance",
+     "themes": [
+      "rural-lending"
+     ]
+    },
+    {
+     "id": "retailfin",
+     "label": "Individual & retail finance",
+     "themes": []
+    }
+   ],
    "ticker": "CREDITACC",
    "competitors": [
     "fusion",
@@ -1553,6 +1975,22 @@
    "size": "mid",
    "themes": [
     "fintech"
+   ],
+   "segments": [
+    {
+     "id": "payments",
+     "label": "Payments",
+     "themes": [
+      "fintech"
+     ]
+    },
+    {
+     "id": "lending",
+     "label": "Loan distribution",
+     "themes": [
+      "consumer-lending"
+     ]
+    }
    ],
    "ticker": "PAYTM",
    "competitors": [

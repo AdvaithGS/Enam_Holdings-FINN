@@ -208,3 +208,9 @@ h1, h2, h3, p { margin: 0; }
 .field { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; } .field label { font-size: 12px; color: var(--ink-2); }
 .field input { display: block; width: 100%; margin-top: 4px; padding: 9px 10px; border-radius: 9px; border: 1px solid var(--rule); background: var(--card); font-size: 16px; }
 .gauge { height: 10px; border-radius: 5px; background: var(--wash); position: relative; margin-top: 8px; overflow: hidden; } .gauge i { position: absolute; top: 0; bottom: 0; }
+
+.segs { display: flex; align-items: center; gap: 4px; margin-top: 7px; flex-wrap: wrap; width: 100%; }
+.segp { min-width: 24px; height: 20px; padding: 0 4px; border-radius: 5px; font: 600 10px/20px var(--sans); text-align: center; border: 1px dashed var(--matter); color: var(--matter); }
+.segp.on { border: 0; background: var(--people); color: #fff; }
+.segs .cover { margin-left: 4px; }
+.segrow { display: grid; grid-template-columns: 1fr auto; gap: 10px; padding: 6px 0; border-top: 1px dotted var(--rule); font-size: 12.5px; }

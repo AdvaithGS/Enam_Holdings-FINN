@@ -33,7 +33,7 @@ A mobile-first investment agent for a 20-stock NSE portfolio. It tells you what 
 
 - *Against what you expected.* You set a return (15% a year by default). Each position is held to `cost × (1+E)^(days/365)`; the book is so many rupees ahead or behind, with no annualising of short holdings.
 - *Risk.* 95% historical VaR and expected shortfall over 250 sessions at today's weights, volatility, beta, alpha, tracking error, and rolling 60-session alpha to show whether the edge is fading. Each position is also compared with the same rupees put into the NIFTY on its entry date.
-- *Coverage.* Every holding shows the person best placed to explain it, heaviest first, and the share of the book with nobody to call.
+- *Coverage, business by business.* A holding is not one node. Each company is broken into the businesses it reports (Reliance: refining, exploration, retail, Jio, new energy), and a contact covers only the business their role sat in, or the one their employer competes with, supplies or buys from. Each holding shows which businesses have a person and which do not; the book's coverage is weight × share of businesses covered, and the largest blind spots are named. Group-level contacts (finance, strategy, board) are listed separately and do not count as knowing a business.
 
 **People (network).** Not a contact list.
 

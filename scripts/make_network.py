@@ -66,6 +66,41 @@ ORGS = [
     ("northlight", "Northlight Capital", None, "small", [], None, [], [], [], []),
     ("mod", "Ministry of Defence", None, "large", T("drones"), None, [], [], T("ideaforge"), T("Indian Air Force")),
 ]
+# What each holding is made of. A large company is several businesses, and knowing one
+# of them is not knowing the company. (id, label, fields it competes in, unlisted unit)
+# Public segment structure, as the companies report it; no revenue shares are asserted.
+SEGMENTS = {
+    "reliance": [("o2c", "Refining & petrochemicals", ["energy"], None), ("upstream", "Oil & gas exploration", ["energy"], None),
+                 ("retail", "Retail", ["retail"], "relianceretail"), ("digital", "Jio / digital", ["telecom"], "jio"), ("newenergy", "New energy", [], None)],
+    "lt": [("infra", "Infrastructure projects", ["infrastructure"], None), ("hydrocarbon", "Energy & hydrocarbon projects", ["energy"], None),
+           ("it", "IT & technology services", ["it-services"], None), ("heavy", "Heavy engineering & defence", ["drones"], None), ("finserv", "Financial services", ["consumer-lending"], None)],
+    "hdfcbank": [("retail", "Retail lending", ["consumer-lending"], None), ("wholesale", "Wholesale & rural banking", ["rural-lending"], None), ("treasury", "Treasury", [], None)],
+    "tcs": [("bfsi", "Banking & financial services", ["it-services"], None), ("other", "Other verticals", ["it-services"], None)],
+    "bharti": [("mobile", "India mobile", ["telecom"], None), ("africa", "Airtel Africa", [], None), ("enterprise", "Enterprise & homes", ["telecom"], None)],
+    "itc": [("cigarettes", "Cigarettes", [], None), ("fmcg", "Packaged foods & FMCG", ["fmcg"], None), ("agri", "Agri & paperboards", ["agrochemicals"], None)],
+    "sunpharma": [("us", "US generics & specialty", ["pharma"], None), ("india", "India branded", ["pharma"], None)],
+    "maruti": [("cars", "Passenger vehicles", ["autos"], None), ("exports", "Exports & EVs", [], None)],
+    "titan": [("jewellery", "Jewellery", ["jewellery"], None), ("watches", "Watches & wearables", [], None), ("eyecare", "Eyecare", [], None)],
+    "bajfinance": [("consumer", "Consumer & personal loans", ["consumer-lending"], None), ("sme", "SME & commercial", [], None), ("deposits", "Deposits & funding", ["banking"], None)],
+    "asianpaint": [("decorative", "Decorative paints", ["paints"], None), ("industrial", "Industrial coatings", [], None), ("home", "Home decor", [], None)],
+    "eternal": [("food", "Food delivery", ["quick-commerce"], None), ("blinkit", "Blinkit quick commerce", ["quick-commerce"], None), ("hyperpure", "Hyperpure B2B", [], None)],
+    "trent": [("westside", "Westside", ["retail"], None), ("zudio", "Zudio", ["retail"], None), ("star", "Star grocery", [], None)],
+    "dixon": [("mobile", "Mobile phones", ["electronics-manufacturing"], None), ("consumer", "Consumer electronics & appliances", ["electronics-manufacturing"], None), ("components", "Components & displays", ["semiconductors"], None)],
+    "kaynes": [("ems", "Electronics manufacturing", ["electronics-manufacturing"], None), ("osat", "Semiconductor assembly (OSAT)", ["semiconductors"], None), ("pcb", "Bare PCBs", [], None)],
+    "cgpower": [("industrial", "Industrial motors & drives", ["electricals"], None), ("power", "Transformers & switchgear", ["electricals"], None), ("semis", "Semiconductor assembly", ["semiconductors"], None)],
+    "srf": [("chem", "Fluorochemicals & specialty chemicals", ["specialty-chemicals"], None), ("films", "Packaging films", [], None), ("textiles", "Technical textiles", [], None)],
+    "deepak": [("phenol", "Phenolics", ["specialty-chemicals"], None), ("intermediates", "Advanced intermediates", ["specialty-chemicals", "agrochemicals"], None)],
+    "creditacc": [("jlg", "Group microfinance", ["rural-lending"], None), ("retailfin", "Individual & retail finance", [], None)],
+    "paytm": [("payments", "Payments", ["fintech"], None), ("lending", "Loan distribution", ["consumer-lending"], None)],
+}
+# which business of their employer a role sat in: (contact, org) -> segment
+ROLE_SEG = {("Rajesh Pillai", "lt"): "hydrocarbon", ("Meera Iyer", "hdfcbank"): "retail", ("Manoj Tiwari", "hdfcbank"): "wholesale", ("Nandini Krishnan", "hdfcbank"): "treasury",
+            ("Lakshmi Narayanan", "tcs"): "bfsi", ("Sameer Khanna", "bharti"): "mobile", ("Devika Menon", "itc"): "fmcg", ("Alok Banerjee", "sunpharma"): "us",
+            ("Pooja Bansal", "titan"): "jewellery", ("Aditya Pandey", "bajfinance"): "consumer", ("Sandeep Kulkarni", "asianpaint"): "decorative",
+            ("Kabir Malhotra", "eternal"): "food", ("Rhea Kapadia", "trent"): "westside", ("Tanvi Agarwal", "trent"): "zudio", ("Gaurav Sethi", "dixon"): "mobile",
+            ("Karthik Subramanian", "dixon"): "consumer", ("Anitha Rao", "kaynes"): "ems", ("Ishita Roy", "cgpower"): "industrial", ("Hemant Joshi", "srf"): "chem",
+            ("Suresh Gowda", "creditacc"): "jlg", ("Sneha Reddy", "paytm"): "payments"}
+
 # unlisted businesses that sit inside a listed parent
 PARENT = {"relianceretail": "reliance", "jio": "reliance"}
 THEMES = {
@@ -233,6 +268,9 @@ C = [
 def main():
     contacts = []
     for n, (name, headline, city, roles, edu, tie) in enumerate(C, 1):
+        for r in roles:
+            if (name, r["org"]) in ROLE_SEG:
+                r["seg"] = ROLE_SEG[(name, r["org"])]
         contacts.append({"id": f"c{n:02d}", "name": name, "headline": headline, "city": city, "roles": roles, "education": edu,
                          "tie": {"closeness": tie[0], "how": tie[1], "since": tie[2], "last": tie[3], **({"note": tie[4]} if tie[4] else {})}})
     ids = {o[0] for o in ORGS}
@@ -244,6 +282,8 @@ def main():
         for x in comp + sup + cust:
             assert x in ids, (oid, x)
         o = {"id": oid, "name": name, "size": size, "themes": themes}
+        if oid in SEGMENTS:
+            o["segments"] = [{"id": i, "label": l, "themes": t, **({"unit": u} if u else {})} for i, l, t, u in SEGMENTS[oid]]
         if oid in PARENT:
             o["parent"] = PARENT[oid]
         for k, v in (("ticker", ticker), ("group", group), ("competitors", comp), ("suppliers", sup), ("customers", cust), ("aliases", aliases)):
