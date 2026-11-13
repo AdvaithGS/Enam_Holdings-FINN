@@ -1,4 +1,4 @@
-FINN digest  2026-11-13 17:20 IST  window 2026-10-09 .. 2026-11-13
+FINN digest  2026-11-13 17:24 IST  window 2026-10-09 .. 2026-11-13
 baseline P(noticed | no filing) = 0.064; 'what matters' cut-off = 3x = 0.191
 exchange index file: 1235 sessions of NIFTY 500 turnover, 23 sector indices
 prices: 20 stocks, latest session 2026-11-13; fx {'USD': 94.23, 'EUR': 104.1995, 'GBP': 124.6644}
@@ -6,7 +6,7 @@ filings: 294 in window
 opaque titles opened locally: 78 (OCR pages: 4)
 events after folding: 213
 intraday: 26 filings timed during trading hours
-moves without a filing: 124 examined, 86 with a supported explanation
+moves without a filing: 124 examined, 90 with a supported explanation
 
 --- WHAT MATTERS (22)
   0.92 RELIANCE   2026-10-30 Results          Q2 FY27: revenue +29%, PAT +34% YoY
@@ -154,4 +154,4 @@ moves without a filing: 124 examined, 86 with a supported explanation
     world: Nikkei 225 +0.53% (11-13), Hang Seng -1.55% (11-13), Shanghai -0.59% (11-13), KOSPI -0.98% (11-13), NIFTY 50 -0.61% (11-13), DAX +0.41% (11-12), Euro Stoxx 50 +0.09% (11-12), FTSE 100 +0.25% (11-12), S&P 500 -0.35% (11-12), Nasdaq -0.39% (11-12)
 --- SET ASIDE (126 events, 141 filings)
 
-run: {'filings': 294, 'events': 213, 'documents_read': 0, 'llm': {'calls': 0, 'cache_hits': 0, 'input_tokens': 0, 'output_tokens': 0, 'by_tier': {}}, 'http': {'fetched': 0, 'cached': 1804, 'bytes': 0}, 'seconds': 33.6, 'ocr_pages': 7, 'llm_available': False}
+run: {'filings': 294, 'events': 213, 'documents_read': 0, 'llm': {'calls': 0, 'cache_hits': 0, 'input_tokens': 0, 'output_tokens': 0, 'by_tier': {}}, 'http': {'fetched': 0, 'cached': 1804, 'bytes': 0}, 'seconds': 33.8, 'ocr_pages': 7, 'llm_available': False}

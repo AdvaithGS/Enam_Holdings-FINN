@@ -110,13 +110,17 @@ def index_closes(day: dt.date) -> dict[str, dict] | None:
         return None
     out = {}
     for r in csv.DictReader(io.StringIO(text)):
+        name = r.get("Index Name", "").strip()
         try:
-            out[r["Index Name"].strip()] = {"o": float(r["Open Index Value"]), "h": float(r["High Index Value"]),
-                                            "l": float(r["Low Index Value"]), "c": float(r["Closing Index Value"])}
+            out[name] = {"c": float(r["Closing Index Value"])}
         except (KeyError, ValueError):
-            continue  # indices without an intraday range carry "-" in those columns
+            continue
+        try:  # some indices publish a close only; their range columns carry "-"
+            out[name].update(o=float(r["Open Index Value"]), h=float(r["High Index Value"]), l=float(r["Low Index Value"]))
+        except (KeyError, ValueError):
+            pass
         try:  # rupees crore traded in the index's constituents that session
-            out[r["Index Name"].strip()]["t"] = float(r["Turnover (Rs. Cr.)"])
+            out[name]["t"] = float(r["Turnover (Rs. Cr.)"])
         except (KeyError, ValueError):
             pass
     return out or None
