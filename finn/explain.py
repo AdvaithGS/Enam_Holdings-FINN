@@ -7,9 +7,9 @@ reports the ones the data supports. Nothing here is a model's guess.
 
   1. The market.   r = beta * m + e. The part beta * m is the market's; if it is at least
                    half the move, the move is systematic, not the stock's.
-  2. The sector.   e = g * f + u, f = the stock's sector index net of the market, the
-                   sector and its loading g chosen and tested on the 250 sessions before
-                   the window (sectors.py). g * f is the sector's share of the residual.
+  2. The sector.   e = g * f + u, f = first principal component of the stock's peers'
+                   returns net of the market, the stock itself excluded, with weights and
+                   loading fixed on the 250 sessions before the window (sectors.py).
   3. Breadth.      How many holdings had a tail session the same day (a macro day shows
                    up as many at once; volatility scaling alone cannot see that).
   5. Deals.        Bulk and block deals reported to the exchange for that day, sized
@@ -73,9 +73,9 @@ def results_meetings(symbol: str) -> list[str]:
 
 
 def build(companies: dict, events: list[dict], start: dt.date, today: dt.date, log=print, idx_panel: dict | None = None,
-          market: list[dict] | None = None) -> dict:
-    facs = sectors.factors(idx_panel["close"], market) if idx_panel and market else {}
-    members = sectors.membership() if facs else {}
+          market: list[dict] | None = None, baskets: dict | None = None) -> dict:
+    lists = sectors._lists() if idx_panel and market else {}
+    peer_cache: dict[str, dict] = {}
     seen = {(e["symbol"], e["session"]): e for e in events if e["tier"] != "aside"}
     by_day: dict[tuple, list[dict]] = {}
     for e in events:
@@ -96,7 +96,13 @@ def build(companies: dict, events: list[dict], start: dt.date, today: dt.date, l
             continue
         dl = deals(s, start, today)
         own_e = {d: float(np.log1p(g["abnormal"])) for d, g in sig[s].items() if g.get("abnormal") is not None}
-        sec = sectors.sector_of(own_e, facs, start.isoformat(), members.get(s)) if facs else None
+        sec = None
+        if idx_panel and market:
+            ps = sectors.peers_of(s, (baskets or {}).get(s), lists, idx_panel["size"])
+            sec = sectors.sector_factor(own_e, ps, market, start.isoformat(), peer_cache) if ps else None
+            if sec:
+                log(f"  sector factor {s}: {sec['name']} [{', '.join(sec['peers'][:5])}{'...' if len(sec['peers']) > 5 else ''}] "
+                    f"PC1 {sec['share']:.0%} of variance (eigenvalue {sec['lam']:.2f} vs noise edge {sec['edge']:.2f}), loading t = {sec['t']:.1f}")
         meetings = results_meetings(s)
         ses = c["sessions"]
         for d in days:
@@ -110,14 +116,16 @@ def build(companies: dict, events: list[dict], start: dt.date, today: dt.date, l
                 if abs(ch) >= 0.01 and m_part * ch > 0 and abs(m_part) >= 0.5 * abs(ch):
                     why.append({"k": "market", "text": f"Mostly the market: NIFTY {mkt:+.1%} at this stock's beta of {beta:.2f} accounts for {m_part:+.1%} of the {ch:+.1%}."})
             own = g.get("abnormal")
-            if sec and own is not None and d in facs[sec["name"]]:
-                f_d = facs[sec["name"]][d]
+            if sec and own is not None and d in sec["f"]:
+                f_d = sec["f"][d]
                 s_part = float(np.expm1(sec["g"] * f_d))
                 if parts:
                     parts.update(sector=round(s_part, 4), own=round(own - s_part, 4), sector_name=sec["name"])
                 if s_part * own > 0 and abs(s_part) >= 0.005 and abs(s_part) >= 0.4 * abs(own):
-                    why.append({"k": "sector", "text": f"Sector-wide: {sec['name']}{'' if sec['basis'] == 'member' else ' (closest by co-movement; the stock is in no listed sector index)'} moved {np.expm1(f_d):+.1%} beyond the market. At this stock's loading of {sec['g']:.2f} "
-                                                       f"(t = {sec['t']:.1f} over the {sec['n']} sessions before) that accounts for {s_part:+.1%} of its {own:+.1%} beyond the market."})
+                    who = ", ".join(sec["peers"][:3]) + (f" and {len(sec['peers']) - 3} more" if len(sec["peers"]) > 3 else "")
+                    label = "its direct competitors" if sec["basis"] == "basket" else f"its {sec['name']} peers"
+                    why.append({"k": "sector", "text": f"Sector-wide: the common factor of {label} ({who}; this stock excluded) moved {f_d:+.1f} standard deviations, "
+                                                       f"which at its loading (t = {sec['t']:.1f} over the {sec['n']} sessions before) accounts for {s_part:+.1%} of its {own:+.1%} beyond the market."})
             if breadth.get(d, 0) >= BROAD * len(companies):
                 why.append({"k": "breadth", "text": f"A broad day: {breadth[d]} of your {len(companies)} holdings had a tail session at once, which points at macro, not at this company."})
             for x in sorted(dl.get(d, []), key=lambda x: -x["qty"])[:2]:

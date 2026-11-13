@@ -179,8 +179,8 @@ def build(days: int = 35, today: dt.date | None = None) -> dict:
     companies, series = {}, {}
     sigs = {p["symbol"]: materiality.signals(bars[p["symbol"]], market) for p in cfg["portfolio"]}
     idx_panel = sectors.panel([b["date"] for b in market])
-    materiality.adjust_volume(list(sigs.values()), sectors.market_volume(idx_panel["turnover"]))
-    log(f"exchange index file: {len(idx_panel['turnover'])} sessions of NIFTY 500 turnover, {len(idx_panel['close'])} sector indices")
+    materiality.adjust_volume(list(sigs.values()), sectors.market_volume(idx_panel))
+    log(f"market volume: {len(idx_panel['by_stock'])} sessions from constituent medians (bhavcopy), {len(idx_panel['turnover'])} with aggregate NIFTY 500 turnover as fallback")
     for p in cfg["portfolio"]:
         s = p["symbol"]
         sig = sigs[s]
@@ -459,7 +459,7 @@ def build(days: int = 35, today: dt.date | None = None) -> dict:
 
     out_events.sort(key=lambda e: (e["tier"] != "act", -e["p"], e["at"]))
     try:
-        moves = explain.build(companies, out_events, start, today, log, idx_panel, market)
+        moves = explain.build(companies, out_events, start, today, log, idx_panel, market, {p["symbol"]: p.get("peers") for p in cfg["portfolio"]})
     except Exception as ex:  # explanations are an addition; their failure must not sink the run
         moves = {}
         log(f"  ! explain: {ex!r}")

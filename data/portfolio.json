@@ -22,7 +22,13 @@
    "symbol": "BHARTIARTL",
    "name": "Bharti Airtel",
    "sector": "Telecom",
-   "weight": 7
+   "weight": 7,
+   "peers": [
+    "IDEA",
+    "INDUSTOWER",
+    "TATACOMM",
+    "BHARTIHEXA"
+   ]
   },
   {
    "symbol": "ITC",
@@ -64,19 +70,43 @@
    "symbol": "ASIANPAINT",
    "name": "Asian Paints",
    "sector": "Paints",
-   "weight": 3
+   "weight": 3,
+   "peers": [
+    "BERGEPAINT",
+    "KANSAINER",
+    "AKZOINDIA",
+    "INDIGOPNTS",
+    "PIDILITIND"
+   ]
   },
   {
    "symbol": "ETERNAL",
    "name": "Eternal (Zomato)",
    "sector": "Internet",
-   "weight": 4
+   "weight": 4,
+   "peers": [
+    "SWIGGY",
+    "NYKAA",
+    "POLICYBZR",
+    "DELHIVERY",
+    "NAUKRI",
+    "PAYTM"
+   ]
   },
   {
    "symbol": "TRENT",
    "name": "Trent",
    "sector": "Retail",
-   "weight": 5
+   "weight": 5,
+   "peers": [
+    "DMART",
+    "ABFRL",
+    "SHOPERSTOP",
+    "VMART",
+    "ARVINDFASN",
+    "RAYMONDLSL",
+    "VMM"
+   ]
   },
   {
    "symbol": "DIXON",
@@ -88,13 +118,34 @@
    "symbol": "KAYNES",
    "name": "Kaynes Technology",
    "sector": "Electronics & semiconductors",
-   "weight": 7
+   "weight": 7,
+   "peers": [
+    "SYRMA",
+    "CYIENTDLM",
+    "AVALON",
+    "PGEL",
+    "AMBER",
+    "DIXON",
+    "CENTUM"
+   ]
   },
   {
    "symbol": "CGPOWER",
    "name": "CG Power",
    "sector": "Electricals & semiconductors",
-   "weight": 4
+   "weight": 4,
+   "peers": [
+    "SIEMENS",
+    "ABB",
+    "BHEL",
+    "POWERINDIA",
+    "THERMAX",
+    "CUMMINSIND",
+    "GVT&D",
+    "SUZLON",
+    "APARINDS",
+    "KEC"
+   ]
   },
   {
    "symbol": "SRF",
@@ -112,7 +163,16 @@
    "symbol": "CREDITACC",
    "name": "CreditAccess Grameen",
    "sector": "Rural lending",
-   "weight": 4
+   "weight": 4,
+   "peers": [
+    "FUSION",
+    "SPANDANA",
+    "UJJIVANSFB",
+    "BANDHANBNK",
+    "EQUITASBNK",
+    "MUTHOOTMF",
+    "SATIN"
+   ]
   },
   {
    "symbol": "PAYTM",

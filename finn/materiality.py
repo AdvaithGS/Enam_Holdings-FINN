@@ -118,8 +118,8 @@ def adjust_volume(sigs: list[dict[str, dict]], market: dict[str, float] | None =
     """Take the market's own volume out of each stock's volume.
 
     On an index-rebalance or expiry day everything trades heavily; that is not news about
-    any one company. v_mkt(t) is the NIFTY 500's turnover that session over its own
-    20-session average (sectors.market_volume, from the exchange's daily index file), and
+    any one company. v_mkt(t) is the median NIFTY 500 constituent's turnover over its own
+    20-session average (sectors.market_volume; a median, so one block deal cannot move it), and
 
         v_rel = v_t / v_mkt(t)
 
@@ -153,7 +153,7 @@ def panel(years: int = 5) -> list[tuple[dict[str, dict], list[dict]]]:
     out = []
     from . import sectors
     sigs = {p["symbol"]: signals(prices.history(p["symbol"], years=years), market) for p in cfg["portfolio"]}
-    adjust_volume(list(sigs.values()), sectors.market_volume(sectors.panel([b["date"] for b in market])["turnover"]))
+    adjust_volume(list(sigs.values()), sectors.market_volume(sectors.panel([b["date"] for b in market])))
     for p in cfg["portfolio"]:
         sig = sigs[p["symbol"]]
         first = min((d for d, g in sig.items() if g["p_ret"] is not None), default=None)

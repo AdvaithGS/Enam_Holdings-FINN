@@ -1,48 +1,48 @@
-"""The market's volume and the sector factors, from the exchange's own daily index file.
+"""The market's volume and each stock's sector factor.
 
-One small file per session (nse.index_closes) carries, for every NSE index, its close
-and the turnover of its constituents. Two things are built from it.
+Market volume.  The typical stock's volume against its own norm:
+                    v_mkt(t) = median over NIFTY 500 constituents of  T_i,t / mean(T_i,t-20..t-1)
+                T_i = rupee turnover of constituent i from the exchange's bhavcopy. A median,
+                because one block deal in one name moves a sum and cannot move a median.
+                Before the bhavcopy archive in this format begins (and as a fallback), the
+                NIFTY 500's aggregate turnover over its own 20-session mean is used.
 
-Market volume.   v_mkt(t) = T_t / mean(T_{t-20..t-1}),  T = NIFTY 500 turnover in rupees.
-                 Turnover, not share count: shares of different stocks do not add.
+Sector factor.  Who are the stock's peers?
+                  1. a named basket of direct competitors, where the investor has set one
+                     (portfolio.json "peers": CG Power against Siemens, ABB, BHEL...), else
+                  2. the constituents of the narrowest NSE sector index that lists the
+                     stock (the exchange's own list files), largest ten by turnover.
+                The stock itself is never in its own factor. Each peer's return is taken
+                net of the market (same conditional beta as everywhere), standardised on
+                the N_FIT sessions before the window, and the factor is the first principal
+                component of their correlation matrix on those sessions:
+                    f_t = v . z_t ,   v = leading eigenvector, sum(v) > 0
+                It is a factor only if its eigenvalue clears the Marchenko-Pastur edge
+                (1 + sqrt(n/T))^2, the largest eigenvalue pure noise would produce.
+                The stock's residual is then regressed on f over the same sessions,
+                    e_t = g f_t + u_t ,
+                and the sector is accepted at |t(g)| >= T_MIN = 2.58 (1%, one pre-specified
+                factor, so no multiple-testing correction). Weights, scaling and loading are
+                all fixed before the window; inside it, g f_d is out of sample.
 
-Sector factors.  For each sector index s, its return net of the market,
-                     f_s,t = r_s,t - (a + b m_t)        (same conditional beta as stocks)
-                 A stock's own residual e is then regressed on each candidate factor over
-                 the N sessions BEFORE the window being explained:
-                     e_t = g f_s,t + u_t
-                 The candidates are the sector indices whose official constituent list
-                 (membership()) contains the stock; among them the best fit (highest R^2)
-                 is its sector, provided |t(g)| >= T_MIN. With ~30 candidates tested, T_MIN = 3.5 keeps
-                 the chance of a spurious sector under 2% (Bonferroni on a two-sided
-                 normal tail: 30 x 0.00047). N = 250, so this is not a small-sample
-                 correlation, and the loading is estimated out of sample.
-                 On day d the sector accounts for g f_s,d of the stock's residual.
-
-The factor is the exchange's cap-weighted sector index, not a principal component
-computed from constituents. That is a choice: the first principal component of a
-sector's constituent residuals is, in practice, close to its cap-weighted index
-residual, and the index is published daily by the exchange, whereas a PCA needs every
-constituent's history and re-estimation as membership changes.
+Why not regress on the cap-weighted sector index: a large stock IS a large part of its
+index (HDFC Bank in Nifty Bank), so the loading would partly be the stock on itself.
 """
 from __future__ import annotations
 
 import datetime as dt
+import math
+import warnings
 
 import numpy as np
 
-from . import stats
-from .sources import nse
+from . import http, stats
+from .sources import nse, prices
 
 MARKET = "Nifty 500"
-CANDIDATES = [
-    "Nifty Auto", "Nifty Bank", "Nifty Private Bank", "Nifty PSU Bank", "Nifty Financial Services", "Nifty Financial Services Ex-Bank", "Nifty NBFC",
-    "Nifty Small Finance Banks & Microfinance Institutions", "Nifty Capital Markets", "Nifty Insurance", "Nifty FMCG", "Nifty IT", "Nifty Media",
-    "Nifty Metal", "Nifty Pharma", "Nifty Healthcare Index", "Nifty Realty", "Nifty Energy", "Nifty Oil & Gas", "Nifty Power", "Nifty Infrastructure",
-    "Nifty Capital Goods", "Nifty Chemicals", "Nifty Consumer Durables", "Nifty Retail", "Nifty Telecommunications", "Nifty India Internet",
-    "Nifty India Manufacturing", "Nifty India Defence", "Nifty Cement", "Nifty Construction", "Nifty India Consumption",
-]
-N_FIT, T_MIN = 250, 3.5
+N_FIT, T_MIN, TOP, MIN_PEERS = 250, 2.58, 10, 4
+BHAV_SESSIONS = 600   # sessions of per-stock turnover to hold: 500 for rarity, 20 for the mean, a margin
+BROAD = {"Nifty Infrastructure", "Nifty India Manufacturing", "Nifty India Consumption", "Nifty Energy"}
 # The exchange's own constituent files: which sector indices a stock actually belongs to.
 LISTS = {
     "Nifty Auto": "niftyautolist", "Nifty Bank": "niftybanklist", "Nifty Private Bank": "nifty_privatebanklist", "Nifty PSU Bank": "niftypsubanklist",
@@ -55,40 +55,77 @@ LISTS = {
 }
 
 
-def membership() -> dict[str, list[str]]:
-    """symbol -> the sector indices whose official constituent list contains it."""
+def _lists() -> dict[str, list[str]]:
     import csv
     import io
-    from . import http
-    out: dict[str, list[str]] = {}
+    out = {}
     for name, f in LISTS.items():
         try:
             text = http.get_text(f"{nse.ARCHIVE}/content/indices/ind_{f}.csv", ttl=7 * 86400, retries=1)
         except http.FetchError:
             continue
-        for r in csv.DictReader(io.StringIO(text)):
-            if r.get("Symbol"):
-                out.setdefault(r["Symbol"].strip(), []).append(name)
+        out[name] = [r["Symbol"].strip() for r in csv.DictReader(io.StringIO(text)) if r.get("Symbol")]
     return out
 
 
+def peers_of(symbol: str, basket: list[str] | None, lists: dict[str, list[str]], size: dict[str, float]) -> dict | None:
+    """The stock's peer set: a named basket if given, else its narrowest sector list."""
+    if basket:
+        return {"name": "its direct competitors", "basis": "basket", "peers": [p for p in basket if p != symbol][:TOP]}
+    mine = [(n in BROAD, len(v), n) for n, v in lists.items() if symbol in v]
+    if not mine:
+        return None
+    name = min(mine)[2]   # sector-specific lists before broad ones, then the smallest
+    ranked = sorted((p for p in lists[name] if p != symbol), key=lambda p: -size.get(p, 0.0))
+    return {"name": name, "basis": "member", "peers": ranked[:TOP]}
+
+
+def nifty500() -> list[str]:
+    import csv
+    import io
+    text = http.get_text(f"{nse.ARCHIVE}/content/indices/ind_nifty500list.csv", ttl=7 * 86400)
+    return [r["Symbol"].strip() for r in csv.DictReader(io.StringIO(text)) if r.get("Symbol")]
+
+
 def panel(dates: list[str]) -> dict:
-    """Turnover of the NIFTY 500 and closes of the candidate indices, by date."""
+    """Aggregate NIFTY 500 turnover by date (index file), per-constituent turnover for the
+    latest BHAV_SESSIONS (bhavcopy), and each constituent's latest turnover as a size proxy."""
     turnover: dict[str, float] = {}
-    close: dict[str, dict[str, float]] = {c: {} for c in CANDIDATES}
     for d in dates:
         rows = nse.index_closes(dt.date.fromisoformat(d))
-        if not rows:
-            continue
-        if rows.get(MARKET, {}).get("t"):
+        if rows and rows.get(MARKET, {}).get("t"):
             turnover[d] = rows[MARKET]["t"]
-        for c in CANDIDATES:
-            if c in rows:
-                close[c][d] = rows[c]["c"]
-    return {"turnover": turnover, "close": {c: v for c, v in close.items() if len(v) >= 0.8 * N_FIT}}
+    members = set(nifty500())
+    by_stock: dict[str, dict[str, float]] = {}
+    size: dict[str, float] = {}
+    for d in dates[-BHAV_SESSIONS:]:
+        bc = nse.bhavcopy(dt.date.fromisoformat(d))
+        if not bc:
+            continue
+        by_stock[d] = {s: r["value"] for s, r in bc.items() if s in members and r["value"] > 0}
+        size = {s: r["value"] for s, r in bc.items()}
+    return {"turnover": turnover, "by_stock": by_stock, "size": size}
 
 
-def market_volume(turnover: dict[str, float], window: int = stats.VOL_WINDOW) -> dict[str, float]:
+def market_volume(p: dict, window: int = stats.VOL_WINDOW) -> dict[str, float]:
+    """v_mkt by date: the constituent median where the bhavcopy is held, else the aggregate ratio."""
+    out = _aggregate_ratio(p["turnover"], window)
+    ds = sorted(p["by_stock"])
+    if len(ds) > window:
+        syms = sorted({s for d in ds for s in p["by_stock"][d]})
+        M = np.array([[p["by_stock"][d].get(s, np.nan) for s in syms] for d in ds])
+        for i in range(window, len(ds)):
+            with np.errstate(all="ignore"), warnings.catch_warnings():
+                warnings.simplefilter("ignore", RuntimeWarning)   # a stock with no history in the window
+                base = np.nanmean(M[i - window:i], axis=0)
+                ratio = M[i] / base
+            ratio = ratio[np.isfinite(ratio)]
+            if len(ratio) >= 100:
+                out[ds[i]] = float(np.median(ratio))
+    return out
+
+
+def _aggregate_ratio(turnover: dict[str, float], window: int) -> dict[str, float]:
     ds = sorted(turnover)
     out = {}
     for i in range(window, len(ds)):
@@ -98,48 +135,47 @@ def market_volume(turnover: dict[str, float], window: int = stats.VOL_WINDOW) ->
     return out
 
 
-def factors(close: dict[str, dict[str, float]], market: list[dict]) -> dict[str, dict[str, float]]:
-    """Each sector's return net of the market, by date."""
+def _residuals(symbol: str, market: list[dict]) -> dict[str, float]:
     mk = {b["date"]: b["adj"] for b in market}
-    out = {}
-    for name, series in close.items():
-        ds = [d for d in sorted(series) if d in mk]
-        if len(ds) < 0.8 * N_FIT:
-            continue
-        r = stats.log_returns(np.array([series[d] for d in ds]))
-        m = stats.log_returns(np.array([mk[d] for d in ds]))
-        f, _ = stats.ew_abnormal_returns(r, m)
-        out[name] = {d: float(x) for d, x in zip(ds, f) if not np.isnan(x)}
-    return out
+    bars = [b for b in prices.history(symbol, years=2) if b["date"] in mk]
+    if len(bars) < N_FIT:
+        return {}
+    e, _ = stats.ew_abnormal_returns(stats.log_returns(np.array([b["adj"] for b in bars])), stats.log_returns(np.array([mk[b["date"]] for b in bars])))
+    return {b["date"]: float(x) for b, x in zip(bars, e) if not np.isnan(x)}
 
 
-def loading(e: dict[str, float], f: dict[str, float], before: str, n: int = N_FIT) -> dict | None:
-    """OLS through the origin of a stock's residual on one sector factor, on the n sessions before `before`."""
-    ds = [d for d in sorted(e) if d < before and d in f][-n:]
-    if len(ds) < n * 0.8:
+def sector_factor(e: dict[str, float], peer_set: dict, market: list[dict], before: str, cache: dict) -> dict | None:
+    """First principal component of the peers' residuals, and the stock's tested loading on it."""
+    res = {}
+    for p in peer_set["peers"]:
+        if p not in cache:
+            try:
+                cache[p] = _residuals(p, market)
+            except Exception:
+                cache[p] = {}
+        if cache[p]:
+            res[p] = cache[p]
+    fit = [d for d in sorted(e) if d < before][-N_FIT:]
+    names = [p for p in res if sum(d in res[p] for d in fit) >= 0.9 * len(fit)]
+    fit = [d for d in fit if all(d in res[p] for p in names)]
+    if len(names) < MIN_PEERS or len(fit) < 0.8 * N_FIT:
         return None
-    x, y = np.array([f[d] for d in ds]), np.array([e[d] for d in ds])
-    sxx = float(x @ x)
-    if sxx <= 0:
+    X = np.array([[res[p][d] for p in names] for d in fit])
+    mu, sd = X.mean(0), X.std(0)
+    w, V = np.linalg.eigh(np.corrcoef(((X - mu) / sd).T))
+    lam, v = float(w[-1]), V[:, -1]
+    edge = (1 + math.sqrt(len(names) / len(fit))) ** 2
+    if lam <= edge:
+        return None   # the peers share no factor beyond what noise would show
+    v = v if v.sum() > 0 else -v
+    f_fit = ((X - mu) / sd) @ v
+    y = np.array([e[d] for d in fit])
+    g = float(f_fit @ y) / float(f_fit @ f_fit)
+    u = y - g * f_fit
+    se = math.sqrt(float(u @ u) / (len(fit) - 1) / float(f_fit @ f_fit))
+    t = g / se if se > 0 else 0.0
+    if g <= 0 or t < T_MIN:
         return None
-    g = float(x @ y) / sxx
-    resid = y - g * x
-    se = float(np.sqrt(resid @ resid / (len(ds) - 1) / sxx))
-    return {"g": g, "t": g / se if se > 0 else 0.0, "r2": 1 - float(resid @ resid) / float(y @ y), "n": len(ds)}
-
-
-def sector_of(e: dict[str, float], facs: dict[str, dict[str, float]], before: str, member_of: list[str] | None = None) -> dict | None:
-    """The stock's sector factor, if one passes the test.
-
-    Candidates are the sector indices the exchange lists the stock in. Among them the one
-    with the highest R^2 is taken (a bank is in Bank, Private Bank and Financial Services;
-    the tightest fit is its sector). A stock in no listed sector index falls back to all
-    candidates, and the result is marked "statistical", not membership.
-    """
-    listed = [n for n in (member_of or []) if n in facs]
-    best = None
-    for name in (listed or list(facs)):
-        fit = loading(e, facs[name], before)
-        if fit and fit["g"] > 0 and fit["t"] >= T_MIN and (best is None or fit["r2"] > best["r2"]):
-            best = {"name": name, "basis": "member" if listed else "statistical", **fit}
-    return best
+    later = [d for d in sorted(e) if d >= before and all(d in res[p] for p in names)]
+    f = {d: float(((np.array([res[p][d] for p in names]) - mu) / sd) @ v) for d in later}
+    return {**peer_set, "peers": names, "g": g, "t": t, "n": len(fit), "share": lam / len(names), "edge": edge, "lam": lam, "f": f}
