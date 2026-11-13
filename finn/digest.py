@@ -33,7 +33,7 @@ import re
 import time
 from pathlib import Path
 
-from . import close, docs, enrich, http, intraday, llm, materiality, results, stats
+from . import close, docs, explain, enrich, http, intraday, llm, materiality, results, stats
 from .sources import nse, prices, screener
 from .taxonomy import CATEGORIES, classify, is_reappointment, is_routine_debt
 
@@ -177,9 +177,11 @@ def build(days: int = 35, today: dt.date | None = None) -> dict:
         log(f"note: index history ends {market[-1]['date']}, stock prices run to {as_of}; later sessions have no abnormal return yet")
     fx = _fx()
     companies, series = {}, {}
+    sigs = {p["symbol"]: materiality.signals(bars[p["symbol"]], market) for p in cfg["portfolio"]}
+    materiality.adjust_volume(list(sigs.values()))
     for p in cfg["portfolio"]:
         s = p["symbol"]
-        sig = materiality.signals(bars[s], market)
+        sig = sigs[s]
         own = {b["date"]: b for b in bars[s]}
         ses = sorted(sig)
         # sessions after the index history ends still get raw change and volume
@@ -200,11 +202,12 @@ def build(days: int = 35, today: dt.date | None = None) -> dict:
                 avg = sum(vols[i - 20:i]) / 20 if i >= 20 else None
                 rows.append({"close": own[d]["close"], "change": own[d]["adj"] / prev["adj"] - 1, "abnormal": None,
                              "vol_ratio": own[d]["volume"] / avg if avg else None, "volume": own[d]["volume"],
-                             "p_ret": None, "p_vol": None, "market": None, "beta": None})
+                             "p_ret": None, "p_vol": None, "market": None, "beta": None, "vol_mkt": None, "vol_rel": None})
         r4 = lambda x: None if x is None else round(x, 4)  # noqa: E731
         series[s] = {"dates": dates, "close": [round(r["close"], 2) for r in rows],
                      "change": [r4(r["change"]) for r in rows], "abnormal": [r4(r["abnormal"]) for r in rows],
                      "vol_ratio": [None if r["vol_ratio"] is None else round(r["vol_ratio"], 2) for r in rows],
+                     "vol_mkt": [None if r.get("vol_mkt") is None else round(r["vol_mkt"], 2) for r in rows],
                      "p_ret": [r4(r["p_ret"]) for r in rows], "p_vol": [r4(r["p_vol"]) for r in rows]}
         companies[s] = {"symbol": s, "name": p["name"], "legal_name": co.get("name"), "sector": p["sector"], "weight": p.get("weight"),
                         "industry": (co.get("industry") or [None])[-1], "mcap_cr": co.get("market_cap"),
@@ -454,6 +457,11 @@ def build(days: int = 35, today: dt.date | None = None) -> dict:
 
     out_events.sort(key=lambda e: (e["tier"] != "act", -e["p"], e["at"]))
     try:
+        moves = explain.build(companies, out_events, start, today, log)
+    except Exception as ex:  # explanations are an addition; their failure must not sink the run
+        moves = {}
+        log(f"  ! explain: {ex!r}")
+    try:
         brief = close.build(companies, market, out_events, dt.datetime.now(prices.IST), log)
     except Exception as ex:
         brief = None
@@ -469,7 +477,7 @@ def build(days: int = 35, today: dt.date | None = None) -> dict:
                   "categories": {k: {"n": v["n"], "p": round(v["p"], 4), "lift": round(v["lift"], 2),
                                      "lo": round(v["lift_lo"], 2), "hi": round(v["lift_hi"], 2)}
                                  for k, v in model["categories"].items()}},
-        "labels": CATEGORIES, "companies": companies, "events": out_events, "close": brief,
+        "labels": CATEGORIES, "companies": companies, "events": out_events, "close": brief, "moves": moves,
         "run": {"filings": len(filings), "events": len(out_events), "documents_read": reads,
                 "llm": dict(llm.usage), "http": dict(http.stats), "seconds": round(time.time() - t0, 1),
                 "ocr_pages": docs.stats["ocr_pages"], "llm_available": llm.available()},

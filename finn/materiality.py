@@ -114,6 +114,32 @@ def fit(panel: list[tuple[dict[str, dict], list[dict]]]) -> dict:
     return model
 
 
+def adjust_volume(sigs: list[dict[str, dict]]) -> None:
+    """Take the market's own volume out of each stock's volume.
+
+    On an index-rebalance or expiry day everything trades heavily; that is not news about
+    any one company. v_mkt(t) is the median relative volume across the stocks we hold that
+    session (a proxy for the market with 20 names, and stated as such), and
+
+        v_rel = v_t / v_mkt(t)
+
+    is the stock's volume against the day's norm. p_vol is recomputed on v_rel, so "the
+    market noticed" and every "1 in N" for volume mean unusual *for that day*.
+    """
+    by_date: dict[str, list[float]] = {}
+    for sig in sigs:
+        for d, g in sig.items():
+            if g["vol_ratio"] is not None:
+                by_date.setdefault(d, []).append(g["vol_ratio"])
+    med = {d: float(np.median(v)) for d, v in by_date.items() if len(v) >= 5}
+    for sig in sigs:
+        ds = sorted(sig)
+        rel = np.array([sig[d]["vol_ratio"] / med[d] if sig[d]["vol_ratio"] is not None and med.get(d) else np.nan for d in ds])
+        p = stats.tail_prob(rel)
+        for d, r, pv in zip(ds, rel, p):
+            sig[d].update(vol_mkt=med.get(d), vol_rel=None if np.isnan(r) else float(r), p_vol=None if np.isnan(pv) else float(pv))
+
+
 def panel(years: int = 5) -> list[tuple[dict[str, dict], list[dict]]]:
     """Signals and filings for every portfolio stock over `years` of history."""
     from .sources import nse, prices
@@ -121,8 +147,10 @@ def panel(years: int = 5) -> list[tuple[dict[str, dict], list[dict]]]:
     market = prices.history(prices.NIFTY, years=years)
     today = dt.datetime.now(prices.IST).date()
     out = []
+    sigs = {p["symbol"]: signals(prices.history(p["symbol"], years=years), market) for p in cfg["portfolio"]}
+    adjust_volume(list(sigs.values()))
     for p in cfg["portfolio"]:
-        sig = signals(prices.history(p["symbol"], years=years), market)
+        sig = sigs[p["symbol"]]
         first = min((d for d, g in sig.items() if g["p_ret"] is not None), default=None)
         if not first:
             continue

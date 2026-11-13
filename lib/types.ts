@@ -28,7 +28,9 @@ export interface Company {
   symbol: string; name: string; legal_name?: string; sector: string; industry?: string; mcap_cr?: number;
   line?: { cr: number; leg: string } | null; beta?: number | null; weight?: number | null;
 }
+export interface MoveNote { parts: { market: number; own: number } | null; why: { k: string; text: string }[]; found: boolean; broad: number }
 export interface Digest {
+  moves?: Record<string, Record<string, MoveNote>>;
   generated_at: string; as_of: string; window_days: number;
   model: { baseline: number; act: number; alpha: number; sessions: number; categories: Record<string, { n: number; p: number; lift: number; lo: number; hi: number }> };
   labels: Record<string, string>; companies: Record<string, Company>; events: FinnEvent[]; close?: CloseBrief | null;
@@ -49,5 +51,5 @@ export interface CloseBrief {
   sectors: { id: string; name: string; ret: number | null; rel: number | null; rel_20: number | null; p: number | null; held: string[] }[];
   rotation: number | null; world: WorldIndex[]; filed: { act: number; glance: number; aside: number }; act: string[];
 }
-export interface Series { dates: string[]; close: number[]; change: (number | null)[]; abnormal: (number | null)[]; vol_ratio: (number | null)[]; p_ret: (number | null)[]; p_vol: (number | null)[] }
+export interface Series { dates: string[]; close: number[]; change: (number | null)[]; abnormal: (number | null)[]; vol_ratio: (number | null)[]; vol_mkt?: (number | null)[]; p_ret: (number | null)[]; p_vol: (number | null)[] }
 export interface Market { as_of: string; series: Record<string, Series>; index?: { name: string; dates: string[]; close: number[] } }

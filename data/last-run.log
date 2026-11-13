@@ -1,76 +1,82 @@
-FINN digest  2026-11-13 15:45 IST  window 2026-10-09 .. 2026-11-13
-baseline P(noticed | no filing) = 0.064; 'what matters' cut-off = 3x = 0.192
-prices: 20 stocks, latest session 2026-11-12; fx {'USD': 94.23, 'EUR': 104.1995, 'GBP': 124.6644}
+FINN digest  2026-11-13 16:43 IST  window 2026-10-09 .. 2026-11-13
+baseline P(noticed | no filing) = 0.063; 'what matters' cut-off = 3x = 0.190
+prices: 20 stocks, latest session 2026-11-13; fx {'USD': 94.23, 'EUR': 104.1995, 'GBP': 124.6644}
 filings: 293 in window
 opaque titles opened locally: 78 (OCR pages: 4)
 events after folding: 213
 intraday: 26 filings timed during trading hours
+moves without a filing: 126 examined, 90 with a supported explanation
 
 --- WHAT MATTERS (23)
   0.93 RELIANCE   2026-10-30 Results          Q2 FY27: revenue +29%, PAT +34% YoY
-         . The stock moved +9.9% vs market on 5.8x volume that session; for its volatility at the time, a day this unusual comes about 1 in 501. This event carries 87% of the credit among 2 that session.
-  0.88 DEEPAKNTR  2026-10-29 Results          Q2 FY27: revenue +62%, PAT +235% YoY
-         . The stock moved +2.4% vs market on 24.1x volume that session; for its volatility at the time, a day this unusual comes about 1 in 251.
-  0.83 CREDITACC  2026-10-12 Business update  CreditAccess Grameen broadens its Global Lender Base with USD 175 Million Syndicated Socia
+         . The stock moved +9.9% vs market on 5.8x volume that session; for its volatility at the time, a day this unusual comes about 1 in 501. This event carries 88% of the credit among 2 that session.
+  0.85 DIXON      2026-10-30 Results          Q2 FY27: revenue +47%, PAT -45% YoY
+         . The stock moved +9.5% vs market on 6.0x volume that session; for its volatility at the time, a day this unusual comes about 1 in 250. This event carries 77% of the credit among 3 that session.
+  0.83 DEEPAKNTR  2026-10-29 Results          Q2 FY27: revenue +62%, PAT +235% YoY
+         . The stock moved +2.4% vs market on 24.1x volume that session; for its volatility at the time, a day this unusual comes about 1 in 167.
+  0.82 CREDITACC  2026-10-12 Business update  CreditAccess Grameen broadens its Global Lender Base with USD 175 Million Syndicated Socia
          . ₹1,649 cr is 36x this company's SEBI materiality line (₹46 cr, 5% of 3-year average profit)
          . For scale: ₹1,649 cr is 9.31% of the company's market value (₹17,719 cr). Shown for scale; not in the score.
-  0.82 TITAN      2026-11-05 Results          Q2 FY27: revenue +10%, PAT +114% YoY
-         . The stock moved +1.2% vs market on 5.6x volume that session; for its volatility at the time, a day this unusual comes about 1 in 251. This event carries 60% of the credit among 4 that session.
-  0.80 DIXON      2026-10-30 Results          Q2 FY27: revenue +47%, PAT -45% YoY
-         . The stock moved +9.5% vs market on 6.0x volume that session; for its volatility at the time, a day this unusual comes about 1 in 167. This event carries 78% of the credit among 3 that session.
   0.77 LT         2026-10-27 Results          Q2 FY27: revenue +16%, PAT +27% YoY
-         . The stock moved +4.0% vs market on 3.2x volume that session; for its volatility at the time, a day this unusual comes about 1 in 125. This event carries 87% of the credit among 2 that session.
-  0.69 SUNPHARMA  2026-10-30 Results          Q2 FY27: revenue +12%, PAT -36% YoY
-         . The stock moved +0.7% vs market on 3.4x volume that session; for its volatility at the time, a day this unusual comes about 1 in 84. This event carries 88% of the credit among 2 that session.
-  0.66 SRF        2026-10-21 Results          Q2 FY27: revenue +35%, PAT +31% YoY
-         . The stock moved -4.8% vs market on 3.9x volume that session; for its volatility at the time, a day this unusual comes about 1 in 72. This event carries 85% of the credit among 2 that session.
-         . Filed at 14:54. In the next 30 minutes the volume-weighted price moved -3.74% against the session so far on 22.0x the usual volume for that time of day: a half hour like that comes about 1 in 813 at that time of day (n=815). Shown as evidence; not in the score.
-  0.60 TRENT      2026-10-29 Management       Noel N Tata retires as Chairman
-         . Noel N Tata, Chairman: runs the company or its finances
-         . The stock moved +4.9% vs market on 3.9x volume that session; for its volatility at the time, a day this unusual comes about 1 in 39. This event carries 61% of the credit among 2 that session.
-  0.59 CREDITACC  2026-10-22 Results          Q2 FY27: revenue +26%, PAT +299% YoY
-         . The stock moved -5.2% vs market on 13.7x volume that session; for its volatility at the time, a day this unusual comes about 1 in 56. This event carries 78% of the credit among 3 that session.
-  0.58 ASIANPAINT 2026-10-29 Results          Q2 FY27: revenue +17%, PAT +7% YoY
-         . The stock moved -0.3% vs market on 3.7x volume that session; for its volatility at the time, a day this unusual comes about 1 in 50. This event carries 86% of the credit among 2 that session.
+         . The stock moved +4.0% vs market on 3.2x volume that session; for its volatility at the time, a day this unusual comes about 1 in 125. This event carries 88% of the credit among 2 that session.
+  0.76 TITAN      2026-11-05 Results          Q2 FY27: revenue +10%, PAT +114% YoY
+         . The stock moved +1.2% vs market on 5.6x volume that session; for its volatility at the time, a day this unusual comes about 1 in 167. This event carries 60% of the credit among 4 that session.
+  0.68 ASIANPAINT 2026-10-29 Results          Q2 FY27: revenue +17%, PAT +7% YoY
+         . The stock moved -0.3% vs market on 3.7x volume that session; for its volatility at the time, a day this unusual comes about 1 in 83. This event carries 84% of the credit among 2 that session.
          . Filed at 14:04. In the next 30 minutes the volume-weighted price moved -0.33% against the session so far on 17.6x the usual volume for that time of day: a half hour like that comes about 1 in 474 at that time of day (n=1,420). Shown as evidence; not in the score.
-  0.52 TCS        2026-10-09 Other            Statement of the Company regarding the announcement by the US Government on the Permanent 
-         . The stock moved +2.9% vs market on 3.5x volume that session; for its volatility at the time, a day this unusual comes about 1 in 167.
+  0.66 SUNPHARMA  2026-10-30 Results          Q2 FY27: revenue +12%, PAT -36% YoY
+         . The stock moved +0.7% vs market on 3.4x volume that session; for its volatility at the time, a day this unusual comes about 1 in 71. This event carries 88% of the credit among 2 that session.
+  0.62 SRF        2026-10-21 Results          Q2 FY27: revenue +35%, PAT +31% YoY
+         . The stock moved -4.8% vs market on 3.9x volume that session; for its volatility at the time, a day this unusual comes about 1 in 63. This event carries 85% of the credit among 2 that session.
+         . Filed at 14:54. In the next 30 minutes the volume-weighted price moved -3.74% against the session so far on 22.0x the usual volume for that time of day: a half hour like that comes about 1 in 813 at that time of day (n=815). Shown as evidence; not in the score.
+  0.61 TRENT      2026-10-29 Management       Noel N Tata retires as Chairman
+         . Noel N Tata, Chairman: runs the company or its finances
+         . The stock moved +4.9% vs market on 3.9x volume that session; for its volatility at the time, a day this unusual comes about 1 in 42. This event carries 61% of the credit among 2 that session.
+  0.54 CREDITACC  2026-10-22 Results          Q2 FY27: revenue +26%, PAT +299% YoY
+         . The stock moved -5.2% vs market on 13.7x volume that session; for its volatility at the time, a day this unusual comes about 1 in 45. This event carries 78% of the credit among 3 that session.
   0.51 CGPOWER    2026-10-23 Results          Q2 FY27: revenue +30%, PAT +44% YoY
          . The stock moved -0.2% vs market on 3.6x volume that session; for its volatility at the time, a day this unusual comes about 1 in 42. This event carries 68% of the credit among 4 that session.
          . Filed at 14:26. In the next 30 minutes the volume-weighted price moved +1.15% against the session so far on 13.5x the usual volume for that time of day: a half hour like that comes about 1 in 1124 at that time of day (n=1,124). Shown as evidence; not in the score.
-  0.47 TITAN      2026-11-05 Management       Noel N. Tata retires as Director and Vice-Chairman
+  0.46 TRENT      2026-10-29 Results          Q2 FY27: revenue +22%, PAT +25% YoY
+         . The stock moved +4.9% vs market on 3.9x volume that session; for its volatility at the time, a day this unusual comes about 1 in 42. This event carries 39% of the credit among 2 that session.
+  0.44 TCS        2026-10-09 Other            Statement of the Company regarding the announcement by the US Government on the Permanent 
+         . The stock moved +2.9% vs market on 3.5x volume that session; for its volatility at the time, a day this unusual comes about 1 in 125.
+  0.39 TITAN      2026-11-05 Management       Noel N. Tata retires as Director and Vice-Chairman
          . Noel N. Tata, Director and Vice-Chairman: senior executive
-         . The stock moved +1.2% vs market on 5.6x volume that session; for its volatility at the time, a day this unusual comes about 1 in 251. This event carries 24% of the credit among 4 that session.
-  0.45 TRENT      2026-10-29 Results          Q2 FY27: revenue +22%, PAT +25% YoY
-         . The stock moved +4.9% vs market on 3.9x volume that session; for its volatility at the time, a day this unusual comes about 1 in 39. This event carries 39% of the credit among 2 that session.
-  0.43 BAJFINANCE 2026-10-19 Results          Q2 FY27: revenue +22%, PAT +29% YoY
-         . The stock moved -2.8% vs market on 2.4x volume that session; for its volatility at the time, a day this unusual comes about 1 in 26. This event carries 78% of the credit among 3 that session.
+         . The stock moved +1.2% vs market on 5.6x volume that session; for its volatility at the time, a day this unusual comes about 1 in 167. This event carries 24% of the credit among 4 that session.
+  0.37 BAJFINANCE 2026-10-19 Results          Q2 FY27: revenue +22%, PAT +29% YoY
   0.37 HDFCBANK   2026-10-17 Results          Q2 FY27: revenue +9%, PAT +6% YoY
   0.37 ETERNAL    2026-10-21 Results          Q2 FY27: revenue +78%, PAT +92% YoY
   0.37 PAYTM      2026-10-26 Results          Q2 FY27: revenue +28%, PAT +971% YoY
   0.37 MARUTI     2026-10-27 Results          Q2 FY27: revenue +26%, PAT -26% YoY
   0.37 ITC        2026-11-02 Results          Q2 FY27: revenue +44%, PAT -18% YoY
   0.37 BHARTIARTL 2026-11-05 Results          Q2 FY27: revenue +17%, PAT +24% YoY
-  0.23 TCS        2026-10-14 Business update  Press Release -MyState Limited selects TCS BaNCSTM to transform core banking operations
-         . The stock moved +2.5% vs market on 2.9x volume that session; for its volatility at the time, a day this unusual comes about 1 in 50.
+  0.21 TCS        2026-10-14 Business update  Press Release -MyState Limited selects TCS BaNCSTM to transform core banking operations
+         . The stock moved +2.5% vs market on 2.9x volume that session; for its volatility at the time, a day this unusual comes about 1 in 45.
          . Filed at 11:30. In the next 30 minutes the volume-weighted price moved -0.42% against the session so far on 4.0x the usual volume for that time of day: a half hour like that comes about 1 in 41 at that time of day (n=1,471). Shown as evidence; not in the score.
 --- WORTH A GLANCE (64)
-  0.18 SUNPHARMA  2026-11-04 Business update  Clarification regarding news report relating to the Company’s Assam facility
-         . The stock moved -0.1% vs market on 2.8x volume that session; for its volatility at the time, a day this unusual comes about 1 in 36.
-  0.18 HDFCBANK   2026-11-06 Management       Change in Management
-         . The stock moved +1.3% vs market on 2.3x volume that session; for its volatility at the time, a day this unusual comes about 1 in 50.
-  0.16 CGPOWER    2026-11-05 Legal & regulatory Action(s) taken or orders passed
+  0.18 DIXON      2026-10-30 Management       Change in Management
+         . The stock moved +9.5% vs market on 6.0x volume that session; for its volatility at the time, a day this unusual comes about 1 in 250. This event carries 12% of the credit among 3 that session.
+  0.17 CGPOWER    2026-11-05 Legal & regulatory Action(s) taken or orders passed
          . The stock moved -6.0% vs market on 2.0x volume that session; for its volatility at the time, a day this unusual comes about 1 in 46.
          . Filed at 12:35. In the next 30 minutes the volume-weighted price moved -1.16% against the session so far on 7.7x the usual volume for that time of day: a half hour like that comes about 1 in 98 at that time of day (n=1,473). Shown as evidence; not in the score.
-  0.14 ETERNAL    2026-10-21 M&A              Eternal Limited has informed exchange regarding proposed restructuring, acquisition and di
-         . The stock moved -1.8% vs market on 3.9x volume that session; for its volatility at the time, a day this unusual comes about 1 in 42.
-  0.14 DIXON      2026-10-30 Management       Change in Management
-         . The stock moved +9.5% vs market on 6.0x volume that session; for its volatility at the time, a day this unusual comes about 1 in 167. This event carries 11% of the credit among 3 that session.
-  0.13 SRF        2026-10-21 Capex            Capital Expenditure proposal approved by the Board
-         . The stock moved -4.8% vs market on 3.9x volume that session; for its volatility at the time, a day this unusual comes about 1 in 72. This event carries 15% of the credit among 2 that session.
-         . Filed at 15:01. In the next 30 minutes the volume-weighted price moved -1.48% against the session so far on 5.9x the usual volume for that time of day: a half hour like that comes about 1 in 54 at that time of day (n=697). Shown as evidence; not in the score.
+  0.17 HDFCBANK   2026-11-06 Management       Change in Management
+         . The stock moved +1.3% vs market on 2.3x volume that session; for its volatility at the time, a day this unusual comes about 1 in 45.
+  0.17 SUNPHARMA  2026-11-04 Business update  Clarification regarding news report relating to the Company’s Assam facility
+         . The stock moved -0.1% vs market on 2.8x volume that session; for its volatility at the time, a day this unusual comes about 1 in 33.
+  0.14 ASIANPAINT 2026-10-29 Dividend         The Board of Directors at their meeting held today i.e., 29th October 2026, has, inter ali
+         . The stock moved -0.3% vs market on 3.7x volume that session; for its volatility at the time, a day this unusual comes about 1 in 83. This event carries 16% of the credit among 2 that session.
+         . Filed at 14:12. In the next 30 minutes the volume-weighted price moved +0.14% against the session so far on 10.7x the usual volume for that time of day: a half hour like that comes about 1 in 326 at that time of day (n=1,302). Shown as evidence; not in the score.
+  0.13 SUNPHARMA  2026-11-02 Business update  The Exchange has sought clarification from Sun Pharmaceutical Industries Limited with resp
+         . The stock moved -1.2% vs market on 2.1x volume that session; for its volatility at the time, a day this unusual comes about 1 in 33. This event carries 33% of the credit among 4 that session.
+         . Filed at 14:18. In the next 30 minutes the volume-weighted price moved +0.16% against the session so far on 1.5x the usual volume for that time of day: nothing unusual for that time of day (n=1,243). Shown as evidence; not in the score.
   0.13 MARUTI     2026-10-12 Other            General Updates
          . The stock moved -2.3% vs market on 1.8x volume that session; for its volatility at the time, a day this unusual comes about 1 in 25. This event carries 61% of the credit among 2 that session.
+  0.12 SRF        2026-10-21 Capex            Capital Expenditure proposal approved by the Board
+         . The stock moved -4.8% vs market on 3.9x volume that session; for its volatility at the time, a day this unusual comes about 1 in 63. This event carries 15% of the credit among 2 that session.
+         . Filed at 15:01. In the next 30 minutes the volume-weighted price moved -1.48% against the session so far on 5.9x the usual volume for that time of day: a half hour like that comes about 1 in 54 at that time of day (n=697). Shown as evidence; not in the score.
+  0.12 ETERNAL    2026-10-21 M&A              Eternal Limited has informed exchange regarding proposed restructuring, acquisition and di
+         . The stock moved -1.8% vs market on 3.9x volume that session; for its volatility at the time, a day this unusual comes about 1 in 31.
   0.11 SUNPHARMA  2026-10-12 Other            Outcome of the Board Meeting held on 12 October 2026
   0.11 PAYTM      2026-10-13 Other            Update on levy of MDR on select UPI P2M transactions
          . Filed at 14:32. In the next 30 minutes the volume-weighted price moved +3.55% against the session so far on 3.6x the usual volume for that time of day: a half hour like that comes about 1 in 1064 at that time of day (n=1,063). Shown as evidence; not in the score.
@@ -102,57 +108,52 @@ intraday: 26 filings timed during trading hours
   0.11 MARUTI     2026-11-01 Business update  Maruti Suzuki Production Volume: October 2026
   0.11 LT         2026-11-02 Business update  L&T Wins Orders (Significant*) for Residential, Commercial Buildings & Factories Business
          . Filed at 10:18. In the next 30 minutes the volume-weighted price moved +0.54% against the session so far on 2.8x the usual volume for that time of day: a half hour like that comes about 1 in 16 at that time of day (n=1,299). Shown as evidence; not in the score.
-  0.11 SUNPHARMA  2026-11-02 Business update  The Exchange has sought clarification from Sun Pharmaceutical Industries Limited with resp
-         . Filed at 14:18. In the next 30 minutes the volume-weighted price moved +0.16% against the session so far on 1.5x the usual volume for that time of day: nothing unusual for that time of day (n=1,243). Shown as evidence; not in the score.
   0.11 TCS        2026-11-04 Business update  Press Release - TCS Enterprise AI Study: 84% say productivity is AI s top benefit; just 10
          . Filed at 11:00. In the next 30 minutes the volume-weighted price moved -1.22% against the session so far on 1.3x the usual volume for that time of day: a half hour like that comes about 1 in 210 at that time of day (n=1,471). Shown as evidence; not in the score.
   0.11 LT         2026-11-09 Business update  L&T bags ( Significant*) order from Noida Metro for Aqua Line Extension
          . Filed at 10:37. In the next 30 minutes the volume-weighted price moved +0.19% against the session so far on 1.6x the usual volume for that time of day: nothing unusual for that time of day (n=1,472). Shown as evidence; not in the score.
-  0.10 ASIANPAINT 2026-10-29 Dividend         The Board of Directors at their meeting held today i.e., 29th October 2026, has, inter ali
-         . The stock moved -0.3% vs market on 3.7x volume that session; for its volatility at the time, a day this unusual comes about 1 in 50. This event carries 14% of the credit among 2 that session.
-         . Filed at 14:12. In the next 30 minutes the volume-weighted price moved +0.14% against the session so far on 10.7x the usual volume for that time of day: a half hour like that comes about 1 in 326 at that time of day (n=1,302). Shown as evidence; not in the score.
   0.09 CGPOWER    2026-10-23 Management       Change in Management
          . The stock moved -0.2% vs market on 3.6x volume that session; for its volatility at the time, a day this unusual comes about 1 in 42. This event carries 10% of the credit among 4 that session.
          . Filed at 14:28. In the next 30 minutes the volume-weighted price moved +1.15% against the session so far on 13.5x the usual volume for that time of day: a half hour like that comes about 1 in 1124 at that time of day (n=1,124). Shown as evidence; not in the score.
   0.09 ASIANPAINT 2026-11-06 Management       Leo Puri joins as Independent Director
          . Leo Puri, Independent Director: board oversight role
-  0.08 BAJFINANCE 2026-10-19 Management       (the ‘SEBI Listing Regulations, 2015’) –Change in Senior Management Personnel
-  0.08 SUNPHARMA  2026-10-12 Management       Resignation of Director of the Company
-  0.08 TRENT      2026-10-19 Management       Resignation of Director/KMP/SMP
-  0.08 HDFCBANK   2026-10-31 Management       Change in Management
-  0.08 HDFCBANK   2026-11-12 Management       Approval from the Reserve Bank of India for re-appointment of Mr. V. Srinivasa Rangan asth
   0.08 PAYTM      2026-10-13 Legal & regulatory Proposed GST Demand on First Games Reduced; Assessing Solutions Under Relevant Provisions;
   0.08 MARUTI     2026-10-15 Legal & regulatory Action(s) taken or orders passed
   0.08 SRF        2026-11-05 Legal & regulatory Action(s) taken or orders passed
          . Filed at 13:07. In the next 30 minutes the volume-weighted price moved -0.06% against the session so far on 1.7x the usual volume for that time of day: nothing unusual for that time of day (n=1,475). Shown as evidence; not in the score.
   0.08 BHARTIARTL 2026-11-06 Legal & regulatory (‘SEBI Listing Regulations’)
-  0.07 DEEPAKNTR  2026-10-16 Earnings call    Schedule of Q2 & Hl Fy 2027 Earnings conference call
-  0.07 TCS        2026-10-15 M&A              Completion of acquisition of BBY Services India LLP
+  0.08 SUNPHARMA  2026-10-12 Management       Resignation of Director of the Company
+  0.08 TRENT      2026-10-19 Management       Resignation of Director/KMP/SMP
+  0.08 BAJFINANCE 2026-10-19 Management       (the ‘SEBI Listing Regulations, 2015’) –Change in Senior Management Personnel
+  0.08 HDFCBANK   2026-10-31 Management       Change in Management
+  0.08 HDFCBANK   2026-11-12 Management       Approval from the Reserve Bank of India for re-appointment of Mr. V. Srinivasa Rangan asth
+  0.08 TCS        2026-10-15 M&A              Completion of acquisition of BBY Services India LLP
          . Filed at 13:30. In the next 30 minutes the volume-weighted price moved -0.23% against the session so far on 2.6x the usual volume for that time of day: a half hour like that comes about 1 in 10 at that time of day (n=1,475). Shown as evidence; not in the score.
-  0.07 TRENT      2026-10-23 M&A              Nahar Retail Trading Services Limited ( Nahar ), a wholly owned subsidiary of the Company,
-  0.07 RELIANCE   2026-10-24 M&A              Initial Public Offer of Jio Platforms Limited
-  0.07 PAYTM      2026-10-26 M&A              Additional investment by the Company into Paytm Cloud Technologies Limited ("PCTL"), a who
-  0.07 MARUTI     2026-10-27 M&A              Incorporation of Wholly Owned Subsidiary
+  0.08 TRENT      2026-10-23 M&A              Nahar Retail Trading Services Limited ( Nahar ), a wholly owned subsidiary of the Company,
+  0.08 RELIANCE   2026-10-24 M&A              Initial Public Offer of Jio Platforms Limited
+  0.08 PAYTM      2026-10-26 M&A              Additional investment by the Company into Paytm Cloud Technologies Limited ("PCTL"), a who
+  0.08 MARUTI     2026-10-27 M&A              Incorporation of Wholly Owned Subsidiary
          . Filed at 13:18. In the next 30 minutes the volume-weighted price moved +0.05% against the session so far on 0.7x the usual volume for that time of day: nothing unusual for that time of day (n=1,475). Shown as evidence; not in the score.
-  0.07 TITAN      2026-10-28 M&A              (Listing Regulations)
+  0.08 TITAN      2026-10-28 M&A              (Listing Regulations)
          . Filed at 13:49. In the next 30 minutes the volume-weighted price moved +0.78% against the session so far on 0.5x the usual volume for that time of day: a half hour like that comes about 1 in 10 at that time of day (n=1,475). Shown as evidence; not in the score.
-  0.07 RELIANCE   2026-10-29 M&A              Voluntary strike off of Hamleys (Franchising) Limited
-  0.07 LT         2026-10-31 M&A              Updates on the Business Transfer Agreement with Vyoma.AI Limited (Vyoma), Wholly owned Sub
-  0.07 ITC        2026-11-02 M&A              Amalgamation/Merger
-  0.07 KAYNES     2026-11-12 M&A              Execution of binding term sheet amongst the Company, Kaynes Semicon Private Limited, the w
-  0.07 PAYTM      2026-11-13 M&A              Regarding 'In-principle authorisation granted by the Reserve Bank of India to Paytm Paymen
+  0.08 RELIANCE   2026-10-29 M&A              Voluntary strike off of Hamleys (Franchising) Limited
+  0.08 LT         2026-10-31 M&A              Updates on the Business Transfer Agreement with Vyoma.AI Limited (Vyoma), Wholly owned Sub
+  0.08 ITC        2026-11-02 M&A              Amalgamation/Merger
+  0.08 KAYNES     2026-11-12 M&A              Execution of binding term sheet amongst the Company, Kaynes Semicon Private Limited, the w
+  0.08 PAYTM      2026-11-13 M&A              Regarding 'In-principle authorisation granted by the Reserve Bank of India to Paytm Paymen
          . Filed at 14:42. In the next 30 minutes the volume-weighted price moved +0.88% against the session so far on 4.6x the usual volume for that time of day: a half hour like that comes about 1 in 34 at that time of day (n=947). Shown as evidence; not in the score.
-  0.07 BAJFINANCE 2026-11-11 Fund raise       Outcome of QIP 2026 - Special Committee meeting
-  0.07 BAJFINANCE 2026-11-10 Fund raise       Allotment of 5,74,25,740 securities pursuant to Preferential Issue at its meeting held on 
+  0.08 BAJFINANCE 2026-11-11 Fund raise       Outcome of QIP 2026 - Special Committee meeting
+  0.08 BAJFINANCE 2026-11-10 Fund raise       Allotment of 5,74,25,740 securities pursuant to Preferential Issue at its meeting held on 
          . Filed at 12:14. In the next 30 minutes the volume-weighted price moved -0.27% against the session so far on 1.0x the usual volume for that time of day: nothing unusual for that time of day (n=1,471). Shown as evidence; not in the score.
+  0.07 DEEPAKNTR  2026-10-16 Earnings call    Schedule of Q2 & Hl Fy 2027 Earnings conference call
   0.06 SUNPHARMA  2026-10-26 Fund raise       Allotment of 781600 securities pursuant to Non Convertible Securities at its meeting held 
          . Routine debt issuance for a borrower of this kind
          . Filed at 12:30. In the next 30 minutes the volume-weighted price moved -0.28% against the session so far on 1.4x the usual volume for that time of day: nothing unusual for that time of day (n=1,472). Shown as evidence; not in the score.
   0.06 TITAN      2026-11-12 Fund raise       Redemption of Commercial Paper
          . Routine debt issuance for a borrower of this kind
---- THE CLOSE 2026-11-13: portfolio -0.42%, NIFTY -0.61%, alpha +0.26% (1 in 2); 7 up, 13 down; regime normal; rotation -0.72
+--- THE CLOSE 2026-11-13: portfolio -0.42%, NIFTY -0.61%, alpha +0.26% (1 in 2); 7 up, 12 down; regime normal; rotation -0.72
     sectors vs NIFTY: Energy +0.64%, FMCG +0.61%, Infra +0.26%, Pharma +0.13%, IT -0.11%, Bank -0.18%, Metal -0.37%, Auto -0.46%, Realty -0.78%
     world: Nikkei 225 +0.53% (11-13), Hang Seng -1.55% (11-13), Shanghai -0.59% (11-13), KOSPI -0.98% (11-13), NIFTY 50 -0.61% (11-13), DAX +0.41% (11-12), Euro Stoxx 50 +0.09% (11-12), FTSE 100 +0.25% (11-12), S&P 500 -0.35% (11-12), Nasdaq -0.39% (11-12)
 --- SET ASIDE (126 events, 141 filings)
 
-run: {'filings': 293, 'events': 213, 'documents_read': 0, 'llm': {'calls': 0, 'cache_hits': 0, 'input_tokens': 0, 'output_tokens': 0, 'by_tier': {}}, 'http': {'fetched': 200, 'cached': 287, 'bytes': 18467260}, 'seconds': 273.8, 'ocr_pages': 7, 'llm_available': False}
+run: {'filings': 293, 'events': 213, 'documents_read': 0, 'llm': {'calls': 0, 'cache_hits': 0, 'input_tokens': 0, 'output_tokens': 0, 'by_tier': {}}, 'http': {'fetched': 1, 'cached': 554, 'bytes': 208744}, 'seconds': 47.2, 'ocr_pages': 7, 'llm_available': False}
