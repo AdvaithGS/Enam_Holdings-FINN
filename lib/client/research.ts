@@ -9,7 +9,8 @@ export interface Fundamentals { ok: boolean; lender: boolean; last_fy: string; b
   metrics: Record<string, number | string | null>; formulas: Record<string, string> }
 export interface Commitment { id: string; source: string; metric: string; target: string; horizon?: string; quote: string; speaker?: string }
 export interface CallExtract { id: string; when: string; url: string; ok: boolean; reason?: string; quarter?: string; commitments: Commitment[];
-  claims: { topic: string; claim: string; quote: string; source: string }[]; analyst_concerns: { topic: string; question: string; quote?: string }[]; dropped?: number }
+  claims: { topic: string; claim: string; quote: string; source: string }[]; analyst_concerns: { topic: string; question: string; quote?: string }[]; dropped?: number;
+  unverified?: { target: string; quote: string; missing: string[] }[] }
 export interface AnnualExtract { ok: boolean; reason?: string; year: number; url: string; what_it_does?: string; segments?: { name: string; share_pct?: number; note?: string }[];
   revenue_mix_basis?: string; geography?: string; customers?: string; facts?: { fact: string; page: number }[]; risks?: { risk: string; page: number }[]; pages_read?: number[]; pages_total?: number }
 export interface Cited { point: string; sources: string[] }

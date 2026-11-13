@@ -57,6 +57,51 @@ TRANSCRIPT
 {text}"""
 
 
+FORWARD = re.compile(r"\b(will|shall|would|should|expect\w*|guid\w+|target\w*|aim\w*|plan\w*|intend\w*|outlook|going forward|anticipat\w*|on track|"
+                     r"aspir\w+|commit\w*|forecast\w*|project\w*|likely|hope\w*|confident|goal|may (range|be|reach|see)|sticking|maintain\w*|sustain\w*|next (year|quarter|fiscal|few)|coming (year|quarter|quarters)|"
+                     r"by (fy|20)\s?'?\d\d|for (fy|the full year|the year)|medium term|long term|over the next)\b", re.I)
+METRIC_WORDS = {
+    "revenue_growth": r"revenue|top.?line|sales|growth|grow", "revenue": r"revenue|top.?line|sales|turnover", "operating_margin": r"margin|ebitda|opm|operating",
+    "pat": r"profit|pat\b|earnings|bottom.?line", "pat_margin": r"margin|profit|pat\b", "capex": r"capex|capital expenditure|invest|spend", "order_book": r"order",
+    "capacity": r"capacity|plant|line|facility|units?\b", "debt": r"debt|borrow|leverage|net cash", "working_capital": r"working capital|receivable|inventory|days",
+    "credit_cost": r"credit cost|provision|gnpa|npa|slippage|write.?off", "loan_growth": r"aum|loan|advances|disburse|portfolio|book",
+}
+
+
+def anchor(c: dict) -> list[str]:
+    """What a commitment's own quote fails to contain. Empty means it is anchored.
+
+    The quote has already been found verbatim in the transcript. That proves the words
+    were said, not that they say what was extracted. Three further checks, on the quote
+    alone, each a plain pattern:
+      number    every figure the extraction claims (low, high) is printed in the quote
+      forward   the quote has a forward-looking marker (will, expect, guidance, by FY27...)
+      metric    the quote names the metric: the bucket's vocabulary (margin, capex, order...)
+                or at least half of the content words of the extracted target itself
+    A commitment missing any of them is kept in the extract, marked unverified, and is
+    not judged or shown in the scorecard.
+    """
+    q = c.get("quote") or ""
+    missing = []
+    figures = re.findall(r"\d+(?:\.\d+)?", q.replace(",", ""))
+    for v in {c.get("low"), c.get("high")} - {None}:
+        s = f"{v:g}"
+        if not any(f == s or f.rstrip("0").rstrip(".") == s for f in figures):
+            missing.append("number")
+            break
+    if not FORWARD.search(q):
+        missing.append("forward")
+    # the metric: either the bucket's own vocabulary, or the words of the stated target itself
+    # (a target of "NIM of 14.4% to 14.7%" is anchored by a quote that says NIM)
+    words = METRIC_WORDS.get(c.get("metric") or "")
+    stop = {"the", "and", "for", "from", "with", "about", "between", "than", "this", "that", "year", "target", "guidance", "expect", "achieve", "maintain", "around", "least", "minimum", "over"}
+    content = [w for w in re.findall(r"[a-z]{3,}", (c.get("target") or "").lower()) if w not in stop]
+    said = sum(1 for w in content if w in q.lower())
+    if not ((words and re.search(words, q, re.I)) or (content and said >= max(1, (len(content) + 1) // 2))):
+        missing.append("metric")
+    return missing
+
+
 def _verified(items: list[dict], hay: str) -> tuple[list[dict], int]:
     keep = [i for i in items if docs.contains_quote(hay, i.get("quote") or "", min_len=20)]
     return keep, len(items) - len(keep)
@@ -73,6 +118,11 @@ def read_call(company: str, when: str, url: str, sid: str) -> dict:
     commitments, d1 = _verified(got.get("commitments", []), hay)
     claims, d2 = _verified(got.get("claims", []), hay)
     concerns = [c for c in got.get("analyst_concerns", []) if not c.get("quote") or docs.contains_quote(hay, c["quote"], 16)]
+    unanchored = []
+    for c in commitments:
+        c["missing"] = anchor(c)
+    unanchored = [c for c in commitments if c["missing"]]
+    commitments = [c for c in commitments if not c["missing"]]
     for n, c in enumerate(commitments, 1):
         c["id"] = f"{sid}.{n}"
         c["source"] = sid
@@ -80,6 +130,7 @@ def read_call(company: str, when: str, url: str, sid: str) -> dict:
         c["source"] = sid
     return {"id": sid, "when": when, "url": url, "ok": True, "quarter": got.get("quarter") or when,
             "commitments": commitments, "claims": claims, "analyst_concerns": concerns[:4],
+            "unverified": [{"target": c["target"], "quote": c["quote"], "missing": c["missing"]} for c in unanchored],
             "dropped": d1 + d2, "pages": len(pages), "chars": len(text)}
 
 

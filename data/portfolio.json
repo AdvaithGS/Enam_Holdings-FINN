@@ -5,60 +5,73 @@
    "name": "Reliance Industries",
    "sector": "Energy & retail",
    "weight": 9,
-   "peers": {
-    "oil & gas": [
-     "ONGC",
-     "BPCL",
-     "IOC",
-     "HINDPETRO",
-     "GAIL",
-     "OIL"
-    ],
-    "retail": [
-     "DMART",
-     "TRENT",
-     "ABFRL",
-     "VMM",
-     "SHOPERSTOP"
-    ],
-    "telecom": [
-     "BHARTIARTL",
-     "IDEA",
-     "INDUSTOWER",
-     "BHARTIHEXA",
-     "TATACOMM"
-    ]
-   }
+   "sotp": [
+    {
+     "match": "o2c|oil",
+     "name": "oil & gas",
+     "peers": [
+      "ONGC",
+      "BPCL",
+      "IOC",
+      "HINDPETRO",
+      "GAIL",
+      "OIL"
+     ]
+    },
+    {
+     "match": "retail",
+     "name": "retail",
+     "peers": [
+      "DMART",
+      "TRENT",
+      "ABFRL",
+      "VMM",
+      "SHOPERSTOP"
+     ]
+    },
+    {
+     "match": "digital",
+     "name": "telecom",
+     "peers": [
+      "BHARTIARTL",
+      "IDEA",
+      "INDUSTOWER",
+      "BHARTIHEXA",
+      "TATACOMM"
+     ]
+    }
+   ]
   },
   {
    "symbol": "HDFCBANK",
    "name": "HDFC Bank",
    "sector": "Banking",
    "weight": 10,
-   "peers": {
-    "private banks": [
-     "ICICIBANK",
-     "AXISBANK",
-     "KOTAKBANK",
-     "INDUSINDBK",
-     "FEDERALBNK",
-     "IDFCFIRSTB"
-    ],
-    "other lenders": [
-     "SBIN",
-     "BAJFINANCE",
-     "SHRIRAMFIN",
-     "CHOLAFIN",
-     "LICHSGFIN"
-    ],
-    "insurers & asset managers": [
-     "HDFCLIFE",
-     "SBILIFE",
-     "ICICIPRULI",
-     "HDFCAMC",
-     "ICICIGI"
-    ]
-   }
+   "sotp": [
+    {
+     "match": "banking|treasury",
+     "name": "private banks",
+     "peers": [
+      "ICICIBANK",
+      "AXISBANK",
+      "KOTAKBANK",
+      "INDUSINDBK",
+      "FEDERALBNK",
+      "IDFCFIRSTB"
+     ]
+    },
+    {
+     "match": "insurance",
+     "name": "insurers",
+     "peers": [
+      "HDFCLIFE",
+      "SBILIFE",
+      "ICICIPRULI",
+      "ICICIGI",
+      "HDFCAMC"
+     ]
+    }
+   ]
   },
   {
    "symbol": "TCS",
@@ -83,13 +96,55 @@
    "name": "Larsen & Toubro",
    "sector": "Engineering & construction",
    "weight": 6,
-   "peers": [
-    "SIEMENS",
-    "ABB",
-    "CUMMINSIND",
-    "THERMAX",
-    "BHEL",
-    "HAL"
+   "sotp": [
+    {
+     "match": "infrastructure",
+     "name": "construction",
+     "peers": [
+      "RVNL",
+      "KPIL",
+      "IRB",
+      "NBCC",
+      "ENGINERSIN",
+      "KEC",
+      "NCC"
+     ]
+    },
+    {
+     "match": "energy|manufactur",
+     "name": "engineering",
+     "peers": [
+      "SIEMENS",
+      "ABB",
+      "CUMMINSIND",
+      "THERMAX",
+      "BHEL",
+      "HAL"
+     ]
+    },
+    {
+     "match": "technology",
+     "name": "IT services",
+     "peers": [
+      "LTIM",
+      "LTTS",
+      "TCS",
+      "INFY",
+      "HCLTECH",
+      "PERSISTENT"
+     ]
+    },
+    {
+     "match": "financial",
+     "name": "lending",
+     "peers": [
+      "LTF",
+      "BAJFINANCE",
+      "CHOLAFIN",
+      "SHRIRAMFIN",
+      "MUTHOOTFIN"
+     ]
+    }
    ]
   },
   {

@@ -42,6 +42,11 @@ from . import http, stats
 from .sources import nse, prices
 
 MARKET = "Nifty 500"
+# A stock that is a tenth of the NIFTY moves the NIFTY. Net of that index its residual is
+# mechanically pushed AGAINST its own peers (HDFC Bank on its businesses: t = -3.0 against
+# the NIFTY 50, +5.0 against this index, same sessions). For index heavyweights the sector
+# stage therefore measures everything against a market in which each name is 1%.
+EQUAL_WEIGHT = "Nifty100 Equal Weight"
 N_FIT, T_MIN, TOP, MIN_PEERS = 250, 2.58, 10, 4
 BHAV_SESSIONS = 600   # sessions of per-stock turnover to hold: 500 for rarity, 20 for the mean, a margin
 BROAD = {"Nifty Infrastructure", "Nifty India Manufacturing", "Nifty India Consumption", "Nifty Energy"}
@@ -111,10 +116,13 @@ def panel(dates: list[str]) -> dict:
     """Aggregate NIFTY 500 turnover by date (index file), per-constituent turnover for the
     latest BHAV_SESSIONS (bhavcopy), and each constituent's latest turnover as a size proxy."""
     turnover: dict[str, float] = {}
+    equal: list[dict] = []
     for d in dates:
         rows = nse.index_closes(dt.date.fromisoformat(d))
         if rows and rows.get(MARKET, {}).get("t"):
             turnover[d] = rows[MARKET]["t"]
+        if rows and EQUAL_WEIGHT in rows:
+            equal.append({"date": d, "adj": rows[EQUAL_WEIGHT]["c"], "close": rows[EQUAL_WEIGHT]["c"]})
     members = set(nifty500())
     by_stock: dict[str, dict[str, float]] = {}
     size: dict[str, float] = {}
@@ -124,7 +132,7 @@ def panel(dates: list[str]) -> dict:
             continue
         by_stock[d] = {s: r["value"] for s, r in bc.items() if s in members and r["value"] > 0}
         size = {s: r["value"] for s, r in bc.items()}
-    return {"turnover": turnover, "by_stock": by_stock, "size": size}
+    return {"turnover": turnover, "by_stock": by_stock, "size": size, "equal": equal}
 
 
 def market_volume(p: dict, window: int = stats.VOL_WINDOW) -> dict[str, float]:
@@ -229,3 +237,45 @@ def sector_model(e: dict[str, float], sets: list[dict], market: list[dict], befo
                                  "lam": p["lam"], "edge": p["edge"], "f": {d: p["score"](d) for d in later}} for i, p in enumerate(pcs)]}
         pcs = [pcs[i] for i in keep]
     return None
+
+
+def sotp_model(e: dict[str, float], parts: list[dict], market: list[dict], before: str, cache: dict) -> dict | None:
+    """Sum of the parts: one factor for a company that is several businesses.
+
+    parts: [{name, share, peers}], share = the business's share of reported segment
+    revenue (results.segments, from the company's XBRL). Each business gets the first
+    principal component of its own peers, f_k (unit variance on the fit sessions), and
+    the company's factor is their revenue-weighted sum
+        f = sum_k share_k f_k / sum_k share_k .
+    The weights come from the accounts, not from a fit, so this is ONE pre-specified
+    factor and one test (t >= 2.58): it spends one degree of freedom where a free
+    multi-factor regression spends one per business, which is what a conglomerate whose
+    individual loadings are each too weak to pass needs. Exposure of business k is then
+    g x share_k, reported per business.
+    """
+    fit = [d for d in sorted(e) if d < before][-N_FIT:]
+    pcs = []
+    for part in parts:
+        pc = _pc1({"name": part["name"], "basis": "sotp", "peers": [p for p in part["peers"]][:TOP]}, fit, market, cache)
+        if pc:
+            sd = float(np.std([pc["score"](d) for d in pc["days"]])) or 1.0
+            pcs.append((part, pc, sd))
+    if not pcs:
+        return None
+    total = sum(p["share"] for p, _, _ in pcs)
+    days = [d for d in fit if all(d in pc["days"] for _, pc, _ in pcs)]
+    if len(days) < 0.8 * N_FIT or total <= 0:
+        return None
+    comp = lambda d: sum(p["share"] * pc["score"](d) / sd for p, pc, sd in pcs) / total  # noqa: E731
+    x, y = np.array([comp(d) for d in days]), np.array([e[d] for d in days])
+    g = float(x @ y) / float(x @ x)
+    u = y - g * x
+    t = g / math.sqrt(float(u @ u) / (len(days) - 1) / float(x @ x))
+    if g <= 0 or t < T_MIN:
+        return None
+    later = [d for d in sorted(e) if d >= before and all(pc["has"](d) for _, pc, _ in pcs)]
+    mix = ", ".join(f"{p['share'] / total:.0%} {p['name']}" for p, _, _ in pcs)
+    return {"n": len(days), "r2": 1 - float(u @ u) / float(y @ y), "tested": 1, "covered": total,
+            "factors": [{"name": f"its businesses by revenue ({mix})", "basis": "sotp", "peers": [q for _, pc, _ in pcs for q in pc["peers"][:2]], "g": g, "t": t,
+                         "share": float(np.mean([pc["share"] for _, pc, _ in pcs])), "lam": 0.0, "edge": 0.0, "f": {d: comp(d) for d in later},
+                         "parts": [{"name": p["name"], "share": p["share"] / total, "f": {d: pc["score"](d) / sd for d in later}} for p, pc, sd in pcs]}]}

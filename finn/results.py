@@ -136,6 +136,38 @@ def headline(f: dict) -> dict:
                       "BasicEarningsPerShareAfterExtraordinaryItems")}
 
 
+_SEG = re.compile(r"<[\w-]+:(DescriptionOfReportableSegment|SegmentRevenue)\s([^>]*)>([^<]*)<")
+
+
+def segments(symbol: str) -> list[dict]:
+    """Reported segments of the latest quarter with their share of segment revenue (XBRL)."""
+    import html
+    idx = nse.results_index(symbol)
+    entry = next((e for e in idx if e["consolidated"]), idx[0] if idx else None)
+    if not entry:
+        return []
+    try:
+        xml = http.get_text(entry["xbrl"])
+    except http.FetchError:
+        return []
+    names: dict[int, str] = {}
+    rev: dict[int, float] = {}
+    for tag, attrs, val in _SEG.findall(xml):
+        m = re.search(r'contextRef="OneReportable(\d+)D"', attrs)
+        if not m:
+            continue
+        if tag[0] == "D":
+            names[int(m.group(1))] = html.unescape(val.strip())
+        else:
+            try:
+                rev[int(m.group(1))] = float(val)
+            except ValueError:
+                pass
+    rows = [(names[k], rev.get(k, 0.0)) for k in sorted(names) if rev.get(k, 0.0) > 0 and not re.match(r"(?i)(add|less)\b", names[k])]
+    total = sum(v for _, v in rows)
+    return [{"name": n, "share": v / total, "cr": v / CRORE} for n, v in rows] if total > 0 else []
+
+
 def _load(entry: dict) -> dict | None:
     try:
         f = parse_xbrl(http.get_text(entry["xbrl"]))

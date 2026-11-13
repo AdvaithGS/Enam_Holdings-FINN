@@ -84,6 +84,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const [error, setError] = useState<string | null>(null);
   const [net, setNet] = useState<Network | null>(null);
   const [custom, setCustom] = useState(false);
+  const [hierarchy, setHierarchy] = useState<Record<string, string[]>>({});
   const [prefs, setP] = useState<Prefs>(DEFAULT_PREFS);
 
   useEffect(() => {
@@ -91,6 +92,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       .then((d: Digest) => { setDigest((old) => (old?.generated_at === d.generated_at ? old : d)); announce(d); })
       .catch(() => setDigest((old) => { if (!old) setError("The brief could not be loaded."); return old; }));
     load();
+    fetch("/data/hierarchy.json").then((r) => (r.ok ? r.json() : {})).then(setHierarchy).catch(() => {});
     // coming back to the app is the moment to look for a newer brief
     const onShow = () => { if (document.visibilityState === "visible") load(); };
     document.addEventListener("visibilitychange", onShow);
@@ -123,8 +125,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const graph = useMemo(() => {
     if (!net || !digest) return null;
     const d = new Date(digest.generated_at);
-    return new Graph(net, { year: d.getFullYear(), month: d.getMonth() + 1 });
-  }, [net, digest]);
+    return new Graph(net, { year: d.getFullYear(), month: d.getMonth() + 1 }, hierarchy);
+  }, [net, digest, hierarchy]);
   const publicPeople = useMemo(() => (digest && graph ? peopleFromDigest(digest, graph) : []), [digest, graph]);
 
   const value = { digest, market, error, net, graph, publicPeople, prefs, setPrefs, replaceNetwork, custom, loadMarket };

@@ -68,6 +68,10 @@ Each number on screen has a derivation. The short version:
 | Book risk | `VaR = −(5th percentile of r_p)`, `r_p = Σ w_i r_i` at today's weights; alpha `= (mean r_p − β·mean r_m)·252`; expectation gap `= value − cost·(1+E)^(days/365)` |
 | A field moving | Mean market-adjusted return of the holdings in one field, summed over 5 sessions, ranked against every earlier 5-session stretch of the same stocks |
 | Door-openers | Personalised PageRank from the investor (restart 0.15) over tie strengths and acquaintance probabilities |
+| Conglomerates | Sum of the parts: segment revenue shares from the results XBRL weight each business's peer factor into one pre-specified factor (one test). For index heavyweights the sector stage uses an equal-weight market, because net of the NIFTY a stock that is a tenth of it is pushed against its own peers (HDFC Bank on its businesses: t = −3.0 against the NIFTY 50, +5.0 against Nifty100 Equal Weight) |
+| Commitments | After the verbatim check, a commitment's quote must itself contain the claimed figure, a forward-looking word and the metric; otherwise it is listed as "extracted but not anchored" and is not judged |
+| Amounts | The quoted words must contain the figure and its unit, and must not sit in the company's "About" boilerplate; a rating letter's facility size is never treated as an amount at stake |
+| Subsidiaries | Legal-entity names recognised by form on the annual report's subsidiary-statement pages (430 across the 20 holdings), resolved to the parent on the phone |
 | Who to call | `score = tie × knowledge`, knowledge = relation × freshness × depth × seniority × fit, combined across roles |
 | Promised vs delivered | Quantified full-year commitments on revenue growth and margins are adjudicated in code against reported numbers; the model judges only what code cannot |
 

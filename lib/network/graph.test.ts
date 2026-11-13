@@ -27,6 +27,14 @@ test("orgs: legal suffixes do not matter", () => {
   assert.equal(g.orgId("Some Unknown Pvt Ltd"), null);
 });
 
+test("subsidiaries named in annual reports resolve to the parent, existing nodes keep their own id", () => {
+  const h = new Graph(net, now, { KAYNES: ["Iskraemeco India Private Limited", "Kaynes Semicon Private Limited"], RELIANCE: ["Jio Platforms Limited", "Reliance New Energy Limited"] });
+  assert.equal(h.orgId("Iskraemeco India Pvt. Ltd."), "kaynes");
+  assert.equal(h.orgId("Reliance New Energy Limited"), "reliance");
+  assert.equal(h.orgId("Jio Platforms Limited"), "jio");        // already a node, with reliance as parent
+  assert.equal(g.orgId("Iskraemeco India Private Limited"), null);
+});
+
 test("tie strength halves every 36 quiet months", () => {
   const p: Person = { id: "x", name: "A B", headline: "", roles: [], education: [], tie: { closeness: 3, how: "", since: 2010, last: "2023-11" } };
   assert.ok(Math.abs(tieStrength(p, now) - 0.45) < 1e-9);

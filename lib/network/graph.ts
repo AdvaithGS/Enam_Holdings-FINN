@@ -70,12 +70,18 @@ export class Graph {
   readonly net: Network;
   readonly now: Clock;
 
-  constructor(net: Network, now: Clock) {
+  /** `hierarchy`: parent ticker -> names of its subsidiaries, associates and joint ventures (from annual reports). */
+  constructor(net: Network, now: Clock, hierarchy: Record<string, string[]> = {}) {
     this.net = net;
     this.now = now;
     for (const o of net.orgs) {
       this.orgs.set(o.id, o);
       for (const n of [o.name, ...(o.aliases ?? []), o.ticker ?? ""]) if (n) this.orgByKey.set(orgKey(n), o.id);
+    }
+    // a subsidiary's name resolves to its parent, unless the subsidiary is a node of its own
+    for (const [ticker, names] of Object.entries(hierarchy)) {
+      const parent = this.orgByKey.get(orgKey(ticker));
+      if (parent) for (const n of names) { const k = orgKey(n); if (k && !this.orgByKey.has(k)) this.orgByKey.set(k, parent); }
     }
     for (const s of net.schools) for (const n of [s.name, ...(s.aliases ?? [])]) this.schoolByKey.set(orgKey(n), s.id);
   }

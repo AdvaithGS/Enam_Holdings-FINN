@@ -30,7 +30,9 @@ import urllib.parse
 
 import numpy as np
 
-from . import http, sectors
+import re
+
+from . import http, results, sectors
 from .sources import nse
 
 MOVE, VOL, RARE, TAIL = 0.02, 2.0, 0.10, 0.05
@@ -73,9 +75,11 @@ def results_meetings(symbol: str) -> list[str]:
 
 
 def build(companies: dict, events: list[dict], start: dt.date, today: dt.date, log=print, idx_panel: dict | None = None,
-          market: list[dict] | None = None, baskets: dict | None = None) -> dict:
+          market: list[dict] | None = None, baskets: dict | None = None, sotp: dict | None = None) -> dict:
     lists = sectors._lists() if idx_panel and market else {}
     peer_cache: dict[str, dict] = {}
+    heavy_cache: dict[str, dict] = {}
+    equal = (idx_panel or {}).get("equal") or []
     seen = {(e["symbol"], e["session"]): e for e in events if e["tier"] != "aside"}
     by_day: dict[tuple, list[dict]] = {}
     for e in events:
@@ -98,8 +102,25 @@ def build(companies: dict, events: list[dict], start: dt.date, today: dt.date, l
         own_e = {d: float(np.log1p(g["abnormal"])) for d, g in sig[s].items() if g.get("abnormal") is not None}
         sec = None
         if idx_panel and market:
-            for sets in sectors.peer_sets(s, (baskets or {}).get(s), lists, idx_panel["size"]):
-                sec = sectors.sector_model(own_e, sets, market, start.isoformat(), peer_cache)
+            plan = (sotp or {}).get(s)
+            mkt, cache = market, peer_cache
+            if plan and len(equal) >= 400:
+                # an index heavyweight: residuals for the sector stage against the equal-weight market
+                mkt, cache = equal, heavy_cache
+                try:
+                    own_e = sectors._residuals(s, equal) or own_e
+                except Exception:
+                    mkt, cache = market, peer_cache
+            if plan:
+                segs = results.segments(s)
+                parts = []
+                for row in plan:
+                    share = sum(x["share"] for x in segs if re.search(row["match"], x["name"], re.I))
+                    if share > 0:
+                        parts.append({"name": row["name"], "share": share, "peers": row["peers"]})
+                sec = sectors.sotp_model(own_e, parts, mkt, start.isoformat(), cache) if parts else None
+            for sets in ([] if sec else sectors.peer_sets(s, (baskets or {}).get(s), lists, idx_panel["size"])):
+                sec = sectors.sector_model(own_e, sets, mkt, start.isoformat(), cache)
                 if sec:
                     break
             if sec:
@@ -124,7 +145,8 @@ def build(companies: dict, events: list[dict], start: dt.date, today: dt.date, l
                 each = [(f, float(np.expm1(f["g"] * f["f"][d]))) for f in sec["factors"]]
                 s_part = sum(x for _, x in each)
                 if parts:
-                    parts.update(sector=round(s_part, 4), own=round(own - s_part, 4), sector_name=" + ".join(f["name"].replace("its ", "") for f, _ in each))
+                    parts.update(sector=round(s_part, 4), own=round(own - s_part, 4), sector_name=" + ".join(f["name"].replace("its ", "") for f, _ in each),
+                                 sector_peers=[q for f, _ in each for q in f["peers"]][:10])
                 if s_part * own > 0 and abs(s_part) >= 0.005 and abs(s_part) >= 0.4 * abs(own):
                     f, x = max(each, key=lambda fx: abs(fx[1]))
                     who = ", ".join(f["peers"][:3]) + (f" and {len(f['peers']) - 3} more" if len(f["peers"]) > 3 else "")

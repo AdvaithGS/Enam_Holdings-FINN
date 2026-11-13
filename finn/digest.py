@@ -363,6 +363,8 @@ def build(days: int = 35, today: dt.date | None = None) -> dict:
                 if facts["people"]:
                     e["names"] = facts["people"]
                 amount = facts.get("amount") or amount
+            if cat == "credit_rating":
+                amount = None   # the figure in a rating letter is the size of the rated facility, not something at stake
             if amount and c["line"]:
                 rho = amount["cr"] / c["line"]["cr"]
                 e["amount"] = {**amount, "cr": round(amount["cr"], 2), "rho": round(rho, 3),
@@ -459,7 +461,8 @@ def build(days: int = 35, today: dt.date | None = None) -> dict:
 
     out_events.sort(key=lambda e: (e["tier"] != "act", -e["p"], e["at"]))
     try:
-        moves = explain.build(companies, out_events, start, today, log, idx_panel, market, {p["symbol"]: p.get("peers") for p in cfg["portfolio"]})
+        moves = explain.build(companies, out_events, start, today, log, idx_panel, market, {p["symbol"]: p.get("peers") for p in cfg["portfolio"]},
+                              {p["symbol"]: p["sotp"] for p in cfg["portfolio"] if p.get("sotp")})
     except Exception as ex:  # explanations are an addition; their failure must not sink the run
         moves = {}
         log(f"  ! explain: {ex!r}")

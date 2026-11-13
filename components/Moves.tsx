@@ -80,11 +80,24 @@ function MoveRow({ m }: { m: Move }) {
   const { graph } = useStore();
   const [open, setOpen] = useState(false);
   const why = m.note?.why ?? [];
-  // an unexplained move ends with a person: that is what the network is for
-  const lead = useMemo(() => {
-    if (!graph || m.event || m.note?.found !== false) return null;
-    const org = graph.orgId(m.symbol);
-    return org ? graph.whoToCall(org, FIT.press_release, 1).find((l) => l.knowledge >= 0.3) ?? null : null;
+  // Route the move to the contact who fits its explanation, not just the company:
+  //   sector-wide     someone at one of the peers that moved with it (they see the same cause)
+  //   results due     someone in finance who knows how the quarter is closing
+  //   a deal, a filing that followed, or nothing at all: the person closest to the company
+  //   the market      nobody; a macro day is not a question for a contact
+  const route = useMemo(() => {
+    if (!graph || m.event || !m.note) return null;
+    const org = graph.orgId(m.symbol), kind = m.note.why[0]?.k;
+    const notable = (m.p !== null && m.p <= 0.1) || Math.abs(m.note.parts?.own ?? m.change) >= 0.02;
+    if (!org || !notable || kind === "market" || kind === "breadth") return null;
+    if (kind === "sector") {
+      const peerOrgs = new Set((m.note.parts?.sector_peers ?? []).map((p) => graph.orgId(p)).filter(Boolean));
+      const atPeer = graph.whoToCall(org, [], 6).find((l) => l.person.roles.some((r) => peerOrgs.has(r.org) && (r.to === null || r.to >= graph.now.year - 3)));
+      if (atPeer) { const r = atPeer.person.roles.find((x) => peerOrgs.has(x.org))!; return { lead: atPeer, verb: "Ask", why: `${r.title}, ${graph.orgName(r.org)}, which moved with it` }; }
+    }
+    const fit = kind === "calendar" ? FIT.results : kind === "deal" ? FIT.fund_raise : FIT.press_release;
+    const lead = graph.whoToCall(org, fit, 1).find((l) => l.knowledge >= 0.3);
+    return lead ? { lead, verb: "Ask", why: null } : null;
   }, [graph, m]);
   const sys = m.note?.parts && Math.abs(m.change) >= 0.01 && m.note.parts.market * m.change > 0 ? Math.min(1, Math.abs(m.note.parts.market / m.change)) : 0;
   return (
@@ -102,7 +115,7 @@ function MoveRow({ m }: { m: Move }) {
             : <span className="muted">No filing that session; below the line the batch job examines.</span>}
         {open && why.slice(1).map((w, i) => <p key={i} className="muted" style={{ marginTop: 5 }}>{w.text}</p>)}
       </div>
-      {lead && <LeadLine lead={lead} verb="Ask" />}
+      {route && <LeadLine lead={route.why ? { ...route.lead, why: route.why } : route.lead} verb={route.verb} />}
     </div>
   );
 }

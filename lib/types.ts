@@ -28,7 +28,7 @@ export interface Company {
   symbol: string; name: string; legal_name?: string; sector: string; industry?: string; mcap_cr?: number;
   line?: { cr: number; leg: string } | null; beta?: number | null; weight?: number | null;
 }
-export interface MoveNote { parts: { market: number; own: number; sector?: number; sector_name?: string } | null; why: { k: string; text: string }[]; found: boolean; broad: number }
+export interface MoveNote { parts: { market: number; own: number; sector?: number; sector_name?: string; sector_peers?: string[] } | null; why: { k: string; text: string }[]; found: boolean; broad: number }
 export interface Digest {
   moves?: Record<string, Record<string, MoveNote>>;
   generated_at: string; as_of: string; window_days: number;

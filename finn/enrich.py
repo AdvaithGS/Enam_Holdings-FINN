@@ -245,7 +245,13 @@ def facts_from_document(company: str, category: str, pages: list[str], fx: dict[
     if unit and unit != "none" and got.get("amount_value") and docs.contains_quote(hay, quote, min_len=4):
         # the number itself must be inside the quoted words
         digits = re.sub(r"[^\d.]", "", f"{got['amount_value']:.10g}")
-        if digits.rstrip("0").rstrip(".") in re.sub(r"[^\d.]", "", quote):
+        # the unit must be in the quoted words too: "Rs. 130,000 million" read as billion is a 1000x error
+        unit_said = re.search({"crore": r"crore|\bcr\b", "lakh": r"lakh|lac", "million": r"million|\bmn\b", "billion": r"billion|\bbn\b"}[unit], quote, re.I)
+        # and the sentence must not be the company describing itself ("About TCS: ... US $30 billion in revenue")
+        at = docs.norm(text).find(docs.norm(quote))
+        about = [m.start() for m in re.finditer(r"(?im)^\s*about (the company|us\b|" + re.escape(company.split()[0]) + r")", text)]
+        boiler = bool(about) and at >= 0 and len(docs.norm(text[:about[0]])) <= at
+        if unit_said and not boiler and digits.rstrip("0").rstrip(".") in re.sub(r"[^\d.]", "", quote):
             cr = to_crore(float(got["amount_value"]), unit, got.get("amount_currency") or "INR", fx)
             if cr:
                 out["amount"] = {"cr": cr, "quote": short(quote, 160), "from": "document"}

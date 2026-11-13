@@ -234,6 +234,8 @@ export default function Research({ params }: { params: Promise<{ symbol: string 
             {c.claims.length > 0 && <><div className="caps">Management said</div>{c.claims.map((x, i) => <p key={i} className="small" style={{ marginTop: 6 }}><b>{x.topic}.</b> {x.claim}</p>)}</>}
             {c.analyst_concerns.length > 0 && <><div className="caps" style={{ marginTop: 12 }}>Analysts pressed on</div>{c.analyst_concerns.map((x, i) => <p key={i} className="small" style={{ marginTop: 6 }}><b>{x.topic}.</b> {x.question}</p>)}</>}
             {c.commitments.length > 0 && <><div className="caps" style={{ marginTop: 12 }}>On the record</div>{c.commitments.map((x) => <p key={x.id} className="small" style={{ marginTop: 6 }}>{x.target}<span className="src">{x.id}</span></p>)}</>}
+            {c.unverified && c.unverified.length > 0 && <><div className="caps" style={{ marginTop: 12, color: "var(--matter)" }}>Extracted but not anchored · not judged</div>
+              {c.unverified.map((x, i) => <p key={i} className="small muted" style={{ marginTop: 6 }}>{x.target} <span className="src">quote lacks {x.missing.map((k) => ({ number: "the figure", forward: "a forward-looking word", metric: "the metric" }[k] ?? k)).join(", ")}</span></p>)}</>}
             <p className="small" style={{ marginTop: 10 }}><a className="link" href={c.url} target="_blank" rel="noreferrer">Open the transcript</a></p>
           </Mod>))}
         {!(d.call_extracts ?? []).some((c) => c.ok) && !a && <Empty what="Call-by-call summaries" />}
