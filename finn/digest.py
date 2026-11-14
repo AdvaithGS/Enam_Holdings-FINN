@@ -312,17 +312,46 @@ def build(days: int = 35, today: dt.date | None = None) -> dict:
                 if p and p["name"].lower() not in seen:
                     seen.add(p["name"].lower())
                     people.append(p)
-            if True:
-                try:
-                    src = next((f for f in fs if f["url"] and f["url"].lower().endswith(".pdf")), None)
-                    if src and reads < MAX_READS:
-                        pg = docs.fetch_pages(src["url"], 1, 8)
-                        got = enrich.people_from_document(c["legal_name"] or c["name"], pg)
+            try:
+                # one disclosure often arrives as several letters, with the profile "attached separately":
+                # read every distinct PDF of the event together (up to three, eight pages each)
+                urls = list(dict.fromkeys(f["url"] for f in fs if f["url"] and f["url"].lower().endswith(".pdf")))[:3]
+                pages, seen_pg = [], set()
+                for u in urls:
+                    doc = docs.fetch_pages(u, 1, 30, layout=False)   # prose inside table cells: reading order
+                    # a long board-outcome letter: the opening pages plus any page that carries a profile
+                    doc = [pg for n, pg in enumerate(doc) if n < 3 or re.search(r"(?i)brief profile|profile of|years of experience|qualification", pg)][:10]
+                    for pg in doc:
+                        k = docs.norm(pg)[:400]
+                        if k and k not in seen_pg:   # companies file the same letter once per person
+                            seen_pg.add(k)
+                            pages.append(pg)
+                if pages and reads < MAX_READS:
+                    got = enrich.people_from_document(c["legal_name"] or c["name"], pages)
+                    reads += 1
+                    if got:
+                        people = got
+                # "the brief profile was disclosed vide our letter dated ...": go and read that letter
+                bare = [p for p in people if p["tier"] <= 3 and p["action"] in ("appointed", "redesignated") and not (p.get("career") or p.get("education") or p.get("bio"))]
+                if bare and reads < MAX_READS:
+                    earlier = nse.announcements(s, start - dt.timedelta(days=200), today, ttl=6 * 3600)
+                    known = set(urls)
+                    for p in bare[:2]:
+                        last = p["name"].split()[-1].lower()
+                        cands = [f for f in earlier if f["url"] and f["url"].lower().endswith(".pdf") and f["url"] not in known and last in f["text"].lower()]
+                        # the appointment letter itself, not a ballot notice that mentions the name
+                        hit = next((f for f in cands if re.search(r"appoint", f["subject"], re.I)), None) or next(iter(cands), None)
+                        if not hit:
+                            continue
+                        known.add(hit["url"])
+                        more = enrich.people_from_document(c["legal_name"] or c["name"], docs.fetch_pages(hit["url"], 1, 10, layout=False))
                         reads += 1
-                        if got:
-                            people = got
-                except llm.Unavailable:
-                    pass
+                        for q in more:
+                            if q["name"].split()[-1].lower() == last and (q.get("career") or q.get("education") or q.get("bio")):
+                                p.update({k: q[k] for k in ("career", "education", "bio", "age") if q.get(k)})
+                                p["profile_url"] = hit["url"]
+            except llm.Unavailable:
+                pass
             if any(is_reappointment(f["text"]) for f in fs):
                 for p in people:
                     if p["action"] == "appointed":
@@ -459,6 +488,20 @@ def build(days: int = 35, today: dt.date | None = None) -> dict:
                                           f"(n={got['n']:,}). Shown as evidence; not in the score."})
     log(f"intraday: {timed} filings timed during trading hours")
 
+    # the same letter classified twice (a board outcome filed under both "M&A" and "Other"):
+    # keep the higher-ranked event and give it the other's filings
+    keep: list[dict] = []
+    for e in sorted(out_events, key=lambda e: -e["p"]):
+        tok = _tokens(e["title"])
+        twin = next((k for k in keep if k["symbol"] == e["symbol"] and k["session"] == e["session"] and not k.get("results") and not e.get("results")
+                     and len(tok) >= 3 and len(tok & _tokens(k["title"])) / min(len(tok), max(1, len(_tokens(k["title"])))) >= 0.7), None)
+        if twin:
+            have = {f["id"] for f in twin["filings"]}
+            twin["filings"] += [f for f in e["filings"] if f["id"] not in have]
+        else:
+            keep.append(e)
+    log(f"merged {len(out_events) - len(keep)} events that were the same disclosure under two categories")
+    out_events = keep
     out_events.sort(key=lambda e: (e["tier"] != "act", -e["p"], e["at"]))
     try:
         moves = explain.build(companies, out_events, start, today, log, idx_panel, market, {p["symbol"]: p.get("peers") for p in cfg["portfolio"]},

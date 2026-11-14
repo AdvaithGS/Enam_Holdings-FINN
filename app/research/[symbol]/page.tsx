@@ -66,6 +66,12 @@ export default function Research({ params }: { params: Promise<{ symbol: string 
     return org ? graph.whoToCall(org, [], 4).filter((l) => l.score >= 0.08) : [];
   }, [graph, symbol, d]);
 
+  const cov = useMemo(() => {
+    if (!graph) return null;
+    const org = graph.orgId(symbol) ?? (d ? graph.orgId(d.name) : null);
+    return org ? graph.coverage(org) : null;
+  }, [graph, symbol, d]);
+
   if (error) return <div className="top"><Link href="/ask" className="small link">‹ Ask</Link><p className="lede">{error}</p></div>;
   if (!d) return <div className="top"><Link href="/ask" className="small link">‹ Ask</Link><p className="lede">{digest?.companies[symbol]?.name ?? symbol}</p><div className="skel" style={{ marginTop: 16 }} /><div className="skel" /></div>;
 
@@ -144,9 +150,18 @@ export default function Research({ params }: { params: Promise<{ symbol: string 
         <Mod id="watch" title="Check next quarter" color="blue" icon="→" open={open} toggle={toggle} line={a?.watch[0]?.point}>
           {a?.watch.length ? <div className="pane" style={{ padding: 0 }}><Points items={a.watch} /></div> : <Empty what="What to watch" />}
         </Mod>
-        {leads.length > 0 && (
-          <Mod id="people" title="Who you know here" color="people" icon="☎" open={open} toggle={toggle} line={`${leads.length} ${leads.length === 1 ? "person" : "people"}: ${[...new Set(leads.map((l) => l.relation === "inside" ? "insider" : l.relation.split(" (")[0]))].join(", ")}`}>
-            {leads.map((l, i) => <LeadLine key={l.person.id} lead={l} verb={i === 0 ? "Call" : "Or"} />)}
+        {(leads.length > 0 || (cov && cov.segments.length > 1)) && (
+          <Mod id="people" title="Who you know here" color="people" icon="☎" open={open} toggle={toggle}
+            line={cov && cov.segments.length > 1 ? `${cov.segments.filter((x) => x.leads.length).length} of ${cov.segments.length} businesses covered${cov.segments.some((x) => !x.leads.length) ? `; no one on ${cov.segments.filter((x) => !x.leads.length).map((x) => x.segment.label.toLowerCase()).slice(0, 2).join(", ")}` : ""}`
+              : `${leads.length} ${leads.length === 1 ? "person" : "people"}`}>
+            {cov && cov.segments.length > 1 ? <>
+              {cov.segments.map((x) => (
+                <div key={x.segment.id} style={{ marginTop: 10 }}>
+                  <div className="caps" style={x.leads.length ? undefined : { color: "var(--matter)" }}>{x.segment.label}{x.leads.length ? "" : " · no one"}</div>
+                  {x.leads.map((l) => <LeadLine key={l.person.id} lead={l} verb="Call" />)}
+                </div>))}
+              {cov.group.length > 0 && <div style={{ marginTop: 10 }}><div className="caps">Group level</div>{cov.group.map((l) => <LeadLine key={l.person.id} lead={l} verb="Call" />)}</div>}
+            </> : leads.map((l, i) => <LeadLine key={l.person.id} lead={l} verb={i === 0 ? "Call" : "Or"} />)}
           </Mod>
         )}
       </>}

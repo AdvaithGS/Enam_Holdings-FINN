@@ -54,6 +54,7 @@ export function orgKey(name: string): string {
   return name
     .toLowerCase()
     .replace(/&/g, " and ")
+    .replace(/['’`]/g, "")
     .replace(/\(.*?\)/g, " ")
     .replace(/[^a-z0-9\s]/g, " ")
     .replace(ORG_NOISE, " ")

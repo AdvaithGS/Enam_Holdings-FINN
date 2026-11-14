@@ -25,13 +25,13 @@ _HAS = {k: bool(shutil.which(k)) for k in ("pdftotext", "pdftoppm", "tesseract")
 stats = {"ocr_pages": 0}
 
 
-def _pdftotext(raw: bytes, first: int, last: int | None) -> list[str] | None:
+def _pdftotext(raw: bytes, first: int, last: int | None, layout: bool = True) -> list[str] | None:
     if not _HAS["pdftotext"]:
         return None
     with tempfile.NamedTemporaryFile(suffix=".pdf") as f:
         f.write(raw)
         f.flush()
-        cmd = ["pdftotext", "-layout", "-f", str(first)]
+        cmd = ["pdftotext"] + (["-layout"] if layout else []) + ["-f", str(first)]
         if last:
             cmd += ["-l", str(last)]
         try:
@@ -72,11 +72,17 @@ def _ocr(raw: bytes, page: int) -> str:
         return out.stdout.decode("utf-8", errors="replace")
 
 
-def pages(raw: bytes, first: int = 1, last: int | None = None, ocr_limit: int = 6) -> list[str]:
-    """Text of pages [first, last] (1-based, inclusive)."""
+def pages(raw: bytes, first: int = 1, last: int | None = None, ocr_limit: int = 6, layout: bool = True) -> list[str]:
+    """Text of pages [first, last] (1-based, inclusive).
+
+    layout=True keeps columns aligned, which is what a table of numbers needs. It also
+    interleaves the cells of a multi-column table line by line, which destroys prose
+    inside cells (a director's profile in a three-column disclosure table). For prose,
+    pass layout=False: the text is then read in reading order, cell by cell.
+    """
     if not raw.lstrip()[:5].startswith(b"%PDF"):
         return []
-    out = _pdftotext(raw, first, last) or _pypdf(raw, first, last) or []
+    out = _pdftotext(raw, first, last, layout) or _pypdf(raw, first, last) or []
     out = [p for p in out]
     while out and not out[-1].strip():
         out.pop()
@@ -88,12 +94,12 @@ def pages(raw: bytes, first: int = 1, last: int | None = None, ocr_limit: int = 
     return out
 
 
-def fetch_pages(url: str, first: int = 1, last: int | None = None, ocr_limit: int = 6) -> list[str]:
+def fetch_pages(url: str, first: int = 1, last: int | None = None, ocr_limit: int = 6, layout: bool = True) -> list[str]:
     try:
         raw = http.get(url, timeout=120)
     except http.FetchError:
         return []
-    return pages(raw, first, last, ocr_limit)
+    return pages(raw, first, last, ocr_limit, layout)
 
 
 def clean(text: str) -> str:

@@ -1005,7 +1005,7 @@
   {
    "id": "c28",
    "name": "Ankit Jain",
-   "headline": "Fund manager, a domestic mutual fund",
+   "headline": "Fund manager, UTI Asset Management",
    "city": "Mumbai",
    "roles": [
     {
@@ -1015,6 +1015,14 @@
      "to": 2016,
      "fn": "investing",
      "level": 3
+    },
+    {
+     "org": "utiamc",
+     "title": "Fund Manager, Equity",
+     "from": 2016,
+     "to": null,
+     "fn": "investing",
+     "level": 2
     }
    ],
    "education": [
@@ -1189,6 +1197,68 @@
   },
   {
    "id": "c34",
+   "name": "Arvind Nambiar",
+   "headline": "Strategy head, Aditya Birla Group; ex-Tata Motors",
+   "city": "Mumbai",
+   "roles": [
+    {
+     "org": "tatamotors",
+     "title": "General Manager, Passenger Car Strategy",
+     "from": 2003,
+     "to": 2011,
+     "fn": "strategy",
+     "level": 2
+    },
+    {
+     "org": "adityabirla",
+     "title": "Senior Vice President, Corporate Strategy",
+     "from": 2011,
+     "to": null,
+     "fn": "strategy",
+     "level": 2
+    }
+   ],
+   "education": [
+    {
+     "school": "IIM Ahmedabad",
+     "degree": "PGP",
+     "to": 2003
+    }
+   ],
+   "tie": {
+    "closeness": 2,
+    "how": "IIM-A alumni mentor; two long conversations on auto cycles",
+    "since": 2016,
+    "last": "2025-07",
+    "note": "Worked in the chairman's office at Tata Motors' car business."
+   }
+  },
+  {
+   "id": "c35",
+   "name": "Zubin Contractor",
+   "headline": "General counsel, a listed consumer company; ex-AZB",
+   "city": "Mumbai",
+   "roles": [
+    {
+     "org": "azb",
+     "title": "Partner, Corporate & M&A",
+     "from": 2009,
+     "to": 2020,
+     "fn": "legal",
+     "level": 2
+    }
+   ],
+   "education": [],
+   "tie": {
+    "closeness": 1,
+    "how": "Acted for the other side on a deal you looked at",
+    "since": 2019,
+    "last": "2026-02",
+    "note": "Reads a scheme of arrangement faster than anyone you know."
+   }
+  },
+  {
+   "id": "c36",
    "name": "Nandini Krishnan",
    "headline": "Independent director; ex-HDFC Bank treasurer",
    "city": "Mumbai",
@@ -2370,6 +2440,51 @@
    "name": "Northlight Capital",
    "size": "small",
    "themes": []
+  },
+  {
+   "id": "tatamotors",
+   "name": "Tata Motors",
+   "size": "large",
+   "themes": [
+    "autos"
+   ],
+   "group": "Tata",
+   "competitors": [
+    "maruti"
+   ],
+   "aliases": [
+    "Tata Motors Passenger Vehicles"
+   ]
+  },
+  {
+   "id": "adityabirla",
+   "name": "Aditya Birla Group",
+   "size": "large",
+   "themes": [],
+   "aliases": [
+    "Aditya Birla Management Corporation",
+    "Aditya Birla"
+   ]
+  },
+  {
+   "id": "utiamc",
+   "name": "UTI Asset Management",
+   "size": "mid",
+   "themes": [],
+   "aliases": [
+    "UTI Asset Management Company",
+    "UTI AMC",
+    "UTI Mutual Fund"
+   ]
+  },
+  {
+   "id": "azb",
+   "name": "AZB & Partners",
+   "size": "small",
+   "themes": [],
+   "aliases": [
+    "AZB and Partners"
+   ]
   },
   {
    "id": "mod",

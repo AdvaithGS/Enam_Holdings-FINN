@@ -128,8 +128,8 @@ _NONEXEC = re.compile(r"non[- ]*executive|independent|nominee|additional directo
 def role_tier(role: str) -> int:
     """1 runs the company or its money; 2 senior executive; 3 board oversight; 4 paperwork."""
     r = role or ""
-    if _TIER4.search(r):
-        return 4
+    if _TIER4.search(r) and not re.search(r"\bchief\b|\bhead\b|group", r, re.I):
+        return 4   # a company secretary; a bank's Chief Compliance Officer is not paperwork
     if _NONEXEC.search(r) and not re.search(r"chairman|chairperson", r, re.I):
         return 3
     if re.search(r"deputy|joint|assistant|vice", r, re.I) and not re.search(r"\bcfo\b|chief financial|chief executive", r, re.I):
@@ -178,7 +178,8 @@ PEOPLE_PROMPT = """You are reading a stock-exchange filing about a change in dir
 List every person whose appointment, re-appointment, resignation, retirement or cessation the filing announces.
 Use only what the document states. Do not add anything you know from elsewhere. Leave a field out if the document does not state it.
 For "career", list each employer named in the person's brief profile, using the organisation's name exactly as written.
-For "education", list each institution named, exactly as written.
+For "education", list each institution named, exactly as written, including the institution of any degree the profile mentions in passing ("a 2017 graduate of X").
+A document may contain several letters one after another; a person's profile may be in a different letter from the one announcing the change. Use all of them.
 
 DOCUMENT
 {text}"""
