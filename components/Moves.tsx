@@ -4,7 +4,6 @@ import { day, oneIn, pct, tone } from "@/lib/client/format";
 import { useStore } from "@/lib/client/store";
 import { FIT } from "@/lib/network/graph.ts";
 import type { Digest, FinnEvent, Market, MoveNote } from "@/lib/types";
-import { LeadLine } from "./People";
 import { Sheet } from "./Shell";
 
 export interface Move { symbol: string; date: string; change: number; vol: number | null; volMkt: number | null; p: number | null; abnormal: number | null;
@@ -80,78 +79,20 @@ export function Spark({ data, up }: { data: number[]; up: boolean }) {
   if (data.length < 2) return null;
   const lo = Math.min(...data), hi = Math.max(...data), w = 86, h = 26;
   const pts = data.map((v, i) => `${(i / (data.length - 1)) * w},${h - 2 - ((v - lo) / (hi - lo || 1)) * (h - 4)}`).join(" ");
-  return <svg className="spark" viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none" aria-hidden><polyline points={pts} fill="none" stroke={up ? "var(--up)" : "var(--down)"} strokeWidth="1.5" strokeLinejoin="round" /></svg>;
+  return <svg className="spark" viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none" aria-hidden><polyline points={pts} fill="none" stroke="var(--ink-2)" strokeWidth="1.25" strokeLinejoin="round" /></svg>;
 }
 
-function MoveRow({ m }: { m: Move }) {
-  const { graph } = useStore();
-  const [open, setOpen] = useState(false);
-  const why = m.note?.why ?? [];
-  // Route the move to the contact who fits its explanation, not just the company:
-  //   sector-wide     someone at one of the peers that moved with it (they see the same cause)
-  //   results due     someone in finance who knows how the quarter is closing
-  //   a deal, a filing that followed, or nothing at all: the person closest to the company
-  //   the market      nobody; a macro day is not a question for a contact
-  const route = useMemo(() => {
-    if (!graph || m.event || !m.note) return null;
-    const org = graph.orgId(m.symbol), kind = m.note.why[0]?.k;
-    const notable = (m.p !== null && m.p <= 0.1) || Math.abs(m.note.parts?.own ?? m.change) >= 0.02;
-    if (!org || !notable || kind === "market" || kind === "breadth") return null;
-    if (kind === "sector") {
-      const peerOrgs = new Set((m.note.parts?.sector_peers ?? []).map((p) => graph.orgId(p)).filter(Boolean));
-      const atPeer = graph.whoToCall(org, [], 6).find((l) => l.person.roles.some((r) => peerOrgs.has(r.org) && (r.to === null || r.to >= graph.now.year - 3)));
-      if (atPeer) { const r = atPeer.person.roles.find((x) => peerOrgs.has(x.org))!; return { lead: atPeer, verb: "Ask", why: `${r.title}, ${graph.orgName(r.org)}, which moved with it` }; }
-    }
-    const fit = kind === "calendar" ? FIT.results : kind === "deal" ? FIT.fund_raise : FIT.press_release;
-    const lead = graph.whoToCall(org, fit, 1).find((l) => l.knowledge >= 0.3);
-    return lead ? { lead, verb: "Ask", why: null } : null;
-  }, [graph, m]);
-  const sys = m.note?.parts && Math.abs(m.change) >= 0.01 && m.note.parts.market * m.change > 0 ? Math.min(1, Math.abs(m.note.parts.market / m.change)) : 0;
-  return (
-    <div className="move" style={{ display: "block" }}>
-      <div className="row between"><b><span className="tick">{m.symbol}</span> <span className={`num ${tone(m.change)}`}>{pct(m.change, 1)}</span>
-        {m.note?.parts && <span className="small muted" style={{ fontWeight: 400 }}> · {pct(m.note.parts.market, 1)} market{m.note.parts.sector !== undefined ? `, ${pct(m.note.parts.sector, 1)} sector` : ""}, {pct(m.note.parts.own, 1)} its own</span>}</b><span className="tiny faint">{day(m.date)}</span></div>
-      <div className="small muted" style={{ marginTop: 3 }}>
-        {m.vol !== null ? `${m.vol.toFixed(1)}× its usual volume${m.volMkt ? ` (the NIFTY 500 traded ${m.volMkt.toFixed(1)}× its own)` : ""}` : ""}
-        {m.p !== null ? ` · for its volatility and that day’s volume, ${oneIn(m.p)} sessions` : ""}
-      </div>
-      <MoveChart px={m.px} vols={m.vols} up={m.change >= 0} rarity={m.p} />
-      <div className="small" style={{ marginTop: 6 }}>
-        {m.event ? <a href={`#${m.event.id}`}><b>Filed that session:</b> {m.event.title} <span className="faint">›</span></a>
-          : why.length ? <><b>{sys >= 0.5 ? "Systematic. " : m.note?.found ? "No filing. Likely: " : ""}</b>{why[0].text}{why.length > 1 && <button className="link" style={{ marginLeft: 6 }} onClick={() => setOpen(!open)}>{open ? "less" : `+${why.length - 1} more`}</button>}</>
-            : <span className="muted">No filing that session; below the line the batch job examines.</span>}
-        {open && why.slice(1).map((w, i) => <p key={i} className="muted" style={{ marginTop: 5 }}>{w.text}</p>)}
-      </div>
-      {route && <LeadLine lead={route.why ? { ...route.lead, why: route.why } : route.lead} verb={route.verb} />}
-    </div>
-  );
-}
-
-export function Moves({ start }: { start: Date }) {
-  const { market, digest, prefs, setPrefs, loadMarket } = useStore();
-  const [sheet, setSheet] = useState(false);
-  const [more, setMore] = useState(false);
+/** The investor's own line for "unusual", with what that line would have cost in interruptions. */
+export function ThresholdSheet({ onClose, shown }: { onClose: () => void; shown: number }) {
+  const { market, digest, prefs, setPrefs } = useStore();
   const [perm, setPerm] = useState<NotificationPermission>("default");
   useEffect(() => { if (typeof Notification !== "undefined") setPerm(Notification.permission); }, []);
-  useEffect(loadMarket, [loadMarket]);
-  const moves = useMemo(() => (market && digest ? findMoves(market, digest, start, prefs.rare, prefs.move, prefs.volume) : []), [market, digest, start, prefs.rare, prefs.move, prefs.volume]);
   const hist = useMemo(() => (market ? fireCount(market, prefs.rare, prefs.move, prefs.volume) : null), [market, prefs.rare, prefs.move, prefs.volume]);
   if (!digest) return null;
   const n = Object.keys(digest.companies).length;
+  const moves = { length: shown };
   return (
-    <section className="section">
-      <div className="head">
-        <span className="caps">Unusual moves · {moves.length}</span>
-        <button className="small link" onClick={() => setSheet(true)}>rarer than 1 in {prefs.rare}{prefs.move > 0 ? ` · ±${prefs.move}%` : ""}{prefs.volume > 0 ? ` · ${prefs.volume}×` : ""}</button>
-      </div>
-      {moves.length === 0 ? <p className="small muted">Nothing crossed your line in this window.</p> : (
-        <div className="card" style={{ padding: "4px 14px" }}>
-          {moves.slice(0, more ? 40 : 4).map((m) => <MoveRow key={m.symbol + m.date} m={m} />)}
-          {moves.length > 4 && <button className="small link" style={{ padding: "9px 0" }} onClick={() => setMore(!more)}>{more ? "fewer" : `and ${moves.length - 4} more`}</button>}
-        </div>
-      )}
-      {sheet && (
-        <Sheet onClose={() => setSheet(false)}>
+        <Sheet onClose={onClose}>
           <h2 style={{ font: "600 21px/1.2 var(--serif)" }}>What counts as unusual?</h2>
           <p className="muted small" style={{ marginTop: 4 }}>You draw the line. FINN shows what that line would have cost you in interruptions.</p>
           <div style={{ marginTop: 20 }}>
@@ -189,7 +130,5 @@ export function Moves({ start }: { start: Date }) {
           )}
           <p className="tiny faint" style={{ marginTop: 18 }}>“This unusual 1 in N days” is the stock’s own history: the share of its last 500 sessions with a market-adjusted move, measured against its expected volatility that day, or a relative volume at least this large.</p>
         </Sheet>
-      )}
-    </section>
   );
 }

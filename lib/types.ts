@@ -5,11 +5,11 @@ export interface ResultRow {
 export interface ResultsCard {
   symbol: string; period: string; period_end: string; kind: "company" | "lender" | "bank";
   basis: string; audited: boolean; rows: ResultRow[]; notes: string[];
-  checks: { id: string; label: string; ok: boolean; gap: number }[]; checks_ok: boolean; source: string;
+  checks: { id: string; label: string; ok: boolean; gap: number }[]; checks_ok: boolean; source: string; sources?: { prev?: string | null; year?: string | null };
 }
 export interface FiledPerson {
   name: string; role: string; action: string; tier: number; effective?: string | null; reason?: string; age?: number;
-  bio?: string; source: string;
+  bio?: string; source: string; profile_url?: string;
   career?: { org: string; role?: string; from_year?: number; to_year?: number }[];
   education?: { school: string; degree?: string; year?: number }[];
 }

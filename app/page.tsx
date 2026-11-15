@@ -1,16 +1,23 @@
 "use client";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { EventDetail, GlanceLine, MoveRow, NeedRow, shortfall } from "@/components/Brief";
 import { Close } from "@/components/Close";
-import { ActCard, GlanceRow } from "@/components/EventCard";
-import { Moves } from "@/components/Moves";
+import { findMoves, ThresholdSheet } from "@/components/Moves";
+import { Detail, State, useWide } from "@/components/Shell";
 import { day, dayTime } from "@/lib/client/format";
 import { inWindow, useStore, WINDOWS, windowStart } from "@/lib/client/store";
 import type { FinnEvent } from "@/lib/types";
 
 export default function Brief() {
-  const { digest, error, prefs, setPrefs } = useStore();
+  const { digest, market, error, prefs, setPrefs, loadMarket } = useStore();
+  const wide = useWide();
+  const [sel, setSel] = useState<string | null>(null);
   const [aside, setAside] = useState<string | null>(null);
   const [showAside, setShowAside] = useState(false);
+  const [sheet, setSheet] = useState(false);
+  const [allMoves, setAllMoves] = useState(false);
+  useEffect(loadMarket, [loadMarket]);
+
   const view = useMemo(() => {
     if (!digest) return null;
     const start = windowStart(digest, prefs);
@@ -22,87 +29,107 @@ export default function Brief() {
     const rest = events.filter((e) => tierOf(e) === "aside");
     const groups = new Map<string, FinnEvent[]>();
     for (const e of rest) groups.set(e.label, [...(groups.get(e.label) ?? []), e]);
-    const filings = events.reduce((n, e) => n + e.filings.length, 0);
-    const timeline = [...events].sort((a, b) => a.at.localeCompare(b.at)).map((e) => ({ id: e.id, tier: tierOf(e) }));
-    return { start, events, act, glance, rest, groups: [...groups].sort((a, b) => b[1].length - a[1].length), filings, timeline };
+    return { start, events, act, glance, rest, groups: [...groups].sort((a, b) => b[1].length - a[1].length), filings: events.reduce((n, e) => n + e.filings.length, 0) };
   }, [digest, prefs]);
+  const moves = useMemo(() => (market && digest && view ? findMoves(market, digest, view.start, prefs.rare, prefs.move, prefs.volume) : []), [market, digest, view, prefs.rare, prefs.move, prefs.volume]);
 
-  if (error) return <div className="top"><div className="brand">FINN<i>.</i></div><p className="lede">{error}</p></div>;
-  if (!digest || !view) return <div className="top"><div className="brand">FINN<i>.</i></div><div style={{ marginTop: 24 }}><div className="skel" /><div className="skel" /></div></div>;
+  if (error) return <State kind="error" title="The brief could not be loaded">Check the connection and reload. The last brief you opened is kept on this device and will show once it can be read.</State>;
+  if (!digest || !view) return <State kind="loading" />;
+
+  const pick = (id: string) => setSel(sel === id ? null : id);
+  // on a laptop the evidence pane is never empty: the first thing that needs you, else the close
+  const first = wide && sel === null ? view.act[0]?.id ?? null : null;
+  const is = (id: string) => sel === id || first === id;
+  const scale = Math.max(0.02, ...moves.map((m) => Math.abs(m.change)));
+  const vm = moves.map((m) => m.volMkt).filter((x): x is number => x != null);
+  const shownMoves = moves.slice(0, allMoves ? 60 : 5);
+  const n = Object.keys(digest.companies).length;
 
   return (
     <>
       <header className="top">
-        <div className="row between">
-          <div className="brand">FINN<i>.</i></div>
-          <span className="tiny faint">read {dayTime(digest.generated_at)} · prices to {day(digest.as_of)}</span>
-        </div>
-        <p className="lede">
-          {view.filings === 0 ? <>Nothing was filed across your {Object.keys(digest.companies).length} companies in this window.</> : <>
-            <b>{view.filings}</b> filing{view.filings === 1 ? "" : "s"} became <b>{view.events.length}</b> event{view.events.length === 1 ? "" : "s"}:{" "}
-            <b style={{ color: "var(--matter)" }}>{view.act.length}</b> {view.act.length === 1 ? "needs" : "need"} you, <b>{view.glance.length}</b> worth a glance, <b>{view.rest.length}</b> set aside.
-          </>}
+        <h1 className="lede">{view.act.length === 0 ? "Nothing needs you" : `${view.act.length} ${view.act.length === 1 ? "thing needs" : "things need"} you`}</h1>
+        <p className="counts">
+          <b>{view.filings}</b> filings across {n} holdings became <b>{view.events.length}</b> events: <b className={view.act.length ? "al" : ""}>{view.act.length}</b> need you,{" "}
+          <b>{view.glance.length}</b> worth a glance, <b>{view.rest.length}</b> set aside.
         </p>
+        <p className="tiny" style={{ marginTop: 2 }}>Read {dayTime(digest.generated_at)} · prices to {day(digest.as_of)}</p>
         <div className="chips" role="tablist" aria-label="Window">
-          {WINDOWS.map((w) => <button key={w.id} role="tab" aria-selected={prefs.window === w.id} className={`chip ${prefs.window === w.id ? "on" : ""}`} onClick={() => setPrefs({ window: w.id })}>{w.label}</button>)}
+          {WINDOWS.map((w) => <button key={w.id} role="tab" aria-selected={prefs.window === w.id} className={`chip ${prefs.window === w.id ? "on" : ""}`} onClick={() => { setPrefs({ window: w.id }); setSel(null); }}>{w.label}</button>)}
           <label className={`chip ${prefs.window === "since" ? "on" : ""}`}>
             since <input type="date" value={prefs.since ?? ""} max={digest.generated_at.slice(0, 10)} onChange={(e) => e.target.value && setPrefs({ window: "since", since: e.target.value })} aria-label="Since date" />
           </label>
         </div>
-        {view.timeline.length > 0 && (
-          <div className="sieve" aria-hidden>
-            <div className="dots">{view.timeline.map((t) => <a key={t.id} href={t.tier === "act" ? `#${t.id}` : undefined} className={`dot t-${t.tier}`} />)}</div>
-          </div>
-        )}
       </header>
 
-      <Close />
-
-      <Moves start={view.start} />
-
-      {view.act.length > 0 && (
-        <section className="section">
-          <div className="head"><span className="caps" style={{ color: "var(--matter)" }}>What matters · {view.act.length}</span></div>
-          {view.act.map((e) => <ActCard key={e.id} e={e} />)}
+      {view.act.length > 0 ? (
+        <section className="section" aria-label="Needs you">
+          {view.act.map((e) => <NeedRow key={e.id} e={e} selected={is(e.id)} onSelect={() => pick(e.id)} />)}
         </section>
+      ) : view.glance.length > 0 ? (
+        <section className="section">
+          <div className="head"><span className="caps">The closest calls, and what each lacked</span></div>
+          {view.glance.slice(0, 3).map((e) => (
+            <div key={e.id}>
+              <button className="rowi" aria-current={sel === e.id} onClick={() => pick(e.id)}>
+                <span className="meta1"><b>{e.symbol}</b><span>{e.label}</span><span style={{ marginLeft: "auto" }}>{day(e.at)}</span></span>
+                <span className="title" style={{ display: "block" }}>{e.title}</span>
+                <span className="line2" style={{ display: "block" }}>{shortfall(e, digest.model.act)}</span>
+              </button>
+              {sel === e.id && <Detail><EventDetail e={e} /></Detail>}
+            </div>
+          ))}
+        </section>
+      ) : (
+        <State kind="empty" title="A quiet window">Nothing was filed across your {n} holdings since {day(view.start.toISOString())}. Widen the window above to look further back.</State>
       )}
 
-      {view.glance.length > 0 && (
+      <section className="section">
+        <div className="head"><span className="caps">Unusual moves ({moves.length})</span>
+          <button className="small link" onClick={() => setSheet(true)}>rarer than 1 in {prefs.rare}{prefs.move > 0 ? `, ±${prefs.move}%` : ""}{prefs.volume > 0 ? `, ${prefs.volume}×` : ""}</button></div>
+        {moves.length === 0 ? <p className="small muted" style={{ padding: "8px 0" }}>No holding had a session rarer than 1 in {prefs.rare} in this window.</p> : <>
+          {vm.length > 0 && <p className="tiny">Market volume on these days: the median NIFTY 500 stock traded {Math.min(...vm).toFixed(1)}{Math.min(...vm) !== Math.max(...vm) ? `–${Math.max(...vm).toFixed(1)}` : ""}× its own norm. Each stock’s volume below is net of that.</p>}
+          {shownMoves.map((m) => <MoveRow key={m.symbol + m.date} m={m} scale={scale} selected={sel === m.symbol + m.date} onSelect={() => pick(m.symbol + m.date)} />)}
+          {moves.length > 5 && <button className="count" onClick={() => setAllMoves(!allMoves)}><span>{allMoves ? "Show the five rarest" : `${moves.length - 5} more, less rare`}</span><span>{allMoves ? "−" : "+"}</span></button>}
+        </>}
+      </section>
+
+      {view.act.length > 0 && view.glance.length > 0 || (view.act.length === 0 && view.glance.length > 3) ? (
         <section className="section">
-          <div className="head"><span className="caps">Worth a glance · {view.glance.length}</span><span className="tiny faint">a green dot means you know someone</span></div>
-          <div className="card" style={{ padding: "2px 14px" }}>{view.glance.map((e) => <GlanceRow key={e.id} e={e} />)}</div>
+          <div className="head"><span className="caps">Worth a glance ({view.act.length === 0 ? view.glance.length - 3 : view.glance.length})</span><span className="tiny">a name in green can explain it</span></div>
+          {view.glance.slice(view.act.length === 0 ? 3 : 0).map((e) => <GlanceLine key={e.id} e={e} selected={sel === e.id} onSelect={() => pick(e.id)} />)}
         </section>
-      )}
+      ) : null}
 
       {view.rest.length > 0 && (
         <section className="section">
-          <button className="head" style={{ width: "100%" }} onClick={() => setShowAside(!showAside)} aria-expanded={showAside}>
-            <span className="caps">Set aside · {view.rest.length} events ({view.rest.reduce((n, e) => n + e.filings.length, 0)} filings)</span><span className="small link">{showAside ? "hide" : "show"}</span>
+          <button className="count" onClick={() => setShowAside(!showAside)} aria-expanded={showAside}>
+            <span>Set aside: {view.rest.length} events ({view.rest.reduce((k, e) => k + e.filings.length, 0)} filings) of routine paperwork</span><span>{showAside ? "−" : "+"}</span>
           </button>
-          {showAside && (
-            <div className="card" style={{ padding: "2px 14px" }}>
-              {view.groups.map(([label, list]) => (
-                <div key={label}>
-                  <button className="aside" onClick={() => setAside(aside === label ? null : label)} aria-expanded={aside === label}><span>{label}</span><span className="num">{list.length}</span></button>
-                  {aside === label && list.map((e) => (
-                    <a key={e.id} className="aside small" href={e.url ?? "#"} target="_blank" rel="noreferrer" style={{ paddingLeft: 10 }}>
-                      <span className="grow clip"><b>{e.symbol}</b> {e.title}</span><span className="faint" style={{ marginLeft: 8 }}>{day(e.at)}</span>
-                    </a>
-                  ))}
-                </div>
+          {showAside && view.groups.map(([label, list]) => (
+            <div key={label}>
+              <button className="count" style={{ paddingLeft: 12 }} onClick={() => setAside(aside === label ? null : label)} aria-expanded={aside === label}><span>{label}</span><span className="num">{list.length}</span></button>
+              {aside === label && list.map((e) => (
+                <a key={e.id} className="one" href={e.url ?? "#"} target="_blank" rel="noreferrer" style={{ paddingLeft: 24, font: "var(--d)" }}>
+                  <b>{e.symbol}</b><span>{e.title}</span><span className="d">{day(e.at).slice(0, 5)}</span>
+                </a>
               ))}
             </div>
-          )}
+          ))}
         </section>
       )}
 
-      <footer className="section tiny faint" style={{ lineHeight: 1.6 }}>
-        Ranking is measured, not asserted: an event study of {digest.model.sessions.toLocaleString("en-IN")} stock-sessions in this portfolio sets each
-        category’s weight; results come from XBRL, never from a model. The last refresh covered {digest.window_days} days: {digest.run.filings} filings in {digest.run.events} events
-        {digest.run.tiers ? ` (${digest.run.tiers.act.events} that matter, ${digest.run.tiers.glance.events} worth a glance, ${digest.run.tiers.aside.events} set aside)` : ""}.
-        A model read {digest.run.documents_read} documents: {digest.run.llm.calls} new, {digest.run.llm.cache_hits} already read and taken from cache
-        ({(digest.run.llm.input_tokens + digest.run.llm.output_tokens).toLocaleString("en-IN")} tokens this run). {digest.run.ocr_pages} scanned pages went through local OCR.
+      {wide ? (sel === null && first === null ? <Detail fallback><Close /></Detail> : null) : <Close />}
+      {wide && (sel !== null || first !== null) && <section className="section"><button className="count" onClick={() => setSel("close")}><span>The close: how the session ended</span><span>→</span></button></section>}
+      {wide && sel === "close" && <Detail fallback><Close /></Detail>}
+
+      <footer className="section tiny" style={{ lineHeight: "18px" }}>
+        The last refresh covered {digest.window_days} days: {digest.run.filings} filings in {digest.run.events} events
+        {digest.run.tiers ? ` (${digest.run.tiers.act.events} that need you, ${digest.run.tiers.glance.events} worth a glance, ${digest.run.tiers.aside.events} set aside)` : ""}.
+        A model read {digest.run.documents_read} of the documents ({digest.run.llm.calls} new, {digest.run.llm.cache_hits} from cache); {digest.run.ocr_pages} scanned pages went through local OCR.
+        Results figures are read from XBRL, and ranking weights come from an event study of {digest.model.sessions.toLocaleString("en-IN")} stock-sessions. Any underlined number opens its source or its formula.
       </footer>
+      {sheet && <ThresholdSheet onClose={() => setSheet(false)} shown={moves.length} />}
     </>
   );
 }

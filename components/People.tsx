@@ -5,21 +5,16 @@ import { type Lead, monthsSince, pctRange, type Reach, strengthWord } from "@/li
 import type { Person } from "@/lib/network/types.ts";
 import { logSuggestion, useStore } from "@/lib/client/store";
 import { useOpenPerson } from "./Shell";
+import { Route } from "./Viz";
 
 export const initials = (name: string) => name.split(/\s+/).filter((w) => /^[A-Za-z]/.test(w)).map((w) => w[0]).slice(0, 2).join("").toUpperCase();
 
-export function Avatar({ person, lg }: { person: Person; lg?: boolean }) {
-  return <span className={`avatar ${person.tie ? "" : "pub"} ${lg ? "lg" : ""}`} aria-hidden>{initials(person.name)}</span>;
-}
+/** People are shown by name, in green. No initials in circles. */
+export function Avatar(_: { person: Person; lg?: boolean }) { return null; }
 
-/** Four bars for a probability: each bar is a quarter. */
-export function Meter({ value, label }: { value: number; label?: string }) {
-  const n = Math.max(1, Math.min(4, Math.ceil(value * 4)));
-  return (
-    <span className="meter" title={`${label ?? ""} ${(value * 100).toFixed(0)}%`} aria-label={`${label ?? "strength"} ${(value * 100).toFixed(0)} percent`}>
-      {[1, 2, 3, 4].map((i) => <i key={i} className={i <= n ? "f" : ""} />)}
-    </span>
-  );
+/** A strength, as a number. */
+export function Meter({ value }: { value: number; label?: string }) {
+  return <span className="num">{Math.round(value * 100)}%</span>;
 }
 
 export function TieLine({ person }: { person: Person }) {
@@ -61,9 +56,9 @@ export function LeadLine({ lead, verb, about }: { lead: Lead; verb?: string; abo
       <Avatar person={lead.person} />
       <span className="grow">
         <span className="name">{verb?.startsWith("Other") ? "On the other side: " : ""}{lead.person.name}</span>
-        <span className="why" style={{ display: "block" }}>can explain the public context. {lead.why}</span>
+        <span className="why"> can explain the public context. {lead.why}</span>
         <span className="meta" style={{ display: "block" }}>
-          <Meter value={lead.tie} label="tie" /> {strengthWord(lead.tie)} tie · <TieLine person={lead.person} />
+          tie {Math.round(lead.tie * 100)}% · <TieLine person={lead.person} />
         </span>
         {lead.insider && <span className="caution" style={{ display: "block" }}>Works there now. Public context only; never unpublished information.</span>}
       </span>
@@ -72,25 +67,5 @@ export function LeadLine({ lead, verb, about }: { lead: Lead; verb?: string; abo
 }
 
 export function ReachPath({ reach, target }: { reach: Reach; target: Person }) {
-  const open = useOpenPerson();
-  return (
-    <div className="who" style={{ display: "block" }}>
-      <div className="path">
-        <span className="node me">You</span>
-        {reach.via && <>
-          <span className={`edge ${reach.tie < 0.25 ? "thin" : ""}`} />
-          <button className="node c" onClick={() => open(reach.via!.id)}>{reach.via.name}</button>
-        </>}
-        {reach.hops === 2 || !reach.via ? <>
-          <span className={`edge ${reach.link < 0.4 ? "thin" : ""}`} />
-          <span className="node">{target.name}</span>
-        </> : null}
-      </div>
-      <div className="why" style={{ marginTop: 7 }}>{reach.why[0]}</div>
-      <div className="meta">
-        <Meter value={reach.hi} label="route" /> route {pctRange(reach.lo, reach.hi)} likely to work
-        {reach.via && reach.hops === 2 ? <> · {pctRange(reach.linkLo, reach.linkHi)} that they know each other · your tie {strengthWord(reach.tie)}</> : null}
-      </div>
-    </div>
-  );
+  return <Route reach={reach} target={target} />;
 }

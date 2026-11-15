@@ -94,8 +94,8 @@ def build(companies: dict, events: list[dict], start: dt.date, today: dt.date, l
     out: dict[str, dict] = {}
     n = 0
     for s, c in companies.items():
-        days = [d for d, g in sig[s].items() if d >= start.isoformat() and g.get("change") is not None and (s, d) not in seen
-                and (abs(g["change"]) >= MOVE or (g.get("vol_ratio") or 0) >= VOL or rare(g) <= RARE)]
+        days = [d for d, g in sig[s].items() if d >= start.isoformat() and g.get("change") is not None
+                and ((s, d) in seen or abs(g["change"]) >= MOVE or (g.get("vol_ratio") or 0) >= VOL or rare(g) <= RARE)]
         if not days:
             continue
         dl = deals(s, start, today)
@@ -153,6 +153,10 @@ def build(companies: dict, events: list[dict], start: dt.date, today: dt.date, l
                     more = "" if len(each) == 1 else " Jointly with " + ", ".join(f"{g['name'].replace('its ', '')} ({y:+.1%})" for g, y in each if g is not f) + "."
                     why.append({"k": "sector", "text": f"Sector-wide: the common factor of {f['name']} ({who}; this stock excluded) moved {f['f'][d]:+.1f} standard deviations, "
                                                        f"which at its loading (t = {f['t']:.1f} over the {sec['n']} sessions before) accounts for {x:+.1%} of its {own:+.1%} beyond the market.{more}"})
+            if (s, d) in seen:
+                # a filing explains this session; keep only the decomposition, for the event's own card
+                out.setdefault(s, {})[d] = {"parts": parts, "why": [], "found": True, "broad": breadth.get(d, 0), "event": True}
+                continue
             if breadth.get(d, 0) >= BROAD * len(companies):
                 why.append({"k": "breadth", "text": f"A broad day: {breadth[d]} of your {len(companies)} holdings had a tail session at once, which points at macro, not at this company."})
             for x in sorted(dl.get(d, []), key=lambda x: -x["qty"])[:2]:
@@ -176,5 +180,6 @@ def build(companies: dict, events: list[dict], start: dt.date, today: dt.date, l
                 why.append({"k": "none", "text": "No public explanation holds: not the market, not its sector, no reported deals, nothing on the calendar."})
             out.setdefault(s, {})[d] = {"parts": parts, "why": why, "found": found, "broad": breadth.get(d, 0)}
             n += 1
-    log(f"moves without a filing: {n} examined, {sum(1 for s in out.values() for x in s.values() if x['found'])} with a supported explanation")
+    plain = [x for s in out.values() for x in s.values() if not x.get("event")]
+    log(f"moves without a filing: {len(plain)} examined, {sum(1 for x in plain if x['found'])} with a supported explanation")
     return out
