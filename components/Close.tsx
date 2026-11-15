@@ -36,7 +36,7 @@ interface Action { key: string; headline: string; person: Person; why: string; t
 
 /** Tie the session's moves to people the investor knows. Runs on the device. */
 function useActions(c: CloseBrief | null | undefined): Action[] {
-  const { graph, digest } = useStore();
+  const { graph, digest, prefs } = useStore();
   return useMemo(() => {
     if (!c || !graph || !digest) return [];
     const out: Action[] = [];
@@ -45,7 +45,7 @@ function useActions(c: CloseBrief | null | undefined): Action[] {
       const lead = org ? graph.whoToCall(org, [], 1).find((l) => l.score >= 0.1) : undefined;
       if (lead) out.push({ key: `${headline}|${lead.person.id}`, headline, person: lead.person, why: lead.why, tie: lead.tie, insider: lead.insider });
     };
-    for (const m of c.movers) {
+    for (const m of c.movers.filter((x) => x.p <= 1 / prefs.rare)) {
       if (m.p <= 0.05 && !m.event) company(m.symbol, `${m.symbol} moved ${pct(m.change, 1)} and nothing was filed`);
     }
     for (const s of c.sectors) {
@@ -74,7 +74,7 @@ function useActions(c: CloseBrief | null | undefined): Action[] {
 const REGIME: Record<string, string> = { calm: "calm", normal: "ordinary", elevated: "elevated", stressed: "stressed" };
 
 export function Close() {
-  const { digest } = useStore();
+  const { digest, prefs } = useStore();
   const [more, setMore] = useState(false);
   const open = useOpenPerson();
   const c = digest?.close;
@@ -100,8 +100,8 @@ export function Close() {
         <p className="small muted" style={{ marginTop: 6 }}>
           {pf.up} up, {pf.down} down · filed today: {c.filed.act === 0 ? "nothing that needs you" : <a className="link" href={`#${c.act[0]}`}>{c.filed.act} that need{c.filed.act === 1 ? "s" : ""} you</a>}, {c.filed.glance} worth a glance, {c.filed.aside} set aside
         </p>
-        {c.movers.length > 0 && <div style={{ marginTop: 8 }}>
-          {c.movers.map((m) => (
+        {c.movers.some((m) => m.p <= 1 / prefs.rare) && <div style={{ marginTop: 8 }}>
+          {c.movers.filter((m) => m.p <= 1 / prefs.rare).map((m) => (
             <a className="aside" key={m.symbol} href={m.event ? `#${m.event}` : undefined} style={{ alignItems: "baseline", gap: 8 }}>
               <span className="grow"><b className="tick">{m.symbol}</b> <b className={`num ${tone(m.change)}`}>{pct(m.change, 1)}</b>{" "}
                 {m.event_title ? <span className="small clip" style={{ display: "block", marginTop: 2 }}>{m.event_title}</span> : <span className="small">· no filing explains it</span>}</span>

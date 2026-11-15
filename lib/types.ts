@@ -27,6 +27,8 @@ export interface FinnEvent {
 export interface Company {
   symbol: string; name: string; legal_name?: string; sector: string; industry?: string; mcap_cr?: number;
   line?: { cr: number; leg: string } | null; beta?: number | null; weight?: number | null;
+  /** results quiet period: quarter end until 48 hours after results */
+  quiet?: { quarter_end: string; until: string | null; now: boolean };
 }
 export interface MoveNote { parts: { market: number; own: number; sector?: number; sector_name?: string; sector_peers?: string[] } | null; why: { k: string; text: string }[]; found: boolean; broad: number }
 export interface Digest {
@@ -35,7 +37,8 @@ export interface Digest {
   model: { baseline: number; act: number; alpha: number; sessions: number; categories: Record<string, { n: number; p: number; lift: number; lo: number; hi: number }> };
   labels: Record<string, string>; companies: Record<string, Company>; events: FinnEvent[]; close?: CloseBrief | null;
   run: { filings: number; events: number; documents_read: number; seconds: number; ocr_pages: number; llm_available: boolean;
-         llm: { calls: number; cache_hits: number; input_tokens: number; output_tokens: number } };
+         llm: { calls: number; cache_hits: number; input_tokens: number; output_tokens: number };
+         tiers?: Record<"act" | "glance" | "aside", { events: number; filings: number }> };
 }
 export interface Candles { dates: string[]; o: number[]; h: number[]; l: number[]; c: number[] }
 export interface WorldIndex extends Candles {

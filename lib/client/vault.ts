@@ -11,7 +11,7 @@
  * learns its size and nothing else, which is what lets a server store it blind.
  */
 const ROUNDS = 310_000;
-const KEYS = ["finn.network.v1", "finn.holdings.v1", "finn.expect.v1", "finn.prefs.v1"];
+const KEYS = ["finn.network.v1", "finn.holdings.v1", "finn.expect.v1", "finn.prefs.v2", "finn.calls.v1"];
 const b64 = (b: Uint8Array) => btoa(String.fromCharCode(...b));
 const unb64 = (s: string) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0));
 

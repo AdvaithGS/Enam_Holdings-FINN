@@ -219,6 +219,11 @@ FACTS_SCHEMA = {
         "amount_currency": {"type": "string", "enum": ["INR", "USD", "EUR", "GBP", "other"]},
         "amount_quote": {"type": "string", "description": "the exact words from the document that state this amount"},
         "people": {"type": "array", "items": {"type": "string"}, "description": "named individuals central to the event"},
+        "kind": {"type": "string", "enum": ["m_and_a", "fund_raise", "management_change", "litigation", "credit_rating", "dividend", "bonus_split", "capex",
+                                              "press_release", "shareholder_meeting", "insider_trading", "pledging", "routine", "other"],
+                 "description": "what the document is. m_and_a: buying, selling, merging or investing in a business. litigation: court, tax or regulator orders, penalties AND regulatory approvals or licences. "
+                                "capex: new plant or capacity. press_release: orders, products, partnerships, business updates. routine: paperwork with no decision or new information "
+                                "(redemption or interest payment on existing debt, allotments under an existing programme, reminders, certificates, address changes)."},
     },
 }
 
@@ -236,7 +241,7 @@ def facts_from_document(company: str, category: str, pages: list[str], fx: dict[
     if len(text.strip()) < 200:
         return None
     got = llm.ask("lite", FACTS_PROMPT.format(company=company, category=category, text=text), FACTS_SCHEMA, max_tokens=1024)
-    out = {"headline": short(got.get("headline", ""), 130), "so_what": short(got.get("so_what", ""), 220),
+    out = {"headline": short(got.get("headline", ""), 130), "so_what": short(got.get("so_what", ""), 220), "kind": got.get("kind"),
            "counterparty": (got.get("counterparty") or "").strip() or None,
            "people": [p for p in got.get("people", []) if docs.norm(p.split()[-1]) in docs.norm(text)][:4]}
     hay = docs.norm(text)

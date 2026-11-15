@@ -52,6 +52,32 @@ function Results({ card }: { card: ResultsCard }) {
   );
 }
 
+/** Who changed, where they came from, and how you reach them. Used on full cards and glance rows alike. */
+function PeopleBlocks({ reaches }: { reaches: ReturnType<typeof useEventPeople>["reaches"] }) {
+  const open = useOpenPerson();
+  return (
+    <>
+      {reaches.map(({ fp, person, routes }) => (
+        <div className="person" key={person.id}>
+          <button className="row" onClick={() => open(person.id)} style={{ width: "100%" }}>
+            <span className="avatar pub">{fp.name.split(" ").map((w) => w[0]).slice(0, 2).join("")}</span>
+            <span className="grow"><b>{fp.name}</b><span className="muted small" style={{ display: "block" }}>{fp.action} · {fp.role}{fp.effective ? ` · ${fp.effective}` : ""}</span></span>
+          </button>
+          {fp.bio && <p className="bio">{fp.bio}</p>}
+          {(fp.career?.length || fp.education?.length) ? (
+            <div className="tags">
+              {fp.career?.slice(0, 5).map((c, i) => <span className="tag" key={i}>{c.org}{c.from_year ? ` ${c.from_year}–${c.to_year ? String(c.to_year).slice(2) : ""}` : ""}</span>)}
+              {fp.education?.slice(0, 2).map((s, i) => <span className="tag" key={`s${i}`}>{s.school}</span>)}
+            </div>
+          ) : null}
+          {routes.length ? routes.map((r, i) => <ReachPath key={i} reach={r} target={person} />)
+            : fp.tier <= 2 && <p className="small faint" style={{ marginTop: 8 }}>No route to {fp.name.split(" ")[0]} in your network yet.</p>}
+        </div>
+      ))}
+    </>
+  );
+}
+
 export function ActCard({ e }: { e: FinnEvent }) {
   const { digest } = useStore();
   const [why, setWhy] = useState(false);
@@ -88,23 +114,7 @@ export function ActCard({ e }: { e: FinnEvent }) {
           {Math.min(e.intraday.p, e.intraday.p_vol) <= 0.2 ? ` · 1 in ${Math.round(1 / Math.min(e.intraday.p, e.intraday.p_vol))} half hours` : " · no reaction to speak of"}
         </p>
       )}
-      {reaches.map(({ fp, person, routes }) => (
-        <div className="person" key={person.id}>
-          <button className="row" onClick={() => open(person.id)} style={{ width: "100%" }}>
-            <span className="avatar pub">{fp.name.split(" ").map((w) => w[0]).slice(0, 2).join("")}</span>
-            <span className="grow"><b>{fp.name}</b><span className="muted small" style={{ display: "block" }}>{fp.action} · {fp.role}{fp.effective ? ` · ${fp.effective}` : ""}</span></span>
-          </button>
-          {fp.bio && <p className="bio">{fp.bio}</p>}
-          {(fp.career?.length || fp.education?.length) ? (
-            <div className="tags">
-              {fp.career?.slice(0, 5).map((c, i) => <span className="tag" key={i}>{c.org}{c.from_year ? ` ${c.from_year}–${c.to_year ? String(c.to_year).slice(2) : ""}` : ""}</span>)}
-              {fp.education?.slice(0, 2).map((s, i) => <span className="tag" key={`s${i}`}>{s.school}</span>)}
-            </div>
-          ) : null}
-          {routes.length ? routes.map((r, i) => <ReachPath key={i} reach={r} target={person} />)
-            : fp.tier <= 2 && <p className="small faint" style={{ marginTop: 8 }}>No route to {fp.name.split(" ")[0]} in your network yet.</p>}
-        </div>
-      ))}
+      <PeopleBlocks reaches={reaches} />
       {leads.map((l) => <LeadLine key={l.person.id} lead={l} verb={leads[0] === l ? "Call" : "Or"} />)}
       {other.map((l) => <LeadLine key={`o${l.person.id}`} lead={l} verb="Other side:" />)}
       <div className="foot">
@@ -133,12 +143,14 @@ export function GlanceRow({ e }: { e: FinnEvent }) {
       <button className="glance" onClick={() => setOpen(!open)} aria-expanded={open}>
         <span className="tick">{e.symbol}</span>
         <span className="t">{e.title}<span className="faint"> · {e.label.toLowerCase()} · {day(e.at)}</span></span>
-        {known ? <span className="pp" title="Someone you know can explain this" /> : <span />}
+        {known ? <span className="pp" title="Someone you know can explain the public context" /> : <span />}
       </button>
+      {!open && reaches.length > 0 && <div style={{ paddingBottom: 12, marginTop: -4 }}><PeopleBlocks reaches={reaches} /></div>}
       {open && (
         <div style={{ paddingBottom: 12 }}>
           {e.summary && <p className="small muted">{e.summary}</p>}
           {e.evidence.slice(1).map((x, i) => <p key={i} className="small muted" style={{ marginTop: 4 }}>{x.text}</p>)}
+          <PeopleBlocks reaches={reaches} />
           {leads.slice(0, 1).map((l) => <LeadLine key={l.person.id} lead={l} />)}
           <p className="small" style={{ marginTop: 8 }}>
             {e.url && <a className="link" href={e.url} target="_blank" rel="noreferrer">Open filing</a>} <span className="faint">· {e.lift.toFixed(1)}× a quiet day</span>

@@ -6,6 +6,7 @@ import { useOpenPerson } from "@/components/Shell";
 import { useStore } from "@/lib/client/store";
 import { strengthWord } from "@/lib/network/graph.ts";
 import { alike, findPeople, masked, plan, words } from "@/lib/network/search.ts";
+import { themeCompanies, type UCo } from "@/lib/client/universe";
 
 interface Match { symbol: string; name: string }
 type Recognition = { start: () => void; stop: () => void; onresult: (e: { results: { 0: { 0: { transcript: string } } } }) => void; onend: () => void; lang: string };
@@ -19,6 +20,8 @@ export default function Ask() {
   const [demo, setDemo] = useState<Match[]>([]);
   const [live, setLive] = useState(false);
   const [extra, setExtra] = useState<string[]>([]);
+  const [uni, setUni] = useState<UCo[]>([]);
+  useEffect(() => { fetch("/data/universe.json").then((r) => (r.ok ? r.json() : [])).then(setUni).catch(() => {}); }, []);
   const rec = useRef<Recognition | null>(null);
 
   useEffect(() => { const v = new URLSearchParams(window.location.search).get("q"); if (v) setQ(v); }, []);
@@ -52,15 +55,25 @@ export default function Ask() {
   const hits = useMemo(() => {
     if (!digest || !net || !graph || text.length < 2) return null;
     const everyone = [...net.contacts, ...publicPeople];
-    const p = plan(graph, text, everyone, extra);
+    // companies whose reported segments, industry or description carry the theme
+    const byTheme = themeCompanies(text, uni, 6);
+    // the fields those companies sit in point at the people who know them
+    const fields = byTheme.slice(0, 3).flatMap((h) => words([h.co.i, ...h.co.p].join(" ")));
+    const fromCompanies = net.themes.filter((t) => words(t.label).some((w) => w.length > 4 && fields.some((f) => alike(w, f) >= 0.85))).map((t) => t.id);
+    const p = plan(graph, text, everyone, [...extra, ...fromCompanies]);
     const experts = p.wantsPeople || p.orgs.size ? findPeople(graph, p, 6) : [];
     const named = p.people.filter((x) => x.w >= 0.5).map((x) => x.person);
     const q = words(text);
     const near = (name: string) => { const t = words(name); return q.length > 0 && q.every((x) => t.some((y) => alike(x, y) >= 0.74)); };
     const local = experts.length && p.orgs.size === 0 ? [] : Object.values(digest.companies).filter((c) => near(`${c.symbol} ${c.name}`)).map((c) => ({ symbol: c.symbol, name: c.name }));
     const companies = experts.length && !local.length ? [] : [...local, ...remote.filter((r) => !local.some((l) => l.symbol === r.symbol))].slice(0, 6);
-    return { p, experts, named, companies };
-  }, [digest, net, graph, publicPeople, remote, text, extra]);
+    const themed = byTheme.filter((h) => !companies.some((c) => c.symbol === h.co.s)).map((h) => {
+      const org = graph.orgId(h.co.s) ?? graph.orgId(h.co.n);
+      return { ...h, lead: org ? graph.whoToCall(org, [], 1).find((l) => l.knowledge >= 0.3) ?? null : null };
+    });
+    const people = experts.length ? experts : (p.themes.size ? findPeople(graph, p, 4) : []);
+    return { p, experts: people, named, companies, themed };
+  }, [digest, net, graph, publicPeople, remote, text, extra, uni]);
 
   function listen() {
     const W = window as unknown as { SpeechRecognition?: new () => Recognition; webkitSpeechRecognition?: new () => Recognition };
@@ -76,7 +89,7 @@ export default function Ask() {
     r.start();
   }
 
-  const examples = ["Who understands raw material suppliers for battery makers?", "EV supply chain", "Kaynes", "customers of Dixon", "Reha Kapadia", "PI Industries"];
+  const examples = ["Who understands raw material suppliers for battery makers?", "EV supply chain", "Adhesives", "Kaynes", "customers of Dixon", "Reha Kapadia", "PI Industries"];
   return (
     <>
       <header className="top">
@@ -152,7 +165,21 @@ export default function Ask() {
           </div>
         </section>
       )}
-      {hits && !hits.companies.length && !hits.named.length && !hits.experts.length && <p className="muted" style={{ marginTop: 18 }}>Nobody in your network and no NSE company matches “{q}”.</p>}
+      {hits && hits.themed.length > 0 && (
+        <section className="section">
+          <div className="head"><span className="caps">Companies in this business</span><span className="tiny faint">by share of revenue</span></div>
+          <div className="card" style={{ padding: "2px 14px" }}>
+            {hits.themed.map((h) => (
+              <div key={h.co.s} className="hit" style={{ display: "block" }}>
+                <Link href={`/research/${h.co.s}`} className="row" style={{ gap: 11 }}><span className="tick">{h.co.s}</span><span className="grow"><b>{h.co.n.replace(/ (Ltd\.?|Limited)$/i, "")}</b>
+                  <span className="small muted" style={{ display: "block" }}>{h.how}</span></span><span className="faint">›</span></Link>
+                {h.lead && <button className="cover row" style={{ gap: 6 }} onClick={() => open(h.lead!.person.id)}><Avatar person={h.lead.person} /><span><b>{h.lead.person.name}</b> can explain the public context</span></button>}
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+      {hits && !hits.companies.length && !hits.named.length && !hits.experts.length && !hits.themed.length && <p className="muted" style={{ marginTop: 18 }}>Nobody in your network and no NSE company matches “{q}”.</p>}
     </>
   );
 }

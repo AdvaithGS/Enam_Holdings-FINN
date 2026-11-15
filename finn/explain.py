@@ -173,7 +173,7 @@ def build(companies: dict, events: list[dict], start: dt.date, today: dt.date, l
                 why.append({"k": "shape", "text": f"{g['vol_ratio']:.1f}x volume with the price barely moving beyond the market ({own:+.1%}): the shape of a negotiated or index-related trade, not of news."})
             found = bool(why)
             if not found:
-                why.append({"k": "none", "text": "No public explanation holds: not the market, not its sector, no reported deals, nothing on the calendar. That is a reason to ask someone."})
+                why.append({"k": "none", "text": "No public explanation holds: not the market, not its sector, no reported deals, nothing on the calendar."})
             out.setdefault(s, {})[d] = {"parts": parts, "why": why, "found": found, "broad": breadth.get(d, 0)}
             n += 1
     log(f"moves without a filing: {n} examined, {sum(1 for s in out.values() for x in s.values() if x['found'])} with a supported explanation")

@@ -5,7 +5,7 @@ import { fieldMove } from "@/lib/portfolio/risk.ts";
 import { Avatar, Meter, ReachPath } from "@/components/People";
 import { Sheet, useOpenPerson } from "@/components/Shell";
 import { ago, day } from "@/lib/client/format";
-import { useStore } from "@/lib/client/store";
+import { readLog, type Suggestion, useStore } from "@/lib/client/store";
 import { monthsSince, strengthWord, tieStrength } from "@/lib/network/graph.ts";
 import type { Network } from "@/lib/network/types.ts";
 
@@ -17,6 +17,8 @@ export default function NetworkPage() {
   const [settings, setSettings] = useState(false);
   const [draft, setDraft] = useState("");
   const [bad, setBad] = useState<string | null>(null);
+  const [log, setLog] = useState<Suggestion[]>([]);
+  useEffect(() => { if (settings) setLog(readLog()); }, [settings]);
   const [pass, setPass] = useState("");
   const [vault, setVault] = useState<string | null>(null);
   async function backup() {
@@ -42,7 +44,9 @@ export default function NetworkPage() {
       const quiet = monthsSince(c.tie!.last, graph.now);
       if (quiet < 9) continue;
       for (const r of c.roles) {
-        const sym = graph.orgs.get(r.org)?.ticker;
+        const sym = graph.orgs.get(r.org)?.ticker ?? graph.orgs.get(graph.orgs.get(r.org)?.parent ?? "")?.ticker;
+        // someone who works at a holding is not a reason to call while it is in its results quiet period
+        if (sym && r.to === null && digest.companies[sym]?.quiet?.now) continue;
         const ev = sym && digest.events.find((e) => e.symbol === sym && e.tier === "act");
         if (ev) { out.push({ c, r, ev, quiet, weight: quiet * (r.to === null ? 1 : Math.pow(2, -(graph.now.year - r.to) / 5)) * c.tie!.closeness }); break; }
       }
@@ -86,7 +90,7 @@ export default function NetworkPage() {
 
       {noticed.length > 0 && (
         <section className="section">
-          <div className="head"><span className="caps" style={{ color: "var(--people)" }}>A reason to call</span></div>
+          <div className="head"><span className="caps" style={{ color: "var(--people)" }}>A reason to get back in touch</span></div>
           {noticed.map(({ c, r, ev, quiet }) => (
             <button key={c.id} className="card" style={{ width: "100%", display: "block" }} onClick={() => open(c.id)}>
               <span className="row" style={{ alignItems: "flex-start", gap: 11 }}>
@@ -108,7 +112,7 @@ export default function NetworkPage() {
           {shifts.map(({ t, syms, mv, expert }) => (
             <button key={t.id} className="card" style={{ width: "100%", display: "block" }} onClick={() => open(expert.person.id)}>
               <span style={{ display: "block" }}><b>{t.label}:</b> {syms.join(" and ")} have moved <b className={mv.move >= 0 ? "up" : "down"}>{pct(mv.move, 1)}</b> against the market over five sessions, together. A stretch like that comes {oneIn(mv.p)} times.</span>
-              <span className="row" style={{ marginTop: 9, gap: 9 }}><Avatar person={expert.person} /><span className="grow small"><b style={{ color: "var(--people)" }}>Ask {expert.person.name}</b><span className="muted" style={{ display: "block" }}>{expert.years} years in the field · {expert.roles[0].title}, {graph.orgName(expert.roles[0].org)}</span></span></span>
+              <span className="row" style={{ marginTop: 9, gap: 9 }}><Avatar person={expert.person} /><span className="grow small"><b style={{ color: "var(--people)" }}>{expert.person.name} can explain the public context</b><span className="muted" style={{ display: "block" }}>{expert.years} years in the field · {expert.roles[0].title}, {graph.orgName(expert.roles[0].org)}</span></span></span>
             </button>
           ))}
         </section>
@@ -190,6 +194,13 @@ export default function NetworkPage() {
             <label className="btn ghost" style={{ cursor: "pointer" }}>Restore from file<input type="file" accept=".finn,application/json" hidden onChange={(e) => e.target.files?.[0] && recover(e.target.files[0])} /></label>
           </div>
           {vault && <p className="small" style={{ marginTop: 6 }}>{vault}</p>}
+          <div className="caps" style={{ marginTop: 18 }}>Suggestion log</div>
+          <p className="muted small" style={{ marginTop: 4 }}>Every contact FINN has put forward on this device, with the subject and the grounds: {log.length} entr{log.length === 1 ? "y" : "ies"}.
+            {log.length > 0 && <> Latest: {log[log.length - 1].name} on {log[log.length - 1].about}, {log[log.length - 1].at.slice(0, 10)}.</>}</p>
+          <div className="row wrap" style={{ marginTop: 8 }}>
+            <button className="btn ghost" disabled={!log.length} onClick={() => { const url = URL.createObjectURL(new Blob([JSON.stringify(log, null, 1)], { type: "application/json" }));
+              Object.assign(document.createElement("a"), { href: url, download: "finn-suggestions.json" }).click(); URL.revokeObjectURL(url); }}>Export log</button>
+          </div>
           <div className="caps" style={{ marginTop: 18 }}>Bring your own</div>
           <p className="muted small" style={{ marginTop: 4 }}>Paste a network file (same shape as <a className="link" href="/data/network.seed.json" target="_blank">the demo file</a>): yourself, your contacts with roles and years, and when you last spoke.</p>
           <textarea className="textarea" style={{ marginTop: 8 }} value={draft} onChange={(e) => setDraft(e.target.value)} placeholder='{"me": {...}, "contacts": [...], "orgs": [...], "schools": [...], "themes": [...]}' aria-label="Network JSON" />

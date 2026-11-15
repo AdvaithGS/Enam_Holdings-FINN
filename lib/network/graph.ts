@@ -8,12 +8,22 @@
  *    quiet years. s reads as "chance this person picks up and talks openly".
  *
  * 2. Did two people know each other? (contact <-> anyone)
- *    Each year two people spend at the same organisation is an independent chance q
- *    of having worked together, so over y overlapping years
- *      p = 1 - (1 - q)^y
+ *      P(know) = P(their stints overlapped) x P(acquainted | they overlapped)
+ *    Overlap. With both sets of dates it is a fact (0 or 1) and y years long. A filing
+ *    usually names a former employer without dates. Then the stint is taken to be
+ *    L years long for each L in {2, 4, 6, 10}, ending when we know it ended, or else
+ *    placed uniformly in a 35-year working life; P(overlap) and the overlap length
+ *    follow from the geometry for each L. Everything downstream is carried as a range
+ *    over L (and over q at half and one-and-a-half times its value), because the point
+ *    value alone would claim knowledge the filing does not contain.
+ *    Acquaintance. Each overlapping year is an independent chance q:
+ *      P(acquainted | overlap) = 1 - (1 - q)^y
+ *    Board seats are a different tie: a director is linked only to other directors
+ *    (q = 0.85) and to the top executives who face the board (0.6), never to staff.
  *    q depends on how small the room was: organisation size (small 0.60, mid 0.25,
  *    large 0.06), tripled when both were senior (level <= 2), x1.5 when one was, and
- *    doubled when they sat in the same function; capped at 0.95.
+ *    doubled when they sat in the same function, doubled again inside the same business
+ *    unit and cut to 0.3 across different units; capped at 0.95.
  *    Classmates: same school, graduating within a year of each other: 0.5 for a small
  *    cohort (a business-school batch), 0.1 for a large one; a third of that within 3 years.
  *    Independent pieces of evidence combine by noisy-OR: p = 1 - prod(1 - p_i).
@@ -43,6 +53,8 @@ const HALF_LIFE_MONTHS = 36;
 const Q_SIZE = { small: 0.6, mid: 0.25, large: 0.06 } as const;
 const LEVEL_W = { 1: 1, 2: 0.85, 3: 0.6, 4: 0.4 } as const;
 const KNOWLEDGE_HALF_LIFE = 5;
+const CAREER = 35;             // years of working life an undated stint could sit in
+const TENURES = [2, 4, 6, 10]; // plausible lengths of a stint whose dates a filing does not give
 
 export interface Clock { year: number; month: number } // month 1..12
 export const yearFrac = (c: Clock) => c.year + (c.month - 1) / 12;
@@ -131,25 +143,57 @@ export class Graph {
   }
 
   /** Probability that a and b know each other, with the evidence. */
-  knows(a: Person, b: Person): { p: number; why: string[] } {
-    const parts: { p: number; why: string }[] = [];
+  knows(a: Person, b: Person): Link {
+    const parts: { p: number; lo: number; hi: number; why: string }[] = [];
+    const W1 = yearFrac(this.now), W0 = W1 - CAREER;
+    const end = (r: Role) => (r.to === null ? W1 : r.to + 1);
     for (const ra of a.roles) {
       for (const rb of b.roles) {
         if (ra.org !== rb.org) continue;
+        // A board seat is a different kind of tie: a director meets the other directors and the
+        // people who present to the board, not the organisation.
+        const boardA = ra.fn === "board", boardB = rb.fn === "board";
+        if ((boardA && !(boardB || rb.level === 1)) || (boardB && !(boardA || ra.level === 1))) continue;
         const org = this.orgs.get(ra.org);
-        let q: number = Q_SIZE[org?.size ?? "large"];
-        const senior = (ra.level <= 2 ? 1 : 0) + (rb.level <= 2 ? 1 : 0);
-        q *= senior === 2 ? 3 : senior === 1 ? 1.5 : 1;
-        if (ra.fn === rb.fn) q *= 2;
-        q = Math.min(q, 0.95);
-        const dated = ra.from > 0 && rb.from > 0;
-        const y = dated ? overlapYears(ra, rb, this.now) : 1;
-        if (y <= 0) continue;
-        const p = 1 - Math.pow(1 - q, y);
-        const span = dated
-          ? `${Math.max(ra.from, rb.from)}–${Math.min(ra.to ?? this.now.year, rb.to ?? this.now.year)}`
-          : "dates not stated";
-        parts.push({ p, why: `Both at ${this.orgName(ra.org)} (${span}): ${a.name.split(" ")[0]} as ${ra.title}, ${b.name.split(" ")[0]} as ${rb.title}` });
+        let q: number;
+        if (boardA || boardB) q = boardA && boardB ? 0.85 : 0.6;
+        else {
+          q = Q_SIZE[org?.size ?? "large"];
+          const senior = (ra.level <= 2 ? 1 : 0) + (rb.level <= 2 ? 1 : 0);
+          q *= senior === 2 ? 3 : senior === 1 ? 1.5 : 1;
+          if (ra.fn === rb.fn) q *= 2;
+          // the room is the business unit when we know it: same unit doubles the chance, different units cut it
+          if (ra.seg && rb.seg) q *= ra.seg === rb.seg ? 2 : 0.3;
+        }
+        const qs = [Math.min(0.95, q * 0.5), Math.min(0.95, q), Math.min(0.95, q * 1.5)];
+        // P(tenures overlap) and the overlap length, for each plausible tenure of an undated role
+        const kA = ra.from > 0, kB = rb.from > 0;
+        const cases = (kA && kB ? [0] : TENURES).map((L) => {
+          if (kA && kB) { const y = overlapYears(ra, rb, this.now); return { po: y > 0 ? 1 : 0, y }; }
+          if (kA !== kB) {
+            const D = kA ? ra : rb, U = kA ? rb : ra, x = D.from, yEnd = end(D);
+            if (U.to !== 0) { // we know when it ended (or that it is current), not when it began
+              const uEnd = end(U), y = Math.max(0, Math.min(yEnd, uEnd) - Math.max(x, uEnd - L));
+              return { po: y > 0 ? 1 : 0, y };
+            }
+            // nothing known: an L-year stint somewhere in a working life that ended by now
+            const span = Math.max(1e-9, W1 - L - W0);
+            const po = Math.max(0, Math.min(yEnd, W1 - L) - Math.max(x - L, W0)) / span;
+            return { po: Math.min(1, po), y: Math.min(L, yEnd - x) / 2 };
+          }
+          const f = Math.max(0, (CAREER - 2 * L) / (CAREER - L)); // two undated stints of length L in the same working life
+          return { po: 1 - f * f, y: L / 3 };
+        });
+        const at = (qi: number) => cases.map((c) => c.po * (1 - Math.pow(1 - qs[qi], c.y)));
+        const mid = at(1), p = mid.reduce((x, y) => x + y, 0) / mid.length;
+        if (p <= 0) continue;
+        const lo = Math.min(...at(0)), hi = Math.max(...at(2));
+        const po = cases.map((c) => c.po);
+        const dated = kA && kB;
+        const span = dated ? `${Math.max(ra.from, rb.from)}\u2013${Math.min(ra.to ?? this.now.year, rb.to ?? this.now.year)}`
+          : `dates not stated; ${pctRange(Math.min(...po), Math.max(...po))} likely the stints overlapped at all`;
+        const kind = boardA || boardB ? (boardA && boardB ? "on the board together" : "board and top management") : "";
+        parts.push({ p, lo, hi, why: `Both at ${this.orgName(ra.org)} (${span})${kind ? `, ${kind}` : ""}: ${a.name.split(" ")[0]} as ${ra.title}, ${b.name.split(" ")[0]} as ${rb.title}` });
       }
     }
     for (const ea of a.education) {
@@ -159,28 +203,29 @@ export class Graph {
         const cohort = this.net.schools.find((s) => s.id === this.schoolId(ea.school))?.cohort ?? "large";
         const base = cohort === "small" ? 0.5 : 0.1;
         const p = gap <= 1 ? base : gap <= 3 ? base / 3 : 0;
-        if (p > 0) parts.push({ p, why: `Both at ${ea.school}, classes of ${ea.to} and ${eb.to}` });
+        if (p > 0) parts.push({ p, lo: p / 2, hi: Math.min(0.95, p * 1.5), why: `Both at ${ea.school}, classes of ${ea.to} and ${eb.to}` });
       }
     }
     parts.sort((x, y) => y.p - x.p);
-    const p = 1 - parts.reduce((acc, x) => acc * (1 - x.p), 1);
-    return { p, why: parts.map((x) => x.why) };
+    const or = (k: "p" | "lo" | "hi") => 1 - parts.reduce((acc, x) => acc * (1 - x[k]), 1);
+    return { p: or("p"), lo: or("lo"), hi: or("hi"), why: parts.map((x) => x.why) };
   }
 
   /** Best routes from the investor to `target` (someone they may not know). */
   reach(target: Person): Reach[] {
     const out: Reach[] = [];
     const direct = this.knows(this.net.me, target);
-    if (direct.p >= 0.05) out.push({ via: null, strength: direct.p, tie: 1, link: direct.p, why: direct.why, hops: 1 });
+    if (direct.hi >= 0.05) out.push({ via: null, strength: direct.p, lo: direct.lo, hi: direct.hi, tie: 1, link: direct.p, linkLo: direct.lo, linkHi: direct.hi, why: direct.why, hops: 1 });
     for (const c of this.net.contacts) {
       if (nameMatch(c.name, target.name) === 2) {
-        out.push({ via: c, strength: tieStrength(c, this.now), tie: tieStrength(c, this.now), link: 1, why: ["Already in your network"], hops: 1 });
+        const t = tieStrength(c, this.now);
+        out.push({ via: c, strength: t, lo: t, hi: t, tie: t, link: 1, linkLo: 1, linkHi: 1, why: ["Already in your network"], hops: 1 });
         continue;
       }
       const k = this.knows(c, target);
-      if (k.p < 0.05) continue;
+      if (k.hi < 0.05) continue;
       const tie = tieStrength(c, this.now);
-      out.push({ via: c, strength: tie * k.p, tie, link: k.p, why: k.why, hops: 2 });
+      out.push({ via: c, strength: tie * k.p, lo: tie * k.lo, hi: tie * k.hi, tie, link: k.p, linkLo: k.lo, linkHi: k.hi, why: k.why, hops: 2 });
     }
     return out.sort((a, b) => b.strength - a.strength);
   }
@@ -218,6 +263,7 @@ export class Graph {
       best.knowledge = 1 - miss;
       best.score = best.tie * best.knowledge;
       best.insider = c.roles.some((r) => (r.org === orgId || this.orgs.get(r.org)?.parent === orgId) && r.to === null);
+      best.target = orgId;
       if (best.score >= 0.03) leads.push(best);
     }
     return leads.sort((a, b) => b.score - a.score).slice(0, limit);
@@ -227,7 +273,7 @@ export class Graph {
     const when = r.to === null ? `since ${r.from}` : `${r.from}–${r.to}`;
     const at = `${r.title}, ${this.orgName(r.org)} (${when})`;
     if (relation === "inside") return r.to === null ? `Works there now: ${at}` : `Worked there: ${at}`;
-    if (relation === "competitor") return `Saw them from across the table: ${at}, a competitor`;
+    if (relation === "competitor") return `Knows the industry from a competitor: ${at}`;
     if (relation === "supplier") return `Sold to them: ${at}, a supplier to ${this.orgName(target)}`;
     if (relation === "customer") return `Bought from them: ${at}, a customer of ${this.orgName(target)}`;
     return `${at}; ${relation}`;
@@ -283,7 +329,7 @@ export class Graph {
     const score = (c: Person, r: Role, w: number, label: string): Lead => {
       const end = r.to === null ? now : r.to + 1, fresh = Math.pow(2, -Math.max(0, now - end) / KNOWLEDGE_HALF_LIFE), depth = 1 - Math.exp(-(end - r.from) / 2);
       const knowledge = w * fresh * depth * LEVEL_W[r.level], tie = tieStrength(c, this.now);
-      return { person: c, role: r, relation: label, knowledge, tie, score: tie * knowledge, insider: (r.org === orgId || this.orgs.get(r.org)?.parent === orgId) && r.to === null,
+      return { person: c, role: r, relation: label, knowledge, tie, score: tie * knowledge, target: orgId, insider: (r.org === orgId || this.orgs.get(r.org)?.parent === orgId) && r.to === null,
         factors: { relation: w, freshness: fresh, depth, seniority: LEVEL_W[r.level], fit: 1 }, why: this.leadReason(c, r, label, orgId) };
     };
     const best = (leads: Lead[]) => {
@@ -350,9 +396,20 @@ export class Graph {
   }
 }
 
-export interface Reach { via: Person | null; strength: number; tie: number; link: number; why: string[]; hops: 1 | 2 }
+export interface Link { p: number; lo: number; hi: number; why: string[] }
+/** strength = tie x link, with the range the unknowns allow. Never read the point value without the range. */
+export interface Reach { via: Person | null; strength: number; lo: number; hi: number; tie: number; link: number; linkLo: number; linkHi: number; why: string[]; hops: 1 | 2 }
+
+/** "1–10%": a probability range as people say it. */
+export function pctRange(lo: number, hi: number): string {
+  const f = (x: number) => (x < 0.01 ? "<1" : x >= 0.995 ? "100" : String(Math.round(x * 100)));
+  const a = f(lo), b = f(hi);
+  return a === b ? `${a === "<1" ? "under 1" : a}%` : `${a}\u2013${b}%`;
+}
 export interface Lead {
   person: Person; role: Role; relation: string; knowledge: number; tie: number; score: number; insider: boolean; why: string;
+  /** the organisation this lead is about */
+  target?: string;
   factors: { relation: number; freshness: number; depth: number; seniority: number; fit: number };
 }
 export interface Expert { person: Person; expertise: number; years: number; roles: Role[]; tie: number }

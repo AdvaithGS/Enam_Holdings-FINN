@@ -45,7 +45,7 @@ READ_CATEGORIES = {"m_and_a", "litigation", "capex", "fund_raise", "press_releas
 ROLE_TERM = {1: math.log(4.0), 2: math.log(1.0), 3: math.log(0.4), 4: math.log(0.1)}
 RESULTS_WORDS = re.compile(r"financial results|results for|earnings|quarter(ly)? (and|ended|update)|presentation|press release|"
                            r"media (statement|release)|outcome of (the )?board meeting|\bq[1-4]\b|h[12] ?fy", re.I)
-MAX_READS = 60
+MAX_READS = 120
 
 log_lines: list[str] = []
 
@@ -217,6 +217,21 @@ def build(days: int = 35, today: dt.date | None = None) -> dict:
                         "sessions": ses + tail, "_sig": {d: r for d, r in zip(dates, rows)}}
     log(f"prices: {len(companies)} stocks, latest session {as_of}; fx {fx}")
 
+    # ---- results quiet period. Indian insider-trading rules close the trading window from the end of a
+    # quarter until 48 hours after its results are published. In that stretch FINN must not point the
+    # investor at someone who works at the company.
+    q_end = max([dt.date(y, m, 1) - dt.timedelta(days=1) for y in (today.year, today.year + 1) for m in (1, 4, 7, 10) if dt.date(y, m, 1) - dt.timedelta(days=1) <= today]
+                + [dt.date(today.year - 1, 12, 31)])
+    for sym, c in companies.items():
+        try:
+            filed = next((e["filed"] for e in nse.results_index(sym) if e["period_end"] == q_end), None)
+        except Exception:
+            filed = None
+        until = (dt.datetime.fromisoformat(filed) + dt.timedelta(hours=48)).isoformat(timespec="minutes") if filed else None
+        c["quiet"] = {"quarter_end": q_end.isoformat(), "until": until,
+                      "now": until is None or dt.datetime.fromisoformat(until) > dt.datetime.now(prices.IST).replace(tzinfo=None)}
+    log(f"quiet period (quarter ended {q_end}): " + (", ".join(s for s, c in companies.items() if c["quiet"]["now"]) or "no holding is in one"))
+
     # ---- filings
     filings = []
     for s, c in companies.items():
@@ -288,6 +303,7 @@ def build(days: int = 35, today: dt.date | None = None) -> dict:
                                      f"({info.get('lift', 1):.1f}x, n={info.get('n', 0)})"})
         z = b0 + coef
         floor = None
+        routine_debt = False
 
         if is_results:
             pe = next(f["period_end"] for f in fs if f.get("is_results"))
@@ -312,6 +328,7 @@ def build(days: int = 35, today: dt.date | None = None) -> dict:
                 if p and p["name"].lower() not in seen:
                     seen.add(p["name"].lower())
                     people.append(p)
+            pages = []
             try:
                 # one disclosure often arrives as several letters, with the profile "attached separately":
                 # read every distinct PDF of the event together (up to three, eight pages each)
@@ -352,6 +369,15 @@ def build(days: int = 35, today: dt.date | None = None) -> dict:
                                 p["profile_url"] = hit["url"]
             except llm.Unavailable:
                 pass
+            if not people and pages and reads < MAX_READS:
+                # nobody could be named (a scanned form, an unusual layout): at least say what the letter is about
+                try:
+                    f0 = enrich.facts_from_document(c["legal_name"] or c["name"], CATEGORIES[cat], pages, fx)
+                    reads += 1
+                    if f0 and f0["headline"]:
+                        e["title"], e["summary"] = f0["headline"], f0["so_what"] or None
+                except llm.Unavailable:
+                    pass
             if any(is_reappointment(f["text"]) for f in fs):
                 for p in people:
                     if p["action"] == "appointed":
@@ -385,6 +411,16 @@ def build(days: int = 35, today: dt.date | None = None) -> dict:
                 except llm.Unavailable:
                     facts = None
             if facts:
+                # The model may correct a category that a text rule only guessed, never one the exchange's own
+                # subject fixed, and never into "results" (that label promises a results card).
+                kind = facts.get("kind")
+                if kind and kind != cat and kind in CATEGORIES and lead["how"] != "subject":
+                    evidence[0] = {"k": "category", "d": round(model["categories"].get(kind, {}).get("coef", 0.0), 2),
+                                   "text": f"Read as {CATEGORIES[kind].lower()} (the title alone suggested {CATEGORIES[cat].lower()}): market noticed "
+                                           f"{model['categories'].get(kind, {}).get('p', base):.0%} of such days vs {base:.0%} base"}
+                    cat = kind
+                    e.update(category=cat, label=CATEGORIES[cat])
+                    z = b0 + model["categories"].get(cat, {}).get("coef", 0.0)
                 if facts["headline"]:
                     e["title"] = facts["headline"]
                 e["summary"] = facts["so_what"] or None
@@ -424,7 +460,7 @@ def build(days: int = 35, today: dt.date | None = None) -> dict:
         if g:
             e["market"] = {"change": g["change"], "abnormal": g["abnormal"], "vol_ratio": g["vol_ratio"],
                            "p_ret": g["p_ret"], "p_vol": g["p_vol"]}
-        e.update(_z=z, _paper=cat in PAPERWORK and floor is None, _dated=cat == "results" and not is_results, evidence=evidence)
+        e.update(_z=z, _paper=(cat in PAPERWORK and floor is None) or bool(locals().get("routine_debt") and cat == "fund_raise"), _dated=cat == "results" and not is_results, evidence=evidence)
         out_events.append(e)
 
     # ---- the tape. A tail session is evidence that *something* that day mattered, not
@@ -526,7 +562,8 @@ def build(days: int = 35, today: dt.date | None = None) -> dict:
                                      "lo": round(v["lift_lo"], 2), "hi": round(v["lift_hi"], 2)}
                                  for k, v in model["categories"].items()}},
         "labels": CATEGORIES, "companies": companies, "events": out_events, "close": brief, "moves": moves,
-        "run": {"filings": len(filings), "events": len(out_events), "documents_read": reads,
+        "run": {"filings": len(filings), "events": len(out_events), "documents_read": llm.usage["calls"] + llm.usage["cache_hits"],
+                "tiers": {t: {"events": sum(1 for e in out_events if e["tier"] == t), "filings": sum(len(e["filings"]) for e in out_events if e["tier"] == t)} for t in ("act", "glance", "aside")},
                 "llm": dict(llm.usage), "http": dict(http.stats), "seconds": round(time.time() - t0, 1),
                 "ocr_pages": docs.stats["ocr_pages"], "llm_available": llm.available()},
     }

@@ -1,8 +1,8 @@
-/* FINN. One accent for what matters, one for people. Everything else is ink on paper. */
+/* FINN. Orange is what matters. Green is people, and only people. Numbers rise in blue and fall in rose. */
 :root {
   --paper: #f5f2ec; --card: #fffdf9; --ink: #17140f; --ink-2: #5b554b; --ink-3: #8f887b; --rule: #e3ddd1; --wash: #ece7dc;
   --matter: #b6481c; --matter-wash: #f6e4d9; --people: #1f6b57; --people-wash: #dfeee8;
-  --up: #1c7a4a; --down: #b3261e; --radius: 14px;
+  --up: #2459c4; --down: #c2376b; --radius: 14px;
   --sans: ui-sans-serif, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
   --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
@@ -10,7 +10,7 @@
 @media (prefers-color-scheme: dark) {
   :root {
     --paper: #12110f; --card: #1b1a17; --ink: #efeae0; --ink-2: #b3ac9f; --ink-3: #7d776c; --rule: #2d2a25; --wash: #24221e;
-    --matter: #f08a54; --matter-wash: #3a2217; --people: #6cc5a8; --people-wash: #17302a; --up: #5fc48c; --down: #f0776c;
+    --matter: #f08a54; --matter-wash: #3a2217; --people: #6cc5a8; --people-wash: #17302a; --up: #86adf7; --down: #f083ab;
   }
 }
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -159,10 +159,10 @@ h1, h2, h3, p { margin: 0; }
 .btn { display: inline-block; padding: 9px 14px; border-radius: 10px; background: var(--ink); color: var(--paper); font-weight: 600; font-size: 14px; } .btn.ghost { background: transparent; color: var(--ink); border: 1px solid var(--rule); }
 
 /* research: locked header, tabs, modules, charts */
-:root { --blue: #2a63c9; --teal: #0f8a7a; --violet: #7448c4; --amber: #b9770a; --rose: #c2376b;
-  --blue-w: #e3ebfa; --teal-w: #dbf1ed; --violet-w: #ebe3f8; --amber-w: #f8ecd2; --rose-w: #f9e1ea; }
-@media (prefers-color-scheme: dark) { :root { --blue: #7ea9f5; --teal: #58cdbb; --violet: #b394ee; --amber: #e9b455; --rose: #f083ab;
-  --blue-w: #18243c; --teal-w: #12302c; --violet-w: #271d3d; --amber-w: #35290f; --rose-w: #3a1826; } }
+:root { --blue: #2a63c9; --teal: #3d7f99; --violet: #7448c4; --amber: #b9770a; --rose: #c2376b;
+  --blue-w: #e3ebfa; --teal-w: #deedf3; --violet-w: #ebe3f8; --amber-w: #f8ecd2; --rose-w: #f9e1ea; }
+@media (prefers-color-scheme: dark) { :root { --blue: #7ea9f5; --teal: #7fc4dc; --violet: #b394ee; --amber: #e9b455; --rose: #f083ab;
+  --blue-w: #18243c; --teal-w: #14303a; --violet-w: #271d3d; --amber-w: #35290f; --rose-w: #3a1826; } }
 .rhead { position: sticky; top: 0; z-index: 15; margin: 0 -16px; padding: calc(10px + env(safe-area-inset-top)) 16px 0; background: color-mix(in srgb, var(--paper) 94%, transparent); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border-bottom: 1px solid var(--rule); }
 .rhead h1 { font: 600 19px/1.15 var(--serif); }
 .px { font: 600 19px/1.15 var(--serif); text-align: right; white-space: nowrap; }

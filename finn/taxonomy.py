@@ -119,7 +119,7 @@ SUBJECT = {
 # Ordered text rules for catch-all subjects. (category, pattern)
 _R = lambda p: re.compile(p, re.I)  # noqa: E731
 TEXT_RULES: list[tuple[str, re.Pattern]] = [
-    ("routine", _R(r"(appointment|re-?appointment|rotation) of .{0,30}auditors?|change (in|of) .{0,30}(address|registrar|rta)\b")),
+    ("routine", _R(r"redemption of|repayment of|payment of (interest|principal)|interest payment|maturity of (commercial|non)|(appointment|re-?appointment|rotation) of .{0,30}auditors?|change (in|of) .{0,30}(address|registrar|rta)\b")),
     ("earnings_call", _R(r"transcript|audio (recording|link)|recording of (the )?(earnings|conference|analyst)|earnings (conference )?call|con(ference)?[. ]*call")),
     ("investor_meetings", _R(r"investor'?s?'? (meet|conference|day)|analyst'?s?'? (meet|day)|non-deal roadshow|one-on-one|schedule of (analyst|investor)")),
     ("results", _R(r"financial results|results for the (quarter|period|year|half)|(un)?audited .{0,40}results|investor presentation|shareholders?'? letter|earnings (release|presentation)|quarterly (update|business update)")),

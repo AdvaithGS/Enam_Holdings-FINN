@@ -10,15 +10,19 @@ import { Sheet } from "./Shell";
 export interface Move { symbol: string; date: string; change: number; vol: number | null; volMkt: number | null; p: number | null; abnormal: number | null;
   px: number[]; vols: (number | null)[]; event?: FinnEvent; note?: MoveNote }
 
-export function findMoves(market: Market, digest: Digest, start: Date, movePct: number, volX: number): Move[] {
+/** A stock-session qualifies when it is rarer than 1 in `rare` for that stock (and clears the optional raw floors). */
+const qualifies = (ch: number, v: number | null, p: number | null, rare: number, movePct: number, volX: number) =>
+  p !== null && p <= 1 / rare && (movePct <= 0 || Math.abs(ch) * 100 >= movePct) && (volX <= 0 || (v !== null && v >= volX));
+
+export function findMoves(market: Market, digest: Digest, start: Date, rare: number, movePct: number, volX: number): Move[] {
   const out: Move[] = [];
   const from = start.toISOString().slice(0, 10);
   for (const [symbol, s] of Object.entries(market.series)) {
     for (let i = s.dates.length - 1; i >= 0 && s.dates[i] >= from; i--) {
       const ch = s.change[i], v = s.vol_ratio[i];
       if (ch === null) continue;
-      if (Math.abs(ch) * 100 >= movePct || (v !== null && v >= volX)) {
-        const ps = [s.p_ret[i], s.p_vol[i]].filter((x): x is number => x !== null);
+      const ps = [s.p_ret[i], s.p_vol[i]].filter((x): x is number => x !== null);
+      if (qualifies(ch, v, ps.length ? Math.min(...ps) : null, rare, movePct, volX)) {
         const evs = digest.events.filter((e) => e.symbol === symbol && e.session === s.dates[i]);
         out.push({ symbol, date: s.dates[i], change: ch, vol: v, volMkt: s.vol_mkt?.[i] ?? null, abnormal: s.abnormal[i], p: ps.length ? Math.min(...ps) : null,
           px: s.close.slice(Math.max(0, i - 30), i + 1), vols: s.vol_ratio.slice(Math.max(0, i - 29), i + 1), note: digest.moves?.[symbol]?.[s.dates[i]], event: evs.find((e) => e.tier === "act") ?? evs.find((e) => e.tier === "glance") });
@@ -29,13 +33,14 @@ export function findMoves(market: Market, digest: Digest, start: Date, movePct: 
 }
 
 /** How often would these thresholds have fired over the history we hold? */
-export function fireCount(market: Market, movePct: number, volX: number): { fires: number; sessions: number } {
+export function fireCount(market: Market, rare: number, movePct: number, volX: number): { fires: number; sessions: number } {
   let fires = 0, sessions = 0;
   for (const s of Object.values(market.series)) {
     sessions = Math.max(sessions, s.dates.length);
     for (let i = 0; i < s.dates.length; i++) {
       const ch = s.change[i], v = s.vol_ratio[i];
-      if (ch !== null && (Math.abs(ch) * 100 >= movePct || (v !== null && v >= volX))) fires++;
+      const ps = [s.p_ret[i], s.p_vol[i]].filter((x): x is number => x !== null);
+      if (ch !== null && qualifies(ch, v, ps.length ? Math.min(...ps) : null, rare, movePct, volX)) fires++;
     }
   }
   return { fires, sessions };
@@ -47,9 +52,11 @@ export function fireCount(market: Market, movePct: number, volX: number): { fire
  * dashed line at 0% (the starting level) and the flagged session marked.
  * Bottom: each session's volume as a multiple of its own 20-day average; the line is 1x.
  */
-export function MoveChart({ px, vols, up }: { px: number[]; vols: (number | null)[]; up: boolean }) {
+export function MoveChart({ px, vols, up, rarity }: { px: number[]; vols: (number | null)[]; up: boolean; rarity?: number | null }) {
   if (px.length < 3) return null;
-  const W = 300, H = 74, PH = 46, VH = 20, R = 34;
+  // the rarer the move, the more room it gets: 1 in 50 is the base size, each tenfold in rarity adds half again
+  const k = rarity ? Math.max(1, Math.min(1.8, 1 + 0.5 * Math.log10(1 / rarity / 50))) : 1;
+  const W = 300, PH = Math.round(46 * k), VH = Math.round(20 * k), H = PH + VH + 8, R = 34;
   const r = px.slice(1).map((v) => v / px[0] - 1), lo = Math.min(0, ...r), hi = Math.max(0, ...r), n = r.length;
   const x = (i: number) => (n === 1 ? 0 : (i / (n - 1)) * (W - R - 4) + 2), y = (v: number) => 9 + (1 - (v - lo) / (hi - lo || 1)) * (PH - 12);
   const vmax = Math.max(2, ...vols.map((v) => v ?? 0)), bw = (W - R - 4) / n;
@@ -108,7 +115,7 @@ function MoveRow({ m }: { m: Move }) {
         {m.vol !== null ? `${m.vol.toFixed(1)}× its usual volume${m.volMkt ? ` (the NIFTY 500 traded ${m.volMkt.toFixed(1)}× its own)` : ""}` : ""}
         {m.p !== null ? ` · for its volatility and that day’s volume, ${oneIn(m.p)} sessions` : ""}
       </div>
-      <MoveChart px={m.px} vols={m.vols} up={m.change >= 0} />
+      <MoveChart px={m.px} vols={m.vols} up={m.change >= 0} rarity={m.p} />
       <div className="small" style={{ marginTop: 6 }}>
         {m.event ? <a href={`#${m.event.id}`}><b>Filed that session:</b> {m.event.title} <span className="faint">›</span></a>
           : why.length ? <><b>{sys >= 0.5 ? "Systematic. " : m.note?.found ? "No filing. Likely: " : ""}</b>{why[0].text}{why.length > 1 && <button className="link" style={{ marginLeft: 6 }} onClick={() => setOpen(!open)}>{open ? "less" : `+${why.length - 1} more`}</button>}</>
@@ -127,15 +134,15 @@ export function Moves({ start }: { start: Date }) {
   const [perm, setPerm] = useState<NotificationPermission>("default");
   useEffect(() => { if (typeof Notification !== "undefined") setPerm(Notification.permission); }, []);
   useEffect(loadMarket, [loadMarket]);
-  const moves = useMemo(() => (market && digest ? findMoves(market, digest, start, prefs.move, prefs.volume) : []), [market, digest, start, prefs.move, prefs.volume]);
-  const hist = useMemo(() => (market ? fireCount(market, prefs.move, prefs.volume) : null), [market, prefs.move, prefs.volume]);
+  const moves = useMemo(() => (market && digest ? findMoves(market, digest, start, prefs.rare, prefs.move, prefs.volume) : []), [market, digest, start, prefs.rare, prefs.move, prefs.volume]);
+  const hist = useMemo(() => (market ? fireCount(market, prefs.rare, prefs.move, prefs.volume) : null), [market, prefs.rare, prefs.move, prefs.volume]);
   if (!digest) return null;
   const n = Object.keys(digest.companies).length;
   return (
     <section className="section">
       <div className="head">
         <span className="caps">Unusual moves · {moves.length}</span>
-        <button className="small link" onClick={() => setSheet(true)}>±{prefs.move}% or {prefs.volume}× volume</button>
+        <button className="small link" onClick={() => setSheet(true)}>rarer than 1 in {prefs.rare}{prefs.move > 0 ? ` · ±${prefs.move}%` : ""}{prefs.volume > 0 ? ` · ${prefs.volume}×` : ""}</button>
       </div>
       {moves.length === 0 ? <p className="small muted">Nothing crossed your line in this window.</p> : (
         <div className="card" style={{ padding: "4px 14px" }}>
@@ -148,12 +155,17 @@ export function Moves({ start }: { start: Date }) {
           <h2 style={{ font: "600 21px/1.2 var(--serif)" }}>What counts as unusual?</h2>
           <p className="muted small" style={{ marginTop: 4 }}>You draw the line. FINN shows what that line would have cost you in interruptions.</p>
           <div style={{ marginTop: 20 }}>
-            <div className="row between"><span className="caps">Daily price move</span><span className="big num">±{prefs.move}%</span></div>
-            <input className="slider" type="range" min={1} max={10} step={0.5} value={prefs.move} onChange={(e) => setPrefs({ move: Number(e.target.value) })} aria-label="Price move threshold" />
+            <div className="row between"><span className="caps">How rare, for that stock</span><span className="big num">1 in {prefs.rare}</span></div>
+            <input className="slider" type="range" min={10} max={250} step={10} value={prefs.rare} onChange={(e) => setPrefs({ rare: Number(e.target.value) })} aria-label="Rarity threshold" />
+            <p className="tiny faint">Sessions: 1 in 20 is monthly, 1 in 250 is yearly. A 3% day is routine for one stock and extraordinary for another; rarity is what compares them.</p>
           </div>
           <div style={{ marginTop: 16 }}>
-            <div className="row between"><span className="caps">Volume vs 20-day average</span><span className="big num">{prefs.volume}×</span></div>
-            <input className="slider" type="range" min={1.5} max={8} step={0.5} value={prefs.volume} onChange={(e) => setPrefs({ volume: Number(e.target.value) })} aria-label="Volume threshold" />
+            <div className="row between"><span className="caps">And at least this price move</span><span className="big num">{prefs.move > 0 ? `±${prefs.move}%` : "off"}</span></div>
+            <input className="slider" type="range" min={0} max={10} step={0.5} value={prefs.move} onChange={(e) => setPrefs({ move: Number(e.target.value) })} aria-label="Price move threshold" />
+          </div>
+          <div style={{ marginTop: 16 }}>
+            <div className="row between"><span className="caps">And at least this volume</span><span className="big num">{prefs.volume > 0 ? `${prefs.volume}×` : "off"}</span></div>
+            <input className="slider" type="range" min={0} max={8} step={0.5} value={prefs.volume} onChange={(e) => setPrefs({ volume: Number(e.target.value) })} aria-label="Volume threshold" />
           </div>
           {hist && (
             <div className="note">

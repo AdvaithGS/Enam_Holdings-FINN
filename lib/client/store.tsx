@@ -1,13 +1,16 @@
 "use client";
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { Graph } from "../network/graph.ts";
-import { nameTokens, orgKey } from "../network/names.ts";
-import type { Fn, Network, Person, Role } from "../network/types.ts";
-import type { Digest, FiledPerson, FinnEvent, Market } from "../types.ts";
+import { peopleFromDigest, personKey } from "../network/public.ts";
+import type { Network, Person } from "../network/types.ts";
+import type { Digest, FinnEvent, Market } from "../types.ts";
 
-export interface Prefs { window: string; since?: string; move: number; volume: number; alertOn: string[] }
-const DEFAULT_PREFS: Prefs = { window: "24h", move: 3, volume: 2, alertOn: ["results", "m_and_a", "management_change", "litigation", "capex", "fund_raise"] };
-const NET_KEY = "finn.network.v1", PREF_KEY = "finn.prefs.v1";
+export { peopleFromDigest, personKey };
+
+/** rare: show a move only if it is rarer than 1 in `rare` sessions for that stock. move / volume: optional extra floors (0 = off). */
+export interface Prefs { window: string; since?: string; rare: number; move: number; volume: number; alertOn: string[] }
+const DEFAULT_PREFS: Prefs = { window: "24h", rare: 50, move: 0, volume: 0, alertOn: ["results", "m_and_a", "management_change", "litigation", "capex", "fund_raise"] };
+const NET_KEY = "finn.network.v1", PREF_KEY = "finn.prefs.v2";
 
 interface Store {
   digest: Digest | null; market: Market | null; error: string | null;
@@ -17,51 +20,6 @@ interface Store {
   loadMarket: () => void;
 }
 const Ctx = createContext<Store | null>(null);
-
-function fnOf(title: string): Fn {
-  const t = title.toLowerCase();
-  if (/financ|cfo|treasur|account/.test(t)) return "finance";
-  if (/independent|non-?\s*executive|chairman|chairperson|director/.test(t) && !/managing|executive director|whole/.test(t)) return "board";
-  if (/operat|coo|plant|manufactur|supply/.test(t)) return "operations";
-  if (/technolog|cto|digital|engineer/.test(t)) return "technology";
-  if (/legal|counsel|compliance|secretar/.test(t)) return "legal";
-  if (/risk|credit/.test(t)) return "risk";
-  if (/sales|market|business head|commercial/.test(t)) return "sales";
-  if (/human|people|hr\b/.test(t)) return "hr";
-  return "general";
-}
-const year = (iso: string) => Number(iso.slice(0, 4));
-
-/** People named in filings become nodes too: public facts only, from the filing itself. */
-export function peopleFromDigest(digest: Digest, graph: Graph): Person[] {
-  const out = new Map<string, Person>();
-  for (const e of digest.events) {
-    for (const fp of e.people ?? []) {
-      const key = "p:" + nameTokens(fp.name).join("-");
-      const company = graph.orgId(e.symbol) ?? `x:${orgKey(digest.companies[e.symbol]?.name ?? e.symbol)}`;
-      const leaving = ["resigned", "retired", "ceased", "died"].includes(fp.action);
-      const roles: Role[] = [{
-        org: company, title: fp.role, fn: fnOf(fp.role), level: fp.tier <= 1 ? 1 : fp.tier === 2 ? 2 : fp.tier === 3 ? 1 : 3,
-        from: leaving ? 0 : year(e.at), to: leaving ? year(e.at) : null,
-      }];
-      for (const c of fp.career ?? []) {
-        const org = graph.orgId(c.org) ?? `x:${orgKey(c.org)}`;
-        if (org === company && !c.from_year) continue;
-        roles.push({ org, title: c.role || "role not stated", fn: fnOf(c.role ?? ""), level: 2, from: c.from_year ?? 0, to: c.to_year ?? (c.from_year ? c.from_year : 0) });
-      }
-      const prev = out.get(key);
-      const person: Person = {
-        id: key, name: fp.name, headline: `${fp.role}, ${digest.companies[e.symbol]?.name ?? e.symbol}`,
-        roles: prev ? [...prev.roles, ...roles.filter((r) => !prev.roles.some((x) => x.org === r.org && x.title === r.title))] : roles,
-        education: (fp.education ?? []).map((s) => ({ school: s.school, degree: s.degree, to: s.year ?? 0 })),
-        source: { label: `Exchange filing, ${e.at.slice(0, 10)}`, url: e.url },
-      };
-      out.set(key, person);
-    }
-  }
-  return [...out.values()];
-}
-export const personKey = (fp: FiledPerson) => "p:" + nameTokens(fp.name).join("-");
 
 const SEEN_KEY = "finn.seen.v1";
 /** If the investor allowed notifications, tell them about events that matter and are new to this device. */
@@ -137,6 +95,23 @@ export function useStore(): Store {
   if (!s) throw new Error("StoreProvider missing");
   return s;
 }
+
+/**
+ * Every contact FINN puts forward is written to a log on this device: who, about what, on what
+ * grounds, and when. A compliance officer can read it; the investor can export or clear it.
+ */
+export interface Suggestion { at: string; person: string; name: string; about: string; why: string; insider: boolean }
+const LOG_KEY = "finn.calls.v1";
+export function readLog(): Suggestion[] { try { return JSON.parse(localStorage.getItem(LOG_KEY) ?? "[]"); } catch { return []; } }
+export function logSuggestion(s: Omit<Suggestion, "at">) {
+  try {
+    const log = readLog(), day = new Date().toISOString().slice(0, 10);
+    if (log.some((x) => x.person === s.person && x.about === s.about && x.at.slice(0, 10) === day)) return;
+    log.push({ ...s, at: new Date().toISOString() });
+    localStorage.setItem(LOG_KEY, JSON.stringify(log.slice(-2000)));
+  } catch { /* storage unavailable: nothing to log to */ }
+}
+export const clearLog = () => { try { localStorage.removeItem(LOG_KEY); } catch { /* ignore */ } };
 
 export const WINDOWS: { id: string; label: string; hours: number }[] = [
   { id: "24h", label: "24 hours", hours: 24 }, { id: "3d", label: "3 days", hours: 72 },

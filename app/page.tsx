@@ -39,8 +39,8 @@ export default function Brief() {
         </div>
         <p className="lede">
           {view.filings === 0 ? <>Nothing was filed across your {Object.keys(digest.companies).length} companies in this window.</> : <>
-            <b>{view.filings}</b> filing{view.filings === 1 ? "" : "s"} became <b>{view.events.length}</b> event{view.events.length === 1 ? "" : "s"}.{" "}
-            {view.act.length === 0 ? "None of them needs you." : <><b style={{ color: "var(--matter)" }}>{view.act.length}</b> {view.act.length === 1 ? "needs" : "need"} you.</>}
+            <b>{view.filings}</b> filing{view.filings === 1 ? "" : "s"} became <b>{view.events.length}</b> event{view.events.length === 1 ? "" : "s"}:{" "}
+            <b style={{ color: "var(--matter)" }}>{view.act.length}</b> {view.act.length === 1 ? "needs" : "need"} you, <b>{view.glance.length}</b> worth a glance, <b>{view.rest.length}</b> set aside.
           </>}
         </p>
         <div className="chips" role="tablist" aria-label="Window">
@@ -77,7 +77,7 @@ export default function Brief() {
       {view.rest.length > 0 && (
         <section className="section">
           <button className="head" style={{ width: "100%" }} onClick={() => setShowAside(!showAside)} aria-expanded={showAside}>
-            <span className="caps">Set aside · {view.rest.reduce((n, e) => n + e.filings.length, 0)} filings</span><span className="small link">{showAside ? "hide" : "show"}</span>
+            <span className="caps">Set aside · {view.rest.length} events ({view.rest.reduce((n, e) => n + e.filings.length, 0)} filings)</span><span className="small link">{showAside ? "hide" : "show"}</span>
           </button>
           {showAside && (
             <div className="card" style={{ padding: "2px 14px" }}>
@@ -98,9 +98,10 @@ export default function Brief() {
 
       <footer className="section tiny faint" style={{ lineHeight: 1.6 }}>
         Ranking is measured, not asserted: an event study of {digest.model.sessions.toLocaleString("en-IN")} stock-sessions in this portfolio sets each
-        category’s weight; results come from XBRL, never from a model. This run read {digest.run.filings} filings, opened {digest.run.documents_read} with
-        a model ({digest.run.llm.calls} calls, {digest.run.llm.cache_hits} from cache, {(digest.run.llm.input_tokens + digest.run.llm.output_tokens).toLocaleString("en-IN")} tokens)
-        and {digest.run.ocr_pages} scanned pages with local OCR.
+        category’s weight; results come from XBRL, never from a model. The last refresh covered {digest.window_days} days: {digest.run.filings} filings in {digest.run.events} events
+        {digest.run.tiers ? ` (${digest.run.tiers.act.events} that matter, ${digest.run.tiers.glance.events} worth a glance, ${digest.run.tiers.aside.events} set aside)` : ""}.
+        A model read {digest.run.documents_read} documents: {digest.run.llm.calls} new, {digest.run.llm.cache_hits} already read and taken from cache
+        ({(digest.run.llm.input_tokens + digest.run.llm.output_tokens).toLocaleString("en-IN")} tokens this run). {digest.run.ocr_pages} scanned pages went through local OCR.
       </footer>
     </>
   );

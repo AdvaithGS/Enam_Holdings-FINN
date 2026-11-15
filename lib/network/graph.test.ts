@@ -47,12 +47,31 @@ test("overlap counts whole years inclusively", () => {
   assert.equal(overlapYears(a, { ...b, from: 2017 }, now), 0);
 });
 
-test("knows: probability follows 1-(1-q)^y and needs real overlap", () => {
+test("knows: dated overlap is 1-(1-q)^y, and the range brackets the point", () => {
   const rhea = by("Rhea Kapadia"), tanvi = by("Tanvi Agarwal");
-  // both at Trent (mid, q=.25), same function (x2), one senior (x1.5) => q=.75, overlap 2015..2019 = 5 years
+  // both at Trent (mid, q=.25), same function (x2), one senior (x1.5), different business units (x0.3) => q=.225; 2015..2019 = 5 years
   const k = g.knows(rhea, tanvi);
-  assert.ok(Math.abs(k.p - (1 - Math.pow(0.25, 5))) < 1e-9, String(k.p));
+  assert.ok(Math.abs(k.p - (1 - Math.pow(1 - 0.225, 5))) < 1e-9, String(k.p));
+  assert.ok(k.lo < k.p && k.p < k.hi && k.hi <= 1);
   assert.equal(g.knows(by("Hemant Joshi"), by("Sneha Reddy")).p, 0);
+});
+
+test("knows: an undated former employer cannot yield more than the chance the stints overlapped", () => {
+  // a filing says the appointee was once at ICICI Bank, no dates; Meera has been there since 2020
+  const appointee: Person = { id: "t", name: "V. N. Srivatsan", headline: "", education: [],
+    roles: [{ org: "icici", title: "Head, Compliance", from: 0, to: 0, fn: "legal", level: 2 }] };
+  const k = g.knows(by("Meera Iyer"), appointee);
+  assert.ok(k.hi < 0.5 && k.lo < 0.1 && k.p > k.lo && k.p < k.hi, JSON.stringify(k));
+  assert.match(k.why[0], /dates not stated; .*% likely the stints overlapped/);
+});
+
+test("a board seat links a director to directors and top executives only", () => {
+  const chair: Person = { id: "t", name: "Noel N. Tata", headline: "", education: [],
+    roles: [{ org: "trent", title: "Chairman", from: 0, to: 2026, fn: "board", level: 1 }] };
+  assert.equal(g.reach(chair).length, 0);   // a head of merchandising and a buyer did not "work with" the chairman
+  const ceo: Person = { id: "c", name: "A B", headline: "", education: [], roles: [{ org: "trent", title: "CEO", from: 2014, to: 2022, fn: "general", level: 1 }] };
+  assert.ok(g.knows(chair, ceo).p > 0.3);
+  assert.ok(g.knows(by("Nandini Krishnan"), { ...ceo, roles: [{ org: "bandhan", title: "Branch manager", from: 2019, to: null, fn: "sales", level: 3 }] }).p === 0);
 });
 
 test("who to call: an insider-turned-competitor outranks a same-theme acquaintance", () => {
@@ -69,22 +88,22 @@ test("who to call: an insider-turned-competitor outranks a same-theme acquaintan
   assert.ok(!g.whoToCall("bharti").some((l) => l.person.name === "Tanvi Agarwal"));
 });
 
-test("reach: a two-step path is tie x link and never exceeds either", () => {
-  const target: Person = { id: "t", name: "Noel N. Tata", headline: "", education: [],
-    roles: [{ org: "trent", title: "Chairman", from: 0, to: 2026, fn: "board", level: 1 }] };
+test("reach: a two-step path is tie x link, never exceeds either, and carries its range", () => {
+  const target: Person = { id: "t", name: "Some Executive", headline: "", education: [],
+    roles: [{ org: "trent", title: "Chief Financial Officer", from: 2014, to: 2020, fn: "finance", level: 1 }] };
   const r = g.reach(target);
   assert.ok(r.length > 0);
-  for (const x of r) { assert.ok(x.strength <= x.tie + 1e-12 && x.strength <= x.link + 1e-12); }
+  for (const x of r) { assert.ok(x.strength <= x.tie + 1e-12 && x.strength <= x.link + 1e-12 && x.lo <= x.strength && x.strength <= x.hi); }
   assert.ok(["Rhea Kapadia", "Tanvi Agarwal"].includes(r[0].via!.name));
 });
 
 test("connectors: PageRank is a probability distribution and rewards bridges", () => {
-  const target: Person = { id: "t", name: "Noel N. Tata", headline: "", education: [],
-    roles: [{ org: "trent", title: "Chairman", from: 0, to: 2026, fn: "board", level: 1 }] };
+  const target: Person = { id: "t", name: "Some Executive", headline: "", education: [],
+    roles: [{ org: "trent", title: "Chief Financial Officer", from: 2014, to: 2020, fn: "finance", level: 1 }] };
   const c = g.connectors([target], 40);
   assert.ok(c.every((x) => x.score > 0 && x.score < 1));
   assert.ok(c.reduce((a, x) => a + x.score, 0) < 1);
-  assert.ok(c[0].doors.some((p) => p.name === "Noel N. Tata"));
+  assert.ok(c[0].doors.some((p) => p.name === "Some Executive"));
 });
 
 test("coverage is by business: Reliance is five businesses and one contact does not cover them", () => {
