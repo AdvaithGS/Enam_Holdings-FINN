@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Avatar, Meter } from "@/components/People";
+import { Detail, State, useWide } from "@/components/Shell";
 import { useOpenPerson } from "@/components/Shell";
 import { useStore } from "@/lib/client/store";
 import { strengthWord } from "@/lib/network/graph.ts";
@@ -15,6 +16,7 @@ type Recognition = { start: () => void; stop: () => void; onresult: (e: { result
 export default function Ask() {
   const { digest, net, graph, publicPeople } = useStore();
   const open = useOpenPerson();
+  const wide = useWide();
   const [q, setQ] = useState("");
   const [remote, setRemote] = useState<Match[]>([]);
   const [demo, setDemo] = useState<Match[]>([]);
@@ -89,35 +91,27 @@ export default function Ask() {
     r.start();
   }
 
-  const examples = ["Who understands raw material suppliers for battery makers?", "EV supply chain", "Adhesives", "Kaynes", "customers of Dixon", "Reha Kapadia", "PI Industries"];
-  return (
+  // Suggested questions come from what the investor holds and what was filed this week, not from a fixed list.
+  const suggestions = useMemo(() => {
+    if (!digest || !net || !graph) return [];
+    const out: { label: string; q: string }[] = [];
+    const cos = Object.values(digest.companies).sort((a, b) => (b.weight ?? 0) - (a.weight ?? 0));
+    for (const e of digest.events.filter((x) => x.tier === "act").slice(0, 2)) out.push({ label: `${digest.companies[e.symbol]?.name ?? e.symbol}: what did management promise before this?`, q: e.symbol });
+    const appointee = digest.events.flatMap((e) => e.people ?? []).find((p) => p.action === "appointed" && (p.career?.length ?? 0) > 0);
+    if (appointee) out.push({ label: `How do I reach ${appointee.name}?`, q: appointee.name });
+    const seen = new Set<string>();
+    for (const c of cos) {
+      const t = graph.themesOf(graph.orgId(c.symbol) ?? "")[0];
+      if (t && !seen.has(t) && seen.size < 2) { seen.add(t); out.push({ label: `Who can explain ${graph.themeLabel(t).toLowerCase()}? (you hold ${c.symbol})`, q: `who knows ${graph.themeLabel(t).toLowerCase()}` }); }
+    }
+    const big = cos[0] && uni.find((u) => u.s === cos[0].symbol)?.g[0];
+    if (big) out.push({ label: `Which other companies are in ${big[0].toLowerCase()}? (${(big[1] * 100).toFixed(0)}% of ${cos[0].symbol})`, q: big[0] });
+    out.push({ label: "Who understands the raw-material suppliers to battery makers?", q: "Who understands the raw material suppliers for battery manufacturers?" });
+    return out.slice(0, 7);
+  }, [digest, net, graph, uni]);
+
+  const results = hits && (
     <>
-      <header className="top">
-        <div className="brand">Ask<i>.</i></div>
-        <p className="lede">Ask it the way you would ask a colleague.</p>
-      </header>
-      <div className="search">
-        <input autoFocus value={q} onChange={(e) => setQ(e.target.value)} placeholder="Who knows battery raw materials?" aria-label="Ask FINN" enterKeyHint="search" />
-        <button className={`mic ${live ? "live" : ""}`} onClick={listen} aria-label="Speak">●</button>
-      </div>
-
-      {!hits && (
-        <>
-          <div className="chips" style={{ flexWrap: "wrap", margin: "12px 0 0", padding: 0 }}>
-            {examples.map((x) => <button key={x} className="chip" onClick={() => setQ(x)}>{x}</button>)}
-          </div>
-          {demo.length > 0 && (
-            <section className="section">
-              <div className="head"><span className="caps">Research ready to read</span></div>
-              <div className="card" style={{ padding: "2px 14px" }}>
-                {demo.map((d) => <Link key={d.symbol} href={`/research/${d.symbol}`} className="hit"><span className="tick">{d.symbol}</span><span className="grow clip">{d.name}</span><span className="faint">›</span></Link>)}
-              </div>
-              <p className="tiny faint" style={{ marginTop: 8 }}>Any other NSE company is read live when you open it: statements first, then the last four earnings calls and the annual report.</p>
-            </section>
-          )}
-        </>
-      )}
-
       {hits && (hits.p.concepts.length > 0 || hits.p.orgs.size > 0 || extra.length > 0) && (
         <p className="small muted" style={{ marginTop: 12 }}>
           Read as:{" "}
@@ -180,6 +174,32 @@ export default function Ask() {
         </section>
       )}
       {hits && !hits.companies.length && !hits.named.length && !hits.experts.length && !hits.themed.length && <p className="muted" style={{ marginTop: 18 }}>Nobody in your network and no NSE company matches “{q}”.</p>}
+    </>
+  );
+
+  return (
+    <>
+      <header className="top">
+        <h1 className="lede">Ask about a company, a person or a business</h1>
+        <div className="search" style={{ marginTop: 12 }}>
+          <input autoFocus value={q} onChange={(e) => setQ(e.target.value)} placeholder="Adhesives · Kaynes · who knows rural lending?" aria-label="Ask FINN" enterKeyHint="search" />
+          <button className={`mic ${live ? "live" : ""}`} onClick={listen} aria-label="Speak your question" style={{ minWidth: 44, minHeight: 44 }}>{live ? "Listening" : "Speak"}</button>
+        </div>
+      </header>
+
+      <section className="section">
+        <div className="head"><span className="caps">{hits ? "Try another" : "Questions from your book and this week’s filings"}</span></div>
+        {!digest || !net ? <State kind="loading" /> : suggestions.map((s) => <button key={s.label} className="one" style={{ gridTemplateColumns: "1fr auto" }} onClick={() => setQ(s.q)}><span>{s.label}</span><span className="d">→</span></button>)}
+      </section>
+
+      {!hits && demo.length > 0 && (
+        <section className="section">
+          <div className="head"><span className="caps">Research already read</span><span className="tiny">any other NSE company is read when you open it</span></div>
+          {demo.map((d) => <Link key={d.symbol} href={`/research/${d.symbol}`} className="one" style={{ gridTemplateColumns: "92px 1fr auto" }}><b style={{ font: "var(--d)", fontWeight: 600 }}>{d.symbol}</b><span>{d.name}</span><span className="d">→</span></Link>)}
+        </section>
+      )}
+
+      {wide ? <Detail fallback>{results ?? <State kind="empty" title="Answers appear here">Type a question, or pick one on the left. FINN shows how it read the question, the people who can explain the public context, and the companies in that business with the share of revenue it represents.</State>}</Detail> : results}
     </>
   );
 }

@@ -1,0 +1,34 @@
+name: Visual checks
+on:
+  push:
+    paths: ["app/**", "components/**", "lib/**", "tests/**", "package.json", "playwright.config.ts"]
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      update: { description: "Re-record the baselines and commit them", type: boolean, default: false }
+permissions:
+  contents: write
+jobs:
+  screenshots:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - run: npm ci
+      - run: npm run typecheck && npm test
+      - run: npx playwright install --with-deps chromium
+      - run: npm run build
+      # the first run on a branch with no baselines records them; after that every commit is compared
+      - name: Compare with the baselines (or record them)
+        run: |
+          if [ "${{ inputs.update }}" = "true" ] || [ ! -d tests/snapshots ]; then
+            npx playwright test --update-snapshots
+            git config user.name "finn-bot"; git config user.email "finn-bot@users.noreply.github.com"
+            git add tests/snapshots && (git diff --cached --quiet || git commit -m "visual baselines $(date -u +%Y-%m-%d)") && git push
+          else
+            npx playwright test
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: { name: visual-report, path: "playwright-report\ntest-results", retention-days: 14 }

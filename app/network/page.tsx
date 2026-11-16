@@ -1,24 +1,30 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
-import { oneIn, pct } from "@/lib/client/format";
-import { fieldMove } from "@/lib/portfolio/risk.ts";
-import { Avatar, Meter, ReachPath } from "@/components/People";
-import { Sheet, useOpenPerson } from "@/components/Shell";
-import { ago, day } from "@/lib/client/format";
+import { Detail, Sheet, State, useOpenPerson, useWide } from "@/components/Shell";
+import { RangeBar } from "@/components/Viz";
+import { ago, day, monthYear, oneIn, signed } from "@/lib/client/format";
+import { useHoldings } from "@/lib/client/holdings";
 import { readLog, type Suggestion, useStore } from "@/lib/client/store";
-import { monthsSince, strengthWord, tieStrength } from "@/lib/network/graph.ts";
-import type { Network } from "@/lib/network/types.ts";
+import { monthsSince, pctRange, tieStrength } from "@/lib/network/graph.ts";
+import type { Network, Person } from "@/lib/network/types.ts";
+import { fieldMove, positions } from "@/lib/portfolio/risk.ts";
+
+type Group = "company" | "sector";
 
 export default function NetworkPage() {
-  const { net, graph, digest, publicPeople, replaceNetwork, custom, market, loadMarket } = useStore();
-  useEffect(loadMarket, [loadMarket]);
+  const { net, graph, digest, publicPeople, replaceNetwork, custom, market, loadMarket, error } = useStore();
+  const { holdings, expect } = useHoldings();
   const open = useOpenPerson();
-  const [theme, setTheme] = useState("specialty-chemicals");
+  const wide = useWide();
+  const [q, setQ] = useState("");
+  const [group, setGroup] = useState<Group>("company");
+  const [only, setOnly] = useState<{ held: boolean; strong: boolean; quiet: boolean; sector: string }>({ held: false, strong: false, quiet: false, sector: "" });
   const [settings, setSettings] = useState(false);
   const [draft, setDraft] = useState("");
   const [bad, setBad] = useState<string | null>(null);
   const [log, setLog] = useState<Suggestion[]>([]);
   useEffect(() => { if (settings) setLog(readLog()); }, [settings]);
+  useEffect(loadMarket, [loadMarket]);
   const [pass, setPass] = useState("");
   const [vault, setVault] = useState<string | null>(null);
   async function backup() {
@@ -36,41 +42,59 @@ export default function NetworkPage() {
     catch (e) { setVault(e instanceof Error ? e.message : "Could not open that file."); }
   }
 
+
+  const pos = useMemo(() => (holdings && market ? positions(holdings, market, expect) : []), [holdings, market, expect]);
+  const matrix = useMemo(() => pos.map((p) => { const org = graph?.orgId(p.symbol); return { p, cv: org && graph ? graph.coverage(org, 1) : null }; }), [pos, graph]);
+  const covered = matrix.reduce((a, m) => a + m.p.weight * (m.cv?.covered ?? 0), 0);
+
   const noticed = useMemo(() => {
     if (!net || !graph || !digest) return [];
-    // a quiet tie + fresh news at a company they know from the inside = a natural reason to call
     const out = [];
     for (const c of net.contacts) {
       const quiet = monthsSince(c.tie!.last, graph.now);
       if (quiet < 9) continue;
       for (const r of c.roles) {
         const sym = graph.orgs.get(r.org)?.ticker ?? graph.orgs.get(graph.orgs.get(r.org)?.parent ?? "")?.ticker;
-        // someone who works at a holding is not a reason to call while it is in its results quiet period
-        if (sym && r.to === null && digest.companies[sym]?.quiet?.now) continue;
+        if (sym && r.to === null && digest.companies[sym]?.quiet?.now) continue; // works there, and it is in its results quiet period
         const ev = sym && digest.events.find((e) => e.symbol === sym && e.tier === "act");
-        if (ev) { out.push({ c, r, ev, quiet, weight: quiet * (r.to === null ? 1 : Math.pow(2, -(graph.now.year - r.to) / 5)) * c.tie!.closeness }); break; }
+        if (ev) { out.push({ c, r, ev, quiet }); break; }
       }
     }
-    return out.sort((a, b) => b.weight - a.weight).slice(0, 4);
+    return out.sort((a, b) => b.quiet * b.c.tie!.closeness - a.quiet * a.c.tie!.closeness).slice(0, 4);
   }, [net, graph, digest]);
-  // a whole field moving: two or more holdings in one field, together, beyond the market
   const shifts = useMemo(() => {
     if (!net || !graph || !digest || !market) return [];
     return net.themes.map((t) => {
       const syms = Object.keys(digest.companies).filter((s) => graph.themesOf(graph.orgId(s) ?? "").includes(t.id));
-      const mv = fieldMove(syms, market);
-      const expert = graph.expertise(t.id, 1)[0];
+      const mv = fieldMove(syms, market), expert = graph.expertise(t.id, 1)[0];
       return mv && mv.p <= 0.1 && expert ? { t, syms, mv, expert } : null;
-    }).filter((x): x is NonNullable<typeof x> => !!x).sort((a, b) => a.mv.p - b.mv.p).slice(0, 3);
+    }).filter((x): x is NonNullable<typeof x> => !!x).slice(0, 3);
   }, [net, graph, digest, market]);
-  const doors = useMemo(() => (graph ? graph.connectors(publicPeople, 3).filter((c) => c.doors.length > 0) : []), [graph, publicPeople]);
-  const experts = useMemo(() => (graph ? graph.expertise(theme, 5) : []), [graph, theme]);
-  const themes = useMemo(() => (net && graph ? net.themes.filter((t) => graph.expertise(t.id, 1).length) : []), [net, graph]);
-  const inNews = useMemo(() => (graph ? publicPeople.map((p) => ({ p, routes: graph.reach(p) })).filter((x) => x.routes.length).sort((a, b) => b.routes[0].strength - a.routes[0].strength).slice(0, 4) : []), [graph, publicPeople]);
+  const reachable = useMemo(() => (graph ? publicPeople.map((p) => ({ p, r: graph.reach(p)[0] })).filter((x) => x.r && x.r.hi >= 0.05).sort((a, b) => b.r.hi - a.r.hi).slice(0, 5) : []), [graph, publicPeople]);
 
-  if (!net || !graph || !digest) return <div className="top"><div className="brand">People<i>.</i></div><div style={{ marginTop: 24 }}><div className="skel" /></div></div>;
-  const ranked = [...net.contacts].sort((a, b) => tieStrength(b, graph.now) - tieStrength(a, graph.now));
+  const groups = useMemo(() => {
+    if (!net || !graph || !digest) return [];
+    const held = new Set(Object.keys(digest.companies));
+    const text = q.trim().toLowerCase();
+    const keep = (c: Person) => {
+      const t = tieStrength(c, graph.now), m = monthsSince(c.tie!.last, graph.now);
+      const tickers = c.roles.map((r) => graph.orgs.get(r.org)?.ticker ?? graph.orgs.get(graph.orgs.get(r.org)?.parent ?? "")?.ticker).filter(Boolean) as string[];
+      const sectors = c.roles.flatMap((r) => graph.themesOf(r.org));
+      return (!text || `${c.name} ${c.headline} ${c.roles.map((r) => graph.orgName(r.org)).join(" ")}`.toLowerCase().includes(text))
+        && (!only.held || tickers.some((s) => held.has(s))) && (!only.strong || t >= 0.5) && (!only.quiet || m >= 9) && (!only.sector || sectors.includes(only.sector));
+    };
+    const by = new Map<string, Person[]>();
+    for (const c of net.contacts.filter(keep)) {
+      const latest = [...c.roles].sort((a, b) => (b.to ?? 9999) - (a.to ?? 9999))[0];
+      const key = group === "company" ? graph.orgName(latest.org) : graph.themeLabel(graph.themesOf(latest.org)[0] ?? c.roles.flatMap((r) => graph.themesOf(r.org))[0] ?? "Other");
+      by.set(key, [...(by.get(key) ?? []), c]);
+    }
+    return [...by].map(([k, v]) => [k === "undefined" ? "Other" : k, v.sort((a, b) => tieStrength(b, graph.now) - tieStrength(a, graph.now))] as const).sort((a, b) => b[1].length - a[1].length || a[0].localeCompare(b[0]));
+  }, [net, graph, digest, q, only, group]);
 
+  if (error) return <State kind="error" title="Your network could not be loaded">Reload to try again. Nothing has been lost; the network is stored on this device.</State>;
+  if (!net || !graph || !digest) return <State kind="loading" />;
+  const shown = groups.reduce((a, [, v]) => a + v.length, 0);
   function save() {
     try {
       const parsed = JSON.parse(draft) as Network;
@@ -80,105 +104,78 @@ export default function NetworkPage() {
     } catch (e) { setBad(e instanceof Error ? e.message : "Not valid JSON."); }
   }
 
+
+  const insight = (
+    <>
+      <div className="sub" style={{ marginTop: 0 }}>Coverage of the book, business by business: {(covered * 100).toFixed(0)}%</div>
+      <p className="tiny">Each holding is the businesses it reports. A name in green can explain that business; orange means no one can.</p>
+      {matrix.map(({ p, cv }) => cv && (
+        <div key={p.symbol} className="one" style={{ gridTemplateColumns: "104px 1fr", font: "var(--d)", alignItems: "start" }}>
+          <span><b>{p.symbol}</b> <span className="faint">{(p.weight * 100).toFixed(0)}%</span></span>
+          <span>{cv.segments.map((x, i) => <span key={x.segment.id}>{i ? " · " : ""}{cv.segments.length > 1 ? `${x.segment.label}: ` : ""}
+            {x.leads[0] ? <button className="pname" onClick={() => open(x.leads[0].person.id)}>{x.leads[0].person.name}</button> : <span style={{ color: "var(--alert)" }}>no one</span>}</span>)}</span>
+        </div>))}
+
+      {noticed.length > 0 && <><div className="sub">A reason to get back in touch</div>
+        {noticed.map(({ c, r, ev, quiet }) => (
+          <button key={c.id} className="rowi" onClick={() => open(c.id)}>
+            <span className="pname">{c.name}</span> <span className="tiny">quiet for {ago(quiet).replace(" ago", "")}</span>
+            <span className="line2" style={{ display: "block" }}>{graph.orgName(r.org)}, where {c.name.split(" ")[0]} {r.to === null ? "is" : "was"} {r.title.split(",")[0]}, filed on {day(ev.at)}: {ev.title}</span>
+          </button>))}</>}
+
+      {shifts.length > 0 && <><div className="sub">A field is moving</div>
+        {shifts.map(({ t, syms, mv, expert }) => (
+          <button key={t.id} className="rowi" onClick={() => open(expert.person.id)}>
+            <b>{t.label}</b>: {syms.join(" and ")} moved <b className={mv.move >= 0 ? "up" : "down"}>{signed(mv.move)}</b> against the market over five sessions together ({oneIn(mv.p)} such stretches).
+            <span className="line2" style={{ display: "block" }}><span className="pname">{expert.person.name}</span> can explain the public context: {expert.years} years in the field.</span>
+          </button>))}</>}
+
+      {reachable.length > 0 && <><div className="sub">People in this month’s filings you can reach</div>
+        {reachable.map(({ p, r }) => (
+          <button key={p.id} className="one" style={{ gridTemplateColumns: "1fr auto", alignItems: "center" }} onClick={() => open(p.id)}>
+            <span>{p.name} <span className="tiny">{p.headline}</span><span className="line2" style={{ display: "block", font: "var(--d)", color: "var(--ink-2)" }}>via <span className="pname">{r.via?.name ?? "you"}</span></span></span>
+            <RangeBar lo={r.lo} hi={r.hi} width={90} />
+          </button>))}</>}
+    </>
+  );
+
   return (
     <>
       <header className="top">
-        <div className="row between"><div className="brand">People<i style={{ color: "var(--people)" }}>.</i></div>
-          <button className="tiny link" onClick={() => setSettings(true)}>{net.contacts.length} people · on this device</button></div>
-        <p className="lede">What your network knows that the filings don’t.</p>
+        <h1 className="lede">{net.contacts.length} people, covering {(covered * 100).toFixed(0)}% of the book</h1>
+        <p className="tiny" style={{ marginTop: 2 }}>{net.synthetic ? "Synthetic demo network" : "Your network"}, kept on this device · <button className="link" onClick={() => setSettings(true)}>privacy, backup and the suggestion log</button></p>
+        <div className="search" style={{ marginTop: 12 }}><input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search a name, a company, a role" aria-label="Search people" /></div>
+        <div className="chips" role="group" aria-label="Filters">
+          <button className={`chip ${group === "company" ? "on" : ""}`} aria-pressed={group === "company"} onClick={() => setGroup("company")}>By company</button>
+          <button className={`chip ${group === "sector" ? "on" : ""}`} aria-pressed={group === "sector"} onClick={() => setGroup("sector")}>By sector</button>
+          <button className={`chip ${only.held ? "on" : ""}`} aria-pressed={only.held} onClick={() => setOnly({ ...only, held: !only.held })}>At a holding</button>
+          <button className={`chip ${only.strong ? "on" : ""}`} aria-pressed={only.strong} onClick={() => setOnly({ ...only, strong: !only.strong })}>Tie 50% or more</button>
+          <button className={`chip ${only.quiet ? "on" : ""}`} aria-pressed={only.quiet} onClick={() => setOnly({ ...only, quiet: !only.quiet })}>Not spoken in 9 months</button>
+          <label className={`chip ${only.sector ? "on" : ""}`}><select value={only.sector} onChange={(e) => setOnly({ ...only, sector: e.target.value })} aria-label="Sector" style={{ border: 0, background: "transparent", font: "inherit", color: "inherit" }}>
+            <option value="">Any sector</option>{net.themes.map((t) => <option key={t.id} value={t.id}>{t.label}</option>)}</select></label>
+        </div>
       </header>
 
-      {noticed.length > 0 && (
-        <section className="section">
-          <div className="head"><span className="caps" style={{ color: "var(--people)" }}>A reason to get back in touch</span></div>
-          {noticed.map(({ c, r, ev, quiet }) => (
-            <button key={c.id} className="card" style={{ width: "100%", display: "block" }} onClick={() => open(c.id)}>
-              <span className="row" style={{ alignItems: "flex-start", gap: 11 }}>
-                <Avatar person={c} />
-                <span className="grow">
-                  <b>{c.name}</b> <span className="faint small">· quiet for {ago(quiet).replace(" ago", "")}</span>
-                  <span style={{ display: "block", marginTop: 4 }}>{graph.orgName(r.org)}, where {c.name.split(" ")[0]} {r.to === null ? "is" : "was"} {r.title.split(",")[0]}, just filed: <b>{ev.title}</b>.</span>
-                  <span className="small muted" style={{ display: "block", marginTop: 4 }}>{day(ev.at)} · {c.tie!.note ?? c.tie!.how}</span>
-                </span>
-              </span>
-            </button>
-          ))}
-        </section>
-      )}
+      {!wide && <section className="section">{insight}</section>}
 
-      {shifts.length > 0 && (
-        <section className="section">
-          <div className="head"><span className="caps" style={{ color: "var(--matter)" }}>A field is moving</span></div>
-          {shifts.map(({ t, syms, mv, expert }) => (
-            <button key={t.id} className="card" style={{ width: "100%", display: "block" }} onClick={() => open(expert.person.id)}>
-              <span style={{ display: "block" }}><b>{t.label}:</b> {syms.join(" and ")} have moved <b className={mv.move >= 0 ? "up" : "down"}>{pct(mv.move, 1)}</b> against the market over five sessions, together. A stretch like that comes {oneIn(mv.p)} times.</span>
-              <span className="row" style={{ marginTop: 9, gap: 9 }}><Avatar person={expert.person} /><span className="grow small"><b style={{ color: "var(--people)" }}>{expert.person.name} can explain the public context</b><span className="muted" style={{ display: "block" }}>{expert.years} years in the field · {expert.roles[0].title}, {graph.orgName(expert.roles[0].org)}</span></span></span>
-            </button>
-          ))}
-        </section>
-      )}
-
-      {doors.length > 0 && (
-        <section className="section">
-          <div className="head"><span className="caps">Who opens the most doors</span></div>
-          <div className="card" style={{ padding: "2px 14px" }}>
-            {doors.map((c) => (
-              <button key={c.person.id} className="hit" onClick={() => open(c.person.id)}>
-                <Avatar person={c.person} />
-                <span className="grow"><b>{c.person.name}</b><span className="small muted" style={{ display: "block" }}>Likely knows {c.doors.slice(0, 3).map((p) => p.name).join(", ")}{c.doors.length > 3 ? ` and ${c.doors.length - 3} more` : ""}</span></span>
-                <span className="tiny faint">{c.doors.length} in filings</span>
-              </button>
-            ))}
+      <section className="section">
+        {shown === 0 ? <State kind="empty" title="No one matches">Clear a filter or the search to see all {net.contacts.length} people.</State> : groups.map(([name, list]) => (
+          <div key={name} style={{ marginTop: 14 }}>
+            <div className="sub" style={{ margin: "0 0 2px" }}>{name} <span className="faint" style={{ fontWeight: 400 }}>{list.length}</span></div>
+            {list.map((c) => {
+              const m = monthsSince(c.tie!.last, graph.now);
+              return (
+                <button key={c.id} className="one" style={{ gridTemplateColumns: "1fr auto" }} onClick={() => open(c.id)}>
+                  <span><span className="pname">{c.name}</span><span className="line2" style={{ display: "block", font: "var(--d)", color: "var(--ink-2)" }}>{c.headline}</span></span>
+                  <span className="d" style={{ textAlign: "right" }}><b style={{ color: "var(--ink)" }}>tie {Math.round(tieStrength(c, graph.now) * 100)}%</b><br /><span style={m >= 9 ? { color: "var(--alert)" } : undefined}>last spoke {monthYear(c.tie!.last)}</span></span>
+                </button>
+              );
+            })}
           </div>
-          <p className="tiny faint" style={{ marginTop: 8 }}>Ranked by a random walk from you through your ties and their likely acquaintances (personalised PageRank), counting people named in this month’s filings.</p>
-        </section>
-      )}
-
-      <section className="section">
-        <div className="head"><span className="caps">Who to ask about</span></div>
-        <div className="chips" style={{ marginTop: 0 }}>
-          {themes.map((t) => <button key={t.id} className={`chip people ${theme === t.id ? "on" : ""}`} onClick={() => setTheme(t.id)}>{t.label}</button>)}
-        </div>
-        <div className="card" style={{ padding: "2px 14px", marginTop: 10 }}>
-          {experts.map((x) => (
-            <button key={x.person.id} className="hit" onClick={() => open(x.person.id)}>
-              <Avatar person={x.person} />
-              <span className="grow">
-                <b>{x.person.name}</b>
-                <span className="small muted" style={{ display: "block" }}>{x.roles.map((r) => `${r.title.split(",")[0]}, ${graph.orgName(r.org)}`).slice(0, 2).join(" · ")}</span>
-                <span className="tiny faint"><Meter value={x.expertise} label="depth" /> {x.years}y in the field · <Meter value={x.tie} label="tie" /> {strengthWord(x.tie)} tie</span>
-              </span>
-            </button>
-          ))}
-        </div>
-        <p className="tiny faint" style={{ marginTop: 8 }}>Depth = years in the field, weighted by seniority and by how long ago. Nobody tagged themselves an expert; it is computed from careers.</p>
+        ))}
       </section>
 
-      {inNews.length > 0 && (
-        <section className="section">
-          <div className="head"><span className="caps">People in this month’s filings you can reach</span></div>
-          {inNews.map(({ p, routes }) => (
-            <div key={p.id} className="card">
-              <button className="row" style={{ width: "100%" }} onClick={() => open(p.id)}><Avatar person={p} /><span className="grow"><b>{p.name}</b><span className="small muted" style={{ display: "block" }}>{p.headline}</span></span>
-                <span className="tiny faint">{routes.length} route{routes.length === 1 ? "" : "s"}</span></button>
-              <ReachPath reach={routes[0]} target={p} />
-            </div>
-          ))}
-        </section>
-      )}
-
-      <section className="section">
-        <div className="head"><span className="caps">Everyone, warmest first</span></div>
-        <div className="card" style={{ padding: "2px 14px" }}>
-          {ranked.map((c) => (
-            <button key={c.id} className="hit" onClick={() => open(c.id)}>
-              <Avatar person={c} /><span className="grow"><b>{c.name}</b><span className="small muted clip" style={{ display: "block" }}>{c.headline}</span></span>
-              <Meter value={tieStrength(c, graph.now)} label="tie" />
-            </button>
-          ))}
-        </div>
-      </section>
-
+      {wide && <Detail fallback>{insight}</Detail>}
       {settings && (
         <Sheet onClose={() => setSettings(false)}>
           <h2 style={{ font: "600 21px/1.2 var(--serif)" }}>Your network stays with you</h2>

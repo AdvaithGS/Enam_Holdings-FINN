@@ -3,6 +3,7 @@ import Link from "next/link";
 import { use, useEffect, useMemo, useState } from "react";
 import { Chart, Seg } from "@/components/Chart";
 import { Spark } from "@/components/Moves";
+import { Guidance } from "@/components/Viz";
 import { Avatar, LeadLine } from "@/components/People";
 import { useOpenPerson } from "@/components/Shell";
 import { crore, num, pct, tone } from "@/lib/client/format";
@@ -13,7 +14,7 @@ const n = (v: unknown) => (typeof v === "number" ? v : null);
 const P = (v: number) => `${(v * 100).toFixed(1)}%`;
 const C = { blue: ["var(--blue)", "var(--blue-w)"], teal: ["var(--teal)", "var(--teal-w)"], violet: ["var(--violet)", "var(--violet-w)"], amber: ["var(--amber)", "var(--amber-w)"],
   rose: ["var(--rose)", "var(--rose-w)"], matter: ["var(--matter)", "var(--matter-wash)"], people: ["var(--people)", "var(--people-wash)"], ink: ["var(--ink)", "var(--wash)"] } as const;
-const VERDICT: Record<string, string> = { met: "var(--up)", partial: "var(--amber)", missed: "var(--down)", pending: "var(--blue)", not_measurable: "var(--ink-3)" };
+const VERDICT: Record<string, string> = { met: "var(--up)", partial: "var(--ink)", missed: "var(--down)", pending: "var(--ink-3)", not_measurable: "var(--rule)" };
 
 function Src({ ids, d }: { ids: string[]; d: Dossier }) {
   return <>{ids.map((id) => {
@@ -71,6 +72,8 @@ export default function Research({ params }: { params: Promise<{ symbol: string 
     const org = graph.orgId(symbol) ?? (d ? graph.orgId(d.name) : null);
     return org ? graph.coverage(org) : null;
   }, [graph, symbol, d]);
+
+  const commitments = useMemo(() => new Map((d?.call_extracts ?? []).flatMap((c) => c.commitments ?? []).map((c) => [c.id, c as typeof c & { low?: number; high?: number; unit?: string }])), [d]);
 
   if (error) return <div className="top"><Link href="/ask" className="small link">‹ Ask</Link><p className="lede">{error}</p></div>;
   if (!d) return <div className="top"><Link href="/ask" className="small link">‹ Ask</Link><p className="lede">{digest?.companies[symbol]?.name ?? symbol}</p><div className="skel" style={{ marginTop: 16 }} /><div className="skel" /></div>;
@@ -229,6 +232,8 @@ export default function Research({ params }: { params: Promise<{ symbol: string 
             {pvd.map((x) => (
               <div className="item" key={x.commitment_id}>
                 <div className="row between" style={{ alignItems: "flex-start" }}><b className="grow">{x.promised}</b><span className={`verdict ${x.verdict}`}>{x.verdict.replace("_", " ")}</span></div>
+                {(() => { const c = commitments.get(x.commitment_id); return c && c.low != null && c.unit === "percent"
+                  ? <Guidance low={c.low} high={c.high ?? c.low} actual={(x as { actual?: number }).actual} verdict={x.verdict} /> : null; })()}
                 <p className="muted" style={{ marginTop: 5 }}>{x.delivered}<Src ids={x.sources} d={d} />{x.by === "code" && <span className="src" title="Computed from reported numbers, not judged by a model">computed</span>}</p>
                 {x.by === "code" ? <p className="quote">“{x.quote}”</p> : <>
                   <button className="tiny link" style={{ marginTop: 6 }} onClick={() => setQuote(quote === x.commitment_id ? null : x.commitment_id)}>{quote === x.commitment_id ? "hide" : "their words"}</button>

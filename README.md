@@ -202,6 +202,15 @@ There is no free-roaming agent. The pipeline is a fixed sequence in which each s
 - Calibrate the half-hour reaction into the score once a longer intraday history is held (it needs a licensed source).
 - Position sizes, so "the portfolio" is weighted and not an equal-weight average.
 
+## Design rules
+
+- **Two panes on a laptop, one column on a phone.** The list is on the left; the selected item's evidence fills the right. Nothing is selected by accident: on a laptop the first thing that needs you is open.
+- **Size follows importance.** What needs you gets full width, its decomposition and its person. Worth a glance is one line. Set aside is a count.
+- **Three text sizes** (22, 15, 13 with tabular figures) and **five colour meanings**: grey for structure, green for people and nothing else, one up/down pair that always carries its sign, one alert colour for a breached line, and risk drawn neutral until it exceeds its share of money.
+- **Graphics only FINN can draw.** A move split into market, sector and own; rarity on a log scale; a route with the linking fact under each arrow and the chance as a range; guidance as a band with the result as a dot; money against risk as a dumbbell.
+- **Every underlined number opens its source**: the filing, the formula or the window behind it.
+- **Nothing ships unseen.** `npm run visual` (Playwright, in CI on every commit) renders every tab at 390 px and 1440 px against frozen data and compares with committed baselines; it also fails on any control under 44 px or without a focus outline. `npm run shots` does the same locally with only Firefox installed.
+
 ## Run it
 
 ```bash

@@ -273,7 +273,7 @@ a.tick:hover, a.n:hover { text-decoration: underline; }
 .stat.good, .stat.bad { background: none; }
 .mod { border: 0; border-top: 1px solid var(--rule); border-radius: 0; background: none; margin-top: 0; } .mod > button { padding: 12px 0; min-height: 44px; } .mod .body { padding: 0 0 16px; } .mod .ic { display: none; }
 .note, .who { border-radius: 8px; }
-.chip { border-radius: 8px; min-height: 36px; font: var(--d); } .chips { gap: 8px; }
+.chip { border-radius: 8px; min-height: 44px; font: var(--d); display: inline-flex; align-items: center; } .chips { gap: 8px; }
 .dot { display: none; } .sieve { display: none; }
 
 /* people: green text, no pills, no avatars, no meters */
@@ -318,3 +318,17 @@ th.sort { cursor: pointer; user-select: none; } th.sort[aria-sort] { color: var(
 .tblwrap { overflow-x: auto; margin: 0 -16px; padding: 0 16px; } @media (min-width: 1024px) { .tblwrap { margin: 0; padding: 0; } }
 .state { padding: 40px 0; color: var(--ink-2); } .state h2 { font: var(--h); color: var(--ink); margin-bottom: 6px; }
 .skel { border-radius: 4px; height: 18px; margin: 14px 0; }
+
+/* page-specific frames */
+@media (min-width: 1024px) {
+  .frame:has(.tblwide) { grid-template-columns: minmax(680px, 7fr) minmax(0, 5fr); }
+  .frame:has(.rhead) { display: block; max-width: 920px; } .frame:has(.rhead) #pane { display: none; }
+  .rhead { top: 45px; margin: 0; padding: 12px 0 0; }
+}
+.chart { max-width: 640px; } .mic { width: auto; height: auto; border-radius: 8px; padding: 0 12px; font: var(--d); }
+.tabs button { font: 600 15px/22px var(--sans); } .tabs button.on { border-color: var(--ink); }
+.mod .mt { font: 600 15px/22px var(--sans); } .mod .mh { font: var(--d); }
+.verdict { letter-spacing: 0; text-transform: none; font: 600 13px/18px var(--sans); background: none; padding: 0; color: var(--ink-2); }
+.verdict.met, .verdict.agree { background: none; color: var(--up); } .verdict.missed, .verdict.diverge { background: none; color: var(--down); } .verdict.partial, .verdict.mixed { background: none; color: var(--ink); }
+.src { font: 600 11px/16px var(--sans); background: none; padding: 0; border-bottom: 1px dotted var(--ink-3); border-radius: 0; margin-left: 6px; }
+.score button { color: var(--paper); }

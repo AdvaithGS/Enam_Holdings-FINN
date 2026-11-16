@@ -7,3 +7,6 @@ __pycache__/
 data/cache/http/
 .vercel/
 tsconfig.tsbuildinfo
+shots/
+playwright-report/
+test-results/

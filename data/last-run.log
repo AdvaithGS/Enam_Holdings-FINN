@@ -1,11 +1,11 @@
-FINN digest  2026-11-14 23:53 IST  window 2026-10-10 .. 2026-11-14
+FINN digest  2026-11-15 17:49 IST  window 2026-10-11 .. 2026-11-15
 baseline P(noticed | no filing) = 0.071; 'what matters' cut-off = 3x = 0.214
 market volume: 600 sessions from constituent medians (bhavcopy), 1235 with aggregate NIFTY 500 turnover as fallback
 prices: 20 stocks, latest session 2026-11-13; fx {'USD': 94.24, 'EUR': 103.8619, 'GBP': 124.4628}
 quiet period (quarter ended 2026-09-30): KAYNES
-filings: 291 in window
+filings: 288 in window
 opaque titles opened locally: 79 (OCR pages: 4)
-events after folding: 213
+events after folding: 211
 intraday: 24 filings timed during trading hours
 merged 2 events that were the same disclosure under two categories
   sector model RELIANCE: no peer factor passes
@@ -31,7 +31,7 @@ merged 2 events that were the same disclosure under two categories
 moves without a filing: 123 examined, 82 with a supported explanation
 risk: 20x20 covariance over 250 sessions, 1 eigenvalue(s) above the Marchenko-Pastur edge kept, the rest flattened
 
---- WHAT MATTERS (34)
+--- WHAT MATTERS (36)
   0.94 RELIANCE   2026-10-30 Results          Q2 FY27: revenue +29%, PAT +34% YoY
          . The stock moved +9.8% vs market on 5.8x volume that session; for its volatility at the time, a day this unusual comes about 1 in 501. This event carries 88% of the credit among 2 that session.
   0.90 DEEPAKNTR  2026-10-29 Results          Q2 FY27: revenue +62%, PAT +235% YoY
@@ -47,6 +47,9 @@ risk: 20x20 covariance over 250 sessions, 1 eigenvalue(s) above the Marchenko-Pa
   0.85 TCS        2026-10-15 Business update  TCS launches Industrial Intelligence Foundry for AI-led autonomy and engineering
          . ₹282,720 cr is 1.3e+02x this company's SEBI materiality line (₹2,145 cr, 2% of net worth)
          . For scale: ₹282,720 cr is 32.46% of the company's market value (₹871,055 cr) and 5.8 years of its operating cash flow (3-year average ₹48,447 cr). Shown for scale; not in the score.
+  0.85 KAYNES     2026-11-15 Business update  Kaynes Technology approved a joint venture with Toyokawa Techno and voluntary strike-off o
+         . ₹4,279 cr is 3.1e+02x this company's SEBI materiality line (₹14 cr, 5% of 3-year average profit)
+         . For scale: ₹4,279 cr is 18.56% of the company's market value (₹23,057 cr). Shown for scale; not in the score.
   0.84 LT         2026-10-27 Results          Q2 FY27: revenue +16%, PAT +27% YoY
          . The stock moved +4.0% vs market on 3.2x volume that session; for its volatility at the time, a day this unusual comes about 1 in 167. This event carries 88% of the credit among 2 that session.
   0.84 SUNPHARMA  2026-10-12 Fund raise       Board approved issuing non-convertible debentures up to INR 10,000 Crore and noted Gautam 
@@ -94,6 +97,7 @@ risk: 20x20 covariance over 250 sessions, 1 eigenvalue(s) above the Marchenko-Pa
   0.42 MARUTI     2026-10-27 Results          Q2 FY27: revenue +26%, PAT -26% YoY
   0.42 ITC        2026-11-02 Results          Q2 FY27: revenue +44%, PAT -18% YoY
   0.42 BHARTIARTL 2026-11-05 Results          Q2 FY27: revenue +17%, PAT +24% YoY
+  0.42 KAYNES     2026-11-14 Results          Q2 FY27: revenue +5%, PAT -67% YoY
   0.39 DIXON      2026-10-30 Management       Prithvi Vachani joins as Executive Director
          . Prithvi Vachani, Executive Director: senior executive
          . The stock moved +9.8% vs market on 6.0x volume that session; for its volatility at the time, a day this unusual comes about 1 in 125. This event carries 25% of the credit among 3 that session.
@@ -141,7 +145,7 @@ risk: 20x20 covariance over 250 sessions, 1 eigenvalue(s) above the Marchenko-Pa
   0.12 LT         2026-10-27 Business update  Secured major design and build orders for two systems packages of Dhaka Metro Line 1
          . Filed at 10:16. In the next 30 minutes the volume-weighted price moved +0.01% against the session so far on 0.7x the usual volume for that time of day: nothing unusual for that time of day (n=1,299). Shown as evidence; not in the score.
   0.12 MARUTI     2026-11-01 Business update  Production volume for October 2026 reached 260,003 units
-  0.12 LT         2026-11-02 Business update  L&T Wins Orders (Significant*) for Residential, Commercial Buildings & Factories Business
+  0.12 LT         2026-11-02 Business update  Wins significant orders for residential, commercial buildings and factories business
          . Filed at 10:18. In the next 30 minutes the volume-weighted price moved +0.54% against the session so far on 2.8x the usual volume for that time of day: a half hour like that comes about 1 in 16 at that time of day (n=1,299). Shown as evidence; not in the score.
   0.12 SUNPHARMA  2026-11-02 Business update  The Exchange has sought clarification from Sun Pharmaceutical Industries Limited with resp
          . Filed at 14:18. In the next 30 minutes the volume-weighted price moved +0.16% against the session so far on 1.5x the usual volume for that time of day: nothing unusual for that time of day (n=1,244). Shown as evidence; not in the score.
@@ -169,7 +173,7 @@ risk: 20x20 covariance over 250 sessions, 1 eigenvalue(s) above the Marchenko-Pa
   0.09 CGPOWER    2026-10-29 M&A              Axiro Semiconductor invests in ThinSiC as lead investor and strategic partner
          . Filed at 12:23. In the next 30 minutes the volume-weighted price moved -0.10% against the session so far on 0.8x the usual volume for that time of day: nothing unusual for that time of day (n=1,471). Shown as evidence; not in the score.
   0.09 LT         2026-10-31 M&A              Completion timeline for sale of L&T Network Services to Vyoma.AI extended to March 31, 202
-  0.09 ITC        2026-11-02 M&A              Amalgamation/Merger
+  0.09 ITC        2026-11-02 M&A              Board approved the amalgamation of wholly owned subsidiary Sproutlife Foods Private Limite
   0.09 KAYNES     2026-11-12 M&A              Executed a binding term sheet with Vishay Intertechnology and Ecomal Nederland to establis
   0.09 RELIANCE   2026-10-24 Fund raise       Jio Platforms Limited finalises IPO issue price at 1,119 per equity share and files prospe
   0.09 BAJFINANCE 2026-11-10 Fund raise       Allotment of 5,74,25,740 warrants convertible into equity shares to Bajaj Finserv Limited
@@ -195,6 +199,6 @@ risk: 20x20 covariance over 250 sessions, 1 eigenvalue(s) above the Marchenko-Pa
 --- THE CLOSE 2026-11-13: portfolio -0.42%, NIFTY -0.61%, alpha +0.21% (1 in 2); 7 up, 12 down; regime normal; rotation -0.72
     sectors vs NIFTY: Energy +0.64%, FMCG +0.61%, Infra +0.26%, Pharma +0.13%, IT -0.11%, Bank -0.18%, Metal -0.37%, Auto -0.46%, Realty -0.78%
     world: Nikkei 225 +0.53% (11-13), Hang Seng -1.55% (11-13), Shanghai -0.59% (11-13), KOSPI -0.98% (11-13), NIFTY 50 -0.61% (11-13), DAX -0.08% (11-13), Euro Stoxx 50 -0.19% (11-13), FTSE 100 +0.36% (11-13), S&P 500 -0.40% (11-13), Nasdaq -0.91% (11-13)
---- SET ASIDE (130 events, 148 filings)
+--- SET ASIDE (126 events, 143 filings)
 
-run: {'filings': 291, 'events': 211, 'documents_read': 62, 'tiers': {'act': {'events': 34, 'filings': 81}, 'glance': {'events': 47, 'filings': 62}, 'aside': {'events': 130, 'filings': 148}}, 'llm': {'calls': 51, 'cache_hits': 11, 'input_tokens': 86322, 'output_tokens': 6710, 'by_tier': {'lite': {'calls': 51, 'model': 'gemini-3.5-flash-lite'}}}, 'http': {'fetched': 84, 'cached': 2606, 'bytes': 11508527}, 'seconds': 952.6, 'ocr_pages': 7, 'llm_available': True}
+run: {'filings': 288, 'events': 209, 'documents_read': 65, 'tiers': {'act': {'events': 36, 'filings': 83}, 'glance': {'events': 47, 'filings': 62}, 'aside': {'events': 126, 'filings': 143}}, 'llm': {'calls': 3, 'cache_hits': 62, 'input_tokens': 7063, 'output_tokens': 364, 'by_tier': {'lite': {'calls': 3, 'model': 'gemini-3.5-flash-lite'}}}, 'http': {'fetched': 352, 'cached': 2344, 'bytes': 19630955}, 'seconds': 545.6, 'ocr_pages': 7, 'llm_available': True}
