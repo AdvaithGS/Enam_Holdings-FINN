@@ -332,3 +332,6 @@ th.sort { cursor: pointer; user-select: none; } th.sort[aria-sort] { color: var(
 .verdict.met, .verdict.agree { background: none; color: var(--up); } .verdict.missed, .verdict.diverge { background: none; color: var(--down); } .verdict.partial, .verdict.mixed { background: none; color: var(--ink); }
 .src { font: 600 11px/16px var(--sans); background: none; padding: 0; border-bottom: 1px dotted var(--ink-3); border-radius: 0; margin-left: 6px; }
 .score button { color: var(--paper); }
+
+/* every standalone control is a 44px target; inline text buttons are exempt */
+main button:not(.n):not(.link):not(.pname), nav a { min-height: 44px; }
