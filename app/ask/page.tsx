@@ -3,6 +3,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Avatar, Meter } from "@/components/People";
 import { Detail, State, useWide } from "@/components/Shell";
+import { Icon } from "@/components/Viz";
 import { useOpenPerson } from "@/components/Shell";
 import { useStore } from "@/lib/client/store";
 import { strengthWord } from "@/lib/network/graph.ts";
@@ -164,7 +165,7 @@ export default function Ask() {
           <div className="head"><span className="caps">Companies in this business</span><span className="tiny faint">by share of revenue</span></div>
           <div className="card" style={{ padding: "2px 14px" }}>
             {hits.themed.map((h) => (
-              <div key={h.co.s} className="hit" style={{ display: "block" }}>
+              <div key={h.co.s} className="vcard">
                 <Link href={`/research/${h.co.s}`} className="row" style={{ gap: 11 }}><span className="tick">{h.co.s}</span><span className="grow"><b>{h.co.n.replace(/ (Ltd\.?|Limited)$/i, "")}</b>
                   <span className="small muted" style={{ display: "block" }}>{h.how}</span></span><span className="faint">›</span></Link>
                 {h.lead && <button className="cover row" style={{ gap: 6 }} onClick={() => open(h.lead!.person.id)}><Avatar person={h.lead.person} /><span><b>{h.lead.person.name}</b> can explain the public context</span></button>}
@@ -189,7 +190,7 @@ export default function Ask() {
 
       <section className="section">
         <div className="head"><span className="caps">{hits ? "Try another" : "Questions from your book and this week’s filings"}</span></div>
-        {!digest || !net ? <State kind="loading" /> : suggestions.map((s) => <button key={s.label} className="one" style={{ gridTemplateColumns: "1fr auto" }} onClick={() => setQ(s.q)}><span>{s.label}</span><span className="d">→</span></button>)}
+        {!digest || !net ? <State kind="loading" /> : <div>{suggestions.map((s) => <button key={s.label} className="qchip" onClick={() => setQ(s.q)}><Icon kind={/^who|reach/i.test(s.label) ? "person" : /companies/.test(s.label) ? "theme" : "company"} label="" />{s.label}</button>)}</div>}
       </section>
 
       {!hits && demo.length > 0 && (

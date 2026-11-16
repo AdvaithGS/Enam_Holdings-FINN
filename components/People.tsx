@@ -14,7 +14,7 @@ export function Avatar(_: { person: Person; lg?: boolean }) { return null; }
 
 /** A strength, as a number. */
 export function Meter({ value }: { value: number; label?: string }) {
-  return <span className="num">{Math.round(value * 100)}%</span>;
+  return <span className="num">{Math.round(value * 100)} of 100</span>;
 }
 
 export function TieLine({ person }: { person: Person }) {
@@ -58,7 +58,7 @@ export function LeadLine({ lead, verb, about }: { lead: Lead; verb?: string; abo
         <span className="name">{verb?.startsWith("Other") ? "On the other side: " : ""}{lead.person.name}</span>
         <span className="why"> can explain the public context. {lead.why}</span>
         <span className="meta" style={{ display: "block" }}>
-          tie {Math.round(lead.tie * 100)}% · <TieLine person={lead.person} />
+          tie {Math.round(lead.tie * 100)} of 100 ({strengthWord(lead.tie)}) · <TieLine person={lead.person} />
         </span>
         {lead.insider && <span className="caution" style={{ display: "block" }}>Works there now. Public context only; never unpublished information.</span>}
       </span>

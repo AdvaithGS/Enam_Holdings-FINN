@@ -34,7 +34,10 @@ export function Chart({ labels, series, height = 130, start, note }: { labels: s
         {series.map((s) => <span key={s.name}><i style={{ background: s.color }} />{s.name} <b>{s.values[i] === null ? "–" : (s.fmt ?? ((v: number) => v.toLocaleString("en-IN", { maximumFractionDigits: 0 })))(s.values[i]!)}</b></span>)}
         {note?.(i) && <span className="muted">{note(i)}</span>}
       </div>
-      <svg ref={ref} className="chart" viewBox={`0 0 ${W} ${H}`} role="img" aria-label={series.map((s) => s.name).join(", ")}
+      <table className="sr"><caption>{series.map((s) => s.name).join(", ")}</caption><tbody>
+        {labels.filter((_, k) => n <= 24 || k % Math.ceil(n / 24) === 0 || k === n - 1).map((l) => { const k = labels.indexOf(l); return <tr key={l}><th>{l}</th>{series.map((s) => <td key={s.name}>{s.values[k] ?? ""}</td>)}</tr>; })}
+      </tbody></table>
+      <svg ref={ref} className="chart" viewBox={`0 0 ${W} ${H}`} role="img" aria-label={`${series.map((s) => s.name).join(", ")}: ${labels[0]} to ${labels[n - 1]}. ${series.map((s) => { const v = s.values.filter((x): x is number => x !== null); return v.length ? `${s.name} from ${v[0].toFixed(2)} to ${v[v.length - 1].toFixed(2)}` : ""; }).join("; ")}`}
         onPointerDown={(e) => { (e.target as Element).setPointerCapture?.(e.pointerId); pick(e); }} onPointerMove={(e) => (e.buttons || e.pointerType === "mouse") && pick(e)}>
         {dense ? <line x1={x(i)} x2={x(i)} y1={padT} y2={H - padB} stroke="var(--ink-3)" strokeWidth="1" strokeDasharray="2 3" />
           : <rect x={i * step + 1} y={0} width={step - 2} height={H - padB + 2} rx="5" fill="var(--wash)" />}

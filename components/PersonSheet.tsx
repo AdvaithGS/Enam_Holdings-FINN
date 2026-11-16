@@ -33,7 +33,8 @@ export function PersonSheet({ id, onClose }: { id: string; onClose: () => void }
   const reach = person.tie ? [] : graph.reach(person).slice(0, 3);
   const tie = tieStrength(person, graph.now);
   return (
-    <Sheet onClose={onClose}>
+    <>
+      <button className="link small" onClick={onClose} style={{ minHeight: 44 }}>← Back</button>
       <div className="row" style={{ alignItems: "flex-start", gap: 12 }}>
         <Avatar person={person} lg />
         <div className="grow">
@@ -84,6 +85,6 @@ export function PersonSheet({ id, onClose }: { id: string; onClose: () => void }
         {person.tie ? (net.synthetic ? "Synthetic demo contact. Held on this device only." : "Held on this device only.")
           : <>Public record: {person.source?.url ? <a className="link" href={person.source.url} target="_blank" rel="noreferrer">{person.source.label}</a> : person.source?.label}</>}
       </p>
-    </Sheet>
+    </>
   );
 }

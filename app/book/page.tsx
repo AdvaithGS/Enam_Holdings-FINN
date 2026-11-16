@@ -1,10 +1,10 @@
 "use client";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { Chart, Seg } from "@/components/Chart";
 import { Spark } from "@/components/Moves";
-import { Detail, Sheet, State, useWide } from "@/components/Shell";
-import { Dumbbell, N } from "@/components/Viz";
+import { Detail, Sheet, State, useOnClose, useWide } from "@/components/Shell";
+import { Dumbbell, N, Treemap } from "@/components/Viz";
 import { crore, day, num, signed, tone } from "@/lib/client/format";
 import { useHoldings } from "@/lib/client/holdings";
 import { useStore } from "@/lib/client/store";
@@ -16,7 +16,7 @@ const COLS: { k: Key; label: string; how: string }[] = [
   { k: "weight", label: "Weight", how: "Value of the position ÷ value of the book, at the latest close." },
   { k: "ret", label: "Return", how: "Latest close ÷ your entry price − 1." },
   { k: "vsNifty", label: "vs NIFTY", how: "Return minus what the NIFTY 50 returned from your entry date to the latest close." },
-  { k: "gap", label: "vs pace", how: "Value now minus cost × (1 + your expected return)^(days held ÷ 365). The baseline is your own expected return, not the index." },
+  { k: "gap", label: "vs pace, ₹ lakh", how: "Value now minus cost × (1 + your expected return)^(days held ÷ 365). The baseline is your own expected return, not the index." },
   { k: "risk", label: "Risk vs money", how: "Open dot: share of the book's money. Solid dot: share of its variance (w·(Σw) ÷ w'Σw, covariance over 250 sessions with noise eigenvalues flattened). Orange when the risk share is larger." },
   { k: "cover", label: "Coverage", how: "Businesses of the company for which someone in your network can explain the public context. The matrix is on the People tab." },
 ];
@@ -30,6 +30,7 @@ export default function Book() {
   const [view, setView] = useState<"value" | "alpha">("value");
   const [settings, setSettings] = useState(false);
   const [how, setHow] = useState<Key | null>(null);
+  useOnClose(useCallback(() => setSel(null), []));
 
   const pos = useMemo(() => (holdings && market ? positions(holdings, market, expect) : []), [holdings, market, expect]);
   const r = useMemo(() => (market && pos.length ? risk(pos, market) : null), [pos, market]);
@@ -79,6 +80,11 @@ export default function Book() {
       </header>
 
       <section className="section">
+        <Treemap items={pos.map((p) => ({ id: p.symbol, w: p.weight, v: p.bench === null ? null : p.ret - p.bench }))} onPick={(id) => setSel(id)} />
+      </section>
+      <section className="section">
+        <div className="keys" style={{ marginBottom: 6 }}><span>Risk vs money:</span><span><svg width="12" height="12" aria-hidden><circle cx="6" cy="6" r="3.5" fill="var(--card)" stroke="var(--ink-3)" strokeWidth="1.5" /></svg> share of money</span>
+          <span><svg width="12" height="12" aria-hidden><circle cx="6" cy="6" r="4" fill="var(--ink)" /></svg> share of risk</span><span><svg width="12" height="12" aria-hidden><circle cx="6" cy="6" r="4" fill="var(--alert)" /></svg> risk larger than money</span></div>
         <div className="tblwrap tblwide">
           <table className="tbl">
             <thead><tr>
@@ -99,7 +105,7 @@ export default function Book() {
                     <td>{(p.weight * 100).toFixed(1)}%</td>
                     <td className={tone(p.ret)}>{signed(p.ret)}</td>
                     <td className={tone(p.ret - (p.bench ?? 0))}>{p.bench === null ? "–" : signed(p.ret - p.bench)}</td>
-                    <td className={tone(p.gap)}>{p.gap >= 0 ? "+" : "−"}{cr(Math.abs(p.gap))}</td>
+                    <td className={tone(p.gap)}>{p.gap >= 0 ? "+" : "−"}{(Math.abs(p.gap) / 1e5).toFixed(1)}</td>
                     <td>{share !== undefined ? <Dumbbell weight={p.weight} risk={share} max={maxShare} /> : "–"}</td>
                     <td className={cv && have === 0 ? "" : "dim"} style={cv && have === 0 ? { color: "var(--alert)" } : undefined}>{cv ? `${have} of ${cv.segments.length}` : "–"}</td>
                     <td style={{ width: 84 }}><Spark data={market.series[p.symbol].close.slice(-60)} up={p.ret >= 0} /></td>

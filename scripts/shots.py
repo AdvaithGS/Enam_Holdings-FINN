@@ -58,10 +58,10 @@ def main() -> None:
         for name, path, height in PAGES:
             if only and name not in only:
                 continue
-            for label, width in WIDTHS.items():
-                h = height if label == "laptop" else int(height * 1.8)
+            for label, width in [(f"{w}-{th}", px) for w, px in WIDTHS.items() for th in ("light", "dark")]:
+                h = height if label.startswith("laptop") else int(height * 1.8)
                 target = out / f"{name}-{label}.png"
-                q = urllib.parse.urlencode({"u": base + path, "w": width, "h": h, "s": 9})
+                q = urllib.parse.urlencode({"u": base + path + ("&" if "?" in path else "?") + "theme=" + label.split("-")[1], "w": width, "h": h, "s": 9})
                 subprocess.run(["firefox", "--headless", "--no-remote", "--profile", profile, f"--window-size={width},{h}",
                                 "--screenshot", str(target), f"http://127.0.0.1:{port}/?{q}"], capture_output=True, timeout=120)
                 print(target, target.stat().st_size if target.exists() else "MISSING")

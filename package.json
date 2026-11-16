@@ -10,7 +10,8 @@
     "test": "node --test --experimental-strip-types lib/network/*.test.ts lib/portfolio/*.test.ts lib/client/*.test.ts",
     "hits": "node --experimental-strip-types scripts/hit-rate.ts",
     "visual": "playwright test",
-    "shots": "python3 scripts/shots.py"
+    "shots": "python3 scripts/shots.py",
+    "contrast": "node scripts/contrast.mjs"
   },
   "engines": {
     "node": ">=20"
@@ -21,6 +22,8 @@
     "react-dom": "^19.3.1"
   },
   "devDependencies": {
+    "@fontsource-variable/anek-latin": "^5.3.0",
+    "@fontsource-variable/martian-mono": "^5.3.0",
     "@playwright/test": "^1.65.1",
     "@types/node": "^26.6.6",
     "@types/react": "^19.3.0",

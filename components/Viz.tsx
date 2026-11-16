@@ -21,7 +21,7 @@ export function N({ children, href, how, className }: { children: React.ReactNod
  * what is left, the stock's own, which is the only part drawn in ink.
  */
 export function Decomp({ market, sector, own, scale, labels = true }: { market: number; sector?: number; own: number; scale?: number; labels?: boolean }) {
-  const parts = [{ k: "market", v: market, c: "var(--rule)" }, ...(sector !== undefined ? [{ k: "sector", v: sector, c: "var(--ink-3)" }] : []), { k: "own", v: own, c: "var(--ink)" }];
+  const parts = [{ k: "market", v: market, c: "var(--d5)" }, ...(sector !== undefined ? [{ k: "sector", v: sector, c: "var(--d2)" }] : []), { k: "own", v: own, c: "var(--d1)" }];
   const W = 320, H = 14, mid = W / 2;
   const pos = parts.filter((p) => p.v > 0).reduce((a, p) => a + p.v, 0), neg = parts.filter((p) => p.v < 0).reduce((a, p) => a - p.v, 0);
   const max = scale ?? Math.max(pos, neg, 0.01), px = (mid - 4) / max;
@@ -37,7 +37,8 @@ export function Decomp({ market, sector, own, scale, labels = true }: { market: 
         })}
         <line x1={mid} x2={mid} y1="0" y2={H} stroke="var(--ink-2)" strokeWidth="1" />
       </svg>
-      {labels && <div className="legend">{parts.map((p) => <span key={p.k}>{p.k} <b className={p.k === "own" ? (p.v > 0 ? "up" : p.v < 0 ? "down" : "") : ""}>{signed(p.v)}</b></span>)}</div>}
+      <table className="sr"><caption>What the move was made of</caption><tbody>{parts.map((p) => <tr key={p.k}><th>{p.k}</th><td>{signed(p.v)}</td></tr>)}</tbody></table>
+      {labels && <div className="legend">{parts.map((p) => <span key={p.k}><i style={{ display: "inline-block", width: 9, height: 9, background: p.c, marginRight: 4 }} />{p.k} <b className={p.k === "own" ? (p.v > 0 ? "up" : p.v < 0 ? "down" : "") : ""}>{signed(p.v)}</b></span>)}</div>}
     </div>
   );
 }
@@ -115,5 +116,85 @@ export function Dumbbell({ weight, risk, max }: { weight: number; risk: number; 
       <circle cx={x(weight)} cy="6" r="3.5" fill="var(--card)" stroke="var(--ink-3)" strokeWidth="1.5" />
       <circle cx={x(risk)} cy="6" r="4" fill={over ? "var(--alert)" : "var(--ink)"} />
     </svg>
+  );
+}
+
+/* ---------------------------------------------------------------- v3: pictures first */
+
+const ICONS: Record<string, string> = {
+  results: "M4 20V10m6 10V4m6 16v-7m4 7H2", management_change: "M12 12a4 4 0 100-8 4 4 0 000 8zm-7 9a7 7 0 0114 0", m_and_a: "M4 12h7m0 0l-3-3m3 3l-3 3m12-3h-7m0 0l3-3m-3 3l3 3",
+  litigation: "M12 3v18m-7 0h14M5 7h14M5 7l-3 7h6L5 7zm14 0l-3 7h6l-3-7", capex: "M3 21V9l6 4V9l6 4V5h6v16H3z", fund_raise: "M12 3v18m4-14H10a3 3 0 000 6h4a3 3 0 010 6H8",
+  move: "M3 17l6-6 4 4 8-9m0 0h-5m5 0v5", person: "M12 12a4 4 0 100-8 4 4 0 000 8zm-7 9a7 7 0 0114 0", company: "M4 21V5l8-2v18m0-12l8 2v10M2 21h20", theme: "M4 6h16M4 12h10M4 18h13",
+  other: "M5 4h10l4 4v12H5V4zm9 0v5h5",
+};
+/** A category, as a glyph. Always paired with its word for screen readers. */
+export function Icon({ kind, label }: { kind: string; label?: string }) {
+  return <svg className="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" role="img" aria-label={label ?? kind}><path d={ICONS[kind] ?? ICONS.other} /></svg>;
+}
+
+/** Counts as one segmented bar; every segment carries its number and has a key underneath. */
+export function SegBar({ parts }: { parts: { label: string; n: number; color: string }[] }) {
+  const total = parts.reduce((a, p) => a + p.n, 0) || 1;
+  return (
+    <div role="img" aria-label={parts.map((p) => `${p.n} ${p.label}`).join(", ")}>
+      <div className="segbar">{parts.filter((p) => p.n > 0).map((p) => <span key={p.label} style={{ flex: Math.max(p.n / total, 0.08), background: p.color }}>{p.n}</span>)}</div>
+      <div className="keys">{parts.map((p) => <span key={p.label}><i style={{ background: p.color }} />{p.n} {p.label}</span>)}</div>
+    </div>
+  );
+}
+
+/** A few signed values as bars from a shared zero. */
+export function MiniBars({ rows, scale }: { rows: { label: string; v: number }[]; scale?: number }) {
+  const max = scale ?? Math.max(...rows.map((r) => Math.abs(r.v)), 0.001);
+  return (
+    <div role="img" aria-label={rows.map((r) => `${r.label} ${signed(r.v, 2)}`).join(", ")} style={{ display: "grid", gridTemplateColumns: "auto 1fr auto", gap: "4px 10px", alignItems: "center", font: "var(--d)" }}>
+      {rows.map((r) => (
+        <span key={r.label} style={{ display: "contents" }}>
+          <span style={{ color: "var(--ink-2)" }}>{r.label}</span>
+          <svg viewBox="0 0 200 12" preserveAspectRatio="none" style={{ width: "100%", height: 12 }} aria-hidden>
+            <line x1="100" x2="100" y1="0" y2="12" stroke="var(--ink-3)" /><rect x={r.v >= 0 ? 100 : 100 - (Math.abs(r.v) / max) * 98} y="2" width={Math.max(1, (Math.abs(r.v) / max) * 98)} height="8" fill={r.v >= 0 ? "var(--up)" : "var(--down)"} />
+          </svg>
+          <b className={r.v >= 0 ? "up" : "down"} style={{ fontFamily: "var(--mono)" }}>{r.v >= 0 ? "▲" : "▼"} {signed(r.v, 2)}</b>
+        </span>))}
+    </div>
+  );
+}
+
+/** A value against a threshold: how close a call came. */
+export function Against({ value, line, label }: { value: number; line: number; label: string }) {
+  const max = Math.max(value, line) * 1.25;
+  return (
+    <svg viewBox="0 0 200 14" preserveAspectRatio="none" style={{ width: "100%", height: 14 }} role="img" aria-label={label}>
+      <rect x="0" y="4" width="200" height="6" fill="var(--wash)" /><rect x="0" y="4" width={(value / max) * 200} height="6" fill="var(--ink-2)" />
+      <line x1={(line / max) * 200} x2={(line / max) * 200} y1="0" y2="14" stroke="var(--alert)" strokeWidth="3" />
+    </svg>
+  );
+}
+
+/** Holdings as areas: area = weight. Colour and an arrow say whether the holding beat the NIFTY. */
+export function Treemap({ items, onPick }: { items: { id: string; w: number; v: number | null }[]; onPick: (id: string) => void }) {
+  // slice-and-dice on the larger side: simple, stable, and readable for twenty holdings
+  const out: { id: string; v: number | null; w: number; x: number; y: number; dx: number; dy: number }[] = [];
+  let x = 0, y = 0, dx = 100, dy = 100, rest = items.reduce((a, i) => a + i.w, 0);
+  const list = [...items].sort((a, b) => b.w - a.w);
+  for (let i = 0; i < list.length;) {
+    const row = list.slice(i, i + (i < 4 ? 2 : 4)), sum = row.reduce((a, r) => a + r.w, 0), horiz = dx * 16 >= dy * 9, f = sum / rest;
+    let o = 0;
+    for (const r of row) { const g = r.w / sum; out.push(horiz ? { ...r, x, y: y + o * dy, dx: dx * f, dy: dy * g } : { ...r, x: x + o * dx, y, dx: dx * g, dy: dy * f }); o += g; }
+    if (horiz) { x += dx * f; dx *= 1 - f; } else { y += dy * f; dy *= 1 - f; }
+    rest -= sum; i += row.length;
+  }
+  return (
+    <>
+      <div className="tm" role="group" aria-label="Holdings by weight; colour shows return against the NIFTY">
+        {out.map((r) => (
+          <button key={r.id} onClick={() => onPick(r.id)} style={{ left: `${r.x}%`, top: `${r.y}%`, width: `${r.dx}%`, height: `${r.dy}%`, background: r.v === null ? "var(--ink-3)" : r.v >= 0 ? "var(--up)" : "var(--down)", opacity: r.v === null ? 1 : 0.55 + Math.min(0.45, Math.abs(r.v) * 1.5), color: "var(--paper)" }}
+            aria-label={`${r.id}, ${(r.w * 100).toFixed(1)} percent of the book, ${r.v === null ? "no benchmark" : `${signed(r.v)} against the NIFTY`}`}>
+            {r.dx > 9 && r.dy > 14 ? <>{r.id}<br />{r.v === null ? "" : `${r.v >= 0 ? "▲" : "▼"} ${signed(r.v, 0)}`}</> : r.dx > 6 ? r.id.slice(0, 4) : ""}
+          </button>))}
+      </div>
+      <div className="keys"><span><i style={{ background: "var(--up)" }} />▲ ahead of the NIFTY</span><span><i style={{ background: "var(--down)" }} />▼ behind it</span><span>area = weight; deeper = further</span></div>
+      <table className="sr"><caption>Holdings by weight and return against the NIFTY</caption><tbody>{list.map((r) => <tr key={r.id}><th>{r.id}</th><td>{(r.w * 100).toFixed(1)}%</td><td>{r.v === null ? "n/a" : signed(r.v)}</td></tr>)}</tbody></table>
+    </>
   );
 }

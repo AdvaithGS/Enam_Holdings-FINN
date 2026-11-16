@@ -8,7 +8,7 @@ import { PeopleBlocks, Results, useEventPeople } from "./EventCard";
 import { type Move, MoveChart } from "./Moves";
 import { LeadLine } from "./People";
 import { Detail } from "./Shell";
-import { Decomp, N, Rarity } from "./Viz";
+import { Decomp, Icon, N, Rarity } from "./Viz";
 
 const BETA = "Market share = this stock's beta (exponentially weighted, 90-session half-life) x the NIFTY's move. Sector share = its loading on the first principal component of its peers' market-adjusted returns, fitted on the 250 sessions before the window. Own = what is left.";
 const RARE = "Share of this stock's last 500 sessions with a market-adjusted move (in units of that day's GARCH volatility) or a volume, net of the market's, at least this large.";
@@ -31,26 +31,28 @@ function keyLine(e: FinnEvent): React.ReactNode {
   return e.summary;
 }
 
-/** An item that needs the investor: full width, with its decomposition and its person. */
+/** The one number that sizes an event, and what it is. */
+export function bigOf(e: FinnEvent): { v: string; cls: string; what: string } {
+  const pat = e.results?.rows.find((x) => x.key === "pat");
+  if (pat?.yoy != null) return { v: `${pat.yoy >= 0 ? "▲" : "▼"} ${signed(pat.yoy, 0)}`, cls: tone(pat.yoy), what: "PAT on last year" };
+  if (e.amount) return { v: `${e.amount.rho >= 10 ? e.amount.rho.toFixed(0) : e.amount.rho.toFixed(1)}×`, cls: e.amount.rho >= 1 ? "al" : "", what: "the materiality line" };
+  if (e.market?.abnormal != null) return { v: `${e.market.abnormal >= 0 ? "▲" : "▼"} ${signed(e.market.abnormal)}`, cls: tone(e.market.abnormal), what: "the stock's own move" };
+  return { v: pct(e.p, 0, false), cls: "", what: "chance it matters" };
+}
+
+/** An item that needs the investor: icon, ticker, one number, one picture. The words are in the card. */
 export function NeedRow({ e, selected, onSelect }: { e: FinnEvent; selected: boolean; onSelect: () => void }) {
   const { digest } = useStore();
   const { leads, reaches } = useEventPeople(e);
   const parts = digest ? partsOf(digest, e.symbol, e.session, e.market?.change, e.market?.abnormal) : null;
-  const p = rarityOf(e), route = reaches.find((r) => r.routes.length);
-  const line = keyLine(e);
+  const route = reaches.find((r) => r.routes.length), big = bigOf(e), who = route?.routes[0].via?.name ?? leads[0]?.person.name;
   return (
     <>
-      <button className="rowi" aria-current={selected} onClick={onSelect}>
-        <span className="meta1"><b>{e.symbol}</b><span>{e.label}</span><span style={{ marginLeft: "auto" }}>{day(e.at)}</span></span>
-        <span className="title" style={{ display: "block" }}>{e.results ? `${digest?.companies[e.symbol]?.name ?? e.symbol}, ${e.title}` : e.title}</span>
-        {line && <span className="line2" style={{ display: "block" }}>{line}</span>}
-        {parts && p !== null && p <= 0.1 && (
-          <span style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: 12, alignItems: "center", marginTop: 8 }}>
-            <Decomp market={parts.market} sector={parts.sector} own={parts.own} /><Rarity p={p} width={96} />
-          </span>
-        )}
-        {route ? <span className="line2" style={{ display: "block", marginTop: 6 }}>You → <span className="pname">{route.routes[0].via?.name ?? "directly"}</span> → {route.fp.name} · {pctRange(route.routes[0].lo, route.routes[0].hi)}</span>
-          : leads[0] ? <span className="line2" style={{ display: "block", marginTop: 6 }}><span className="pname">{leads[0].person.name}</span> can explain the public context</span> : null}
+      <button className="vrow" aria-current={selected} onClick={onSelect} aria-label={`${e.symbol}, ${e.label}: ${e.title}. ${big.v} ${big.what}`}>
+        <Icon kind={e.category} label={e.label} />
+        <span><b>{e.symbol}</b><br /><span className={`bign ${big.cls}`} style={big.cls === "al" ? { color: "var(--alert)" } : undefined} title={big.what}>{big.v}</span></span>
+        {parts ? <Decomp market={parts.market} sector={parts.sector} own={parts.own} labels={false} /> : <span className="tiny" style={{ textAlign: "right" }}>{big.what}</span>}
+        <span className="t">{e.title}{who && <span className="pname"> · {who}</span>}</span>
       </button>
       {selected && <Detail><EventDetail e={e} /></Detail>}
     </>
@@ -64,7 +66,7 @@ export function GlanceLine({ e, selected, onSelect }: { e: FinnEvent; selected: 
   return (
     <>
       <button className="one" aria-current={selected} onClick={onSelect}>
-        <b style={{ font: "var(--d)", fontWeight: 600 }}>{e.symbol}</b>
+        <span className="row" style={{ gap: 6 }}><Icon kind={e.category} label={e.label} /><b style={{ font: "var(--d)", fontWeight: 600 }}>{e.symbol}</b></span>
         <span>{e.title}{who && <span className="pname" style={{ font: "var(--d)", fontWeight: 600 }}> · {who}</span>}</span>
         <span className="d">{day(e.at).slice(0, 5)}</span>
       </button>
@@ -113,19 +115,15 @@ export function EventDetail({ e }: { e: FinnEvent }) {
   );
 }
 
-/** An unusual move: what it was made of, how rare, and the leading explanation. */
+/** An unusual move: ticker, the move, and what it was made of. */
 export function MoveRow({ m, selected, onSelect, scale }: { m: Move; selected: boolean; onSelect: () => void; scale: number }) {
   const parts = m.note?.parts ?? (m.abnormal != null ? { market: m.change - m.abnormal, own: m.abnormal } : null);
-  const why = m.note?.why ?? [];
   return (
     <>
-      <button className="rowi" aria-current={selected} onClick={onSelect}>
-        <span className="meta1"><b>{m.symbol}</b><b className={tone(m.change)}>{signed(m.change)}</b>{m.vol != null && <span>{m.vol.toFixed(1)}× own volume</span>}<span style={{ marginLeft: "auto" }}>{day(m.date)}</span></span>
-        <span style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: 12, alignItems: "center", marginTop: 6 }}>
-          {parts ? <Decomp market={parts.market} sector={parts.sector} own={parts.own} scale={scale} /> : <span />}
-          {m.p !== null && <Rarity p={m.p} width={96} />}
-        </span>
-        <span className="line2" style={{ display: "block", marginTop: 4 }}>{m.event ? <>Filed that session: {m.event.title}</> : why[0]?.text ?? "No filing that session."}</span>
+      <button className="vrow" aria-current={selected} onClick={onSelect} aria-label={`${m.symbol} moved ${signed(m.change)} on ${day(m.date)}`}>
+        <Icon kind="move" label="Unusual move" />
+        <span><b>{m.symbol}</b><br /><span className={`bign ${tone(m.change)}`}>{m.change >= 0 ? "▲" : "▼"} {signed(m.change)}</span></span>
+        <span>{parts && <Decomp market={parts.market} sector={parts.sector} own={parts.own} scale={scale} labels={false} />}{m.p !== null && <Rarity p={m.p} width={96} />}</span>
       </button>
       {selected && <Detail><MoveDetail m={m} /></Detail>}
     </>

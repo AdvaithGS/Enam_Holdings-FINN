@@ -1,9 +1,11 @@
 "use client";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { Against, MiniBars, SegBar } from "@/components/Viz";
+import { DateField } from "@/components/DateField";
 import { EventDetail, GlanceLine, MoveRow, NeedRow, shortfall } from "@/components/Brief";
 import { Close } from "@/components/Close";
 import { findMoves, ThresholdSheet } from "@/components/Moves";
-import { Detail, State, useWide } from "@/components/Shell";
+import { Detail, State, useOnClose, useWide } from "@/components/Shell";
 import { day, dayTime } from "@/lib/client/format";
 import { inWindow, useStore, WINDOWS, windowStart } from "@/lib/client/store";
 import type { FinnEvent } from "@/lib/types";
@@ -16,6 +18,8 @@ export default function Brief() {
   const [showAside, setShowAside] = useState(false);
   const [sheet, setSheet] = useState(false);
   const [allMoves, setAllMoves] = useState(false);
+  const [how, setHow] = useState(false);
+  useOnClose(useCallback(() => setSel(null), []));
   useEffect(loadMarket, [loadMarket]);
 
   const view = useMemo(() => {
@@ -49,16 +53,16 @@ export default function Brief() {
     <>
       <header className="top">
         <h1 className="lede">{view.act.length === 0 ? "Nothing needs you" : `${view.act.length} ${view.act.length === 1 ? "thing needs" : "things need"} you`}</h1>
-        <p className="counts">
+        <SegBar parts={[{ label: "need you", n: view.act.length, color: "var(--alert)" }, { label: "worth a glance", n: view.glance.length, color: "var(--d1)" }, { label: "set aside", n: view.rest.length, color: "var(--d5)" }]} />
+        {digest.close && <div style={{ marginTop: 12 }}><MiniBars rows={[{ label: "Your book", v: digest.close.portfolio.ret ?? 0 }, { label: "NIFTY", v: digest.close.portfolio.market ?? 0 }, { label: "Beyond market", v: digest.close.portfolio.alpha ?? 0 }]} /></div>}
+        <p className="counts sr">
           <b>{view.filings}</b> filings across {n} holdings became <b>{view.events.length}</b> events: <b className={view.act.length ? "al" : ""}>{view.act.length}</b> need you,{" "}
           <b>{view.glance.length}</b> worth a glance, <b>{view.rest.length}</b> set aside.
         </p>
         <p className="tiny" style={{ marginTop: 2 }}>Read {dayTime(digest.generated_at)} · prices to {day(digest.as_of)}</p>
         <div className="chips" role="tablist" aria-label="Window">
           {WINDOWS.map((w) => <button key={w.id} role="tab" aria-selected={prefs.window === w.id} className={`chip ${prefs.window === w.id ? "on" : ""}`} onClick={() => { setPrefs({ window: w.id }); setSel(null); }}>{w.label}</button>)}
-          <label className={`chip ${prefs.window === "since" ? "on" : ""}`}>
-            since <input type="date" value={prefs.since ?? ""} max={digest.generated_at.slice(0, 10)} onChange={(e) => e.target.value && setPrefs({ window: "since", since: e.target.value })} aria-label="Since date" />
-          </label>
+          <label className={`chip ${prefs.window === "since" ? "on" : ""}`}>since <DateField value={prefs.since} max={digest.generated_at.slice(0, 10)} onChange={(v) => setPrefs({ window: "since", since: v })} /></label>
         </div>
       </header>
 
@@ -74,7 +78,8 @@ export default function Brief() {
               <button className="rowi" aria-current={sel === e.id} onClick={() => pick(e.id)}>
                 <span className="meta1"><b>{e.symbol}</b><span>{e.label}</span><span style={{ marginLeft: "auto" }}>{day(e.at)}</span></span>
                 <span className="title" style={{ display: "block" }}>{e.title}</span>
-                <span className="line2" style={{ display: "block" }}>{shortfall(e, digest.model.act)}</span>
+                <Against value={e.p} line={digest.model.act} label={shortfall(e, digest.model.act)} />
+                <span className="tiny" style={{ display: "block" }}>{(e.p * 100).toFixed(0)}% against the {(digest.model.act * 100).toFixed(0)}% line</span>
               </button>
               {sel === e.id && <Detail><EventDetail e={e} /></Detail>}
             </div>
@@ -119,11 +124,12 @@ export default function Brief() {
         </section>
       )}
 
-      {wide ? (sel === null && first === null ? <Detail fallback><Close /></Detail> : null) : <Close />}
+      {wide && sel === null && first === null ? <Detail fallback><Close /></Detail> : null}
       {wide && (sel !== null || first !== null) && <section className="section"><button className="count" onClick={() => setSel("close")}><span>The close: how the session ended</span><span>→</span></button></section>}
       {wide && sel === "close" && <Detail fallback><Close /></Detail>}
 
-      <footer className="section tiny" style={{ lineHeight: "18px" }}>
+      <section className="section"><button className="count" onClick={() => setHow(!how)} aria-expanded={how}><span>How this was computed</span><span>{how ? "−" : "+"}</span></button></section>
+      <footer className="tiny" style={{ lineHeight: "20px", display: how ? "block" : "none" }}>
         The last refresh covered {digest.window_days} days: {digest.run.filings} filings in {digest.run.events} events
         {digest.run.tiers ? ` (${digest.run.tiers.act.events} that need you, ${digest.run.tiers.glance.events} worth a glance, ${digest.run.tiers.aside.events} set aside)` : ""}.
         A model read {digest.run.documents_read} of the documents ({digest.run.llm.calls} new, {digest.run.llm.cache_hits} from cache); {digest.run.ocr_pages} scanned pages went through local OCR.
