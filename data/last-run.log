@@ -1,11 +1,11 @@
-FINN digest  2026-11-24 07:09 IST  window 2026-10-20 .. 2026-11-24
+FINN digest  2026-11-24 20:00 IST  window 2026-10-20 .. 2026-11-24
 baseline P(noticed | no filing) = 0.071; 'what matters' cut-off = 3x = 0.214
 market volume: 600 sessions from constituent medians (bhavcopy), 1236 with aggregate NIFTY 500 turnover as fallback
-prices: 20 stocks, latest session 2026-11-23; fx {'USD': 92.9, 'EUR': 101.634, 'GBP': 121.4022}
+prices: 20 stocks, latest session 2026-11-23; fx {'USD': 92.9, 'EUR': 101.957, 'GBP': 121.6985}
 quiet period (quarter ended 2026-09-30): no holding is in one
-filings: 280 in window
-opaque titles opened locally: 80 (OCR pages: 3)
-events after folding: 203
+filings: 284 in window
+opaque titles opened locally: 81 (OCR pages: 3)
+events after folding: 206
 intraday: 24 filings timed during trading hours
 merged 3 events that were the same disclosure under two categories
   sector model RELIANCE: no peer factor passes
@@ -34,7 +34,7 @@ risk: 20x20 covariance over 250 sessions, 1 eigenvalue(s) above the Marchenko-Pa
 --- WHAT MATTERS (30)
   0.99 KAYNES     2026-11-15 Business update  Kaynes Technology approved a joint venture with Toyokawa Techno and voluntary strike-off o
          . ₹4,279 cr is 3.1e+02x this company's SEBI materiality line (₹14 cr, 5% of 3-year average profit)
-         . For scale: ₹4,279 cr is 22.60% of the company's market value (₹18,935 cr). Shown for scale; not in the score.
+         . For scale: ₹4,279 cr is 22.66% of the company's market value (₹18,883 cr). Shown for scale; not in the score.
          . The stock moved -13.6% vs market on 15.3x volume that session; for its volatility at the time, a day this unusual comes about 1 in 501. This event carries 86% of the credit among 4 that session.
   0.94 RELIANCE   2026-10-30 Results          Q2 FY27: revenue +29%, PAT +34% YoY
          . The stock moved +9.8% vs market on 5.8x volume that session; for its volatility at the time, a day this unusual comes about 1 in 501. This event carries 88% of the credit among 2 that session.
@@ -42,7 +42,7 @@ risk: 20x20 covariance over 250 sessions, 1 eigenvalue(s) above the Marchenko-Pa
          . The stock moved +2.5% vs market on 24.1x volume that session; for its volatility at the time, a day this unusual comes about 1 in 251.
   0.85 SRF        2026-10-21 Capex            Board approves setting up a manufacturing facility for aluminium foil for battery applicat
          . ₹600 cr is 8.1x this company's SEBI materiality line (₹74 cr, 5% of 3-year average profit)
-         . For scale: ₹600 cr is 0.80% of the company's market value (₹74,714 cr) and 0.3 years of its operating cash flow (3-year average ₹2,378 cr). Shown for scale; not in the score.
+         . For scale: ₹600 cr is 0.80% of the company's market value (₹74,545 cr) and 0.3 years of its operating cash flow (3-year average ₹2,378 cr). Shown for scale; not in the score.
          . The stock moved -4.9% vs market on 3.9x volume that session; for its volatility at the time, a day this unusual comes about 1 in 63. This event carries 76% of the credit among 2 that session.
          . Filed at 15:01. In the next 30 minutes the volume-weighted price moved -1.48% against the session so far on 6.0x the usual volume for that time of day: a half hour like that comes about 1 in 54 at that time of day (n=697). Shown as evidence; not in the score.
   0.84 LT         2026-10-27 Results          Q2 FY27: revenue +16%, PAT +27% YoY
@@ -51,7 +51,7 @@ risk: 20x20 covariance over 250 sessions, 1 eigenvalue(s) above the Marchenko-Pa
          . The stock moved +9.8% vs market on 6.0x volume that session; for its volatility at the time, a day this unusual comes about 1 in 125. This event carries 66% of the credit among 3 that session.
   0.76 PAYTM      2026-10-26 M&A              Board approves additional investments in subsidiaries Paytm Cloud Technologies and Paytm S
          . ₹500 cr is 11x this company's SEBI materiality line (₹44 cr, 5% of 3-year average profit)
-         . For scale: ₹500 cr is 0.45% of the company's market value (₹111,490 cr). Shown for scale; not in the score.
+         . For scale: ₹500 cr is 0.45% of the company's market value (₹111,170 cr). Shown for scale; not in the score.
   0.75 TITAN      2026-11-05 Results          Q2 FY27: revenue +10%, PAT +114% YoY
          . The stock moved +1.3% vs market on 5.6x volume that session; for its volatility at the time, a day this unusual comes about 1 in 125. This event carries 61% of the credit among 4 that session.
   0.72 KAYNES     2026-11-14 Results          Q2 FY27: revenue +5%, PAT -67% YoY
@@ -61,7 +61,7 @@ risk: 20x20 covariance over 250 sessions, 1 eigenvalue(s) above the Marchenko-Pa
          . Filed at 14:04. In the next 30 minutes the volume-weighted price moved -0.33% against the session so far on 17.9x the usual volume for that time of day: a half hour like that comes about 1 in 1429 at that time of day (n=1,418). Shown as evidence; not in the score.
   0.66 CGPOWER    2026-10-26 Business update  Subsidiary receives RDSO approval for Kavach 4.0 to execute previously announced order
          . ₹433 cr is 7.2x this company's SEBI materiality line (₹60 cr, 5% of 3-year average profit)
-         . For scale: ₹433 cr is 0.35% of the company's market value (₹124,613 cr) and 0.5 years of its operating cash flow (3-year average ₹882 cr). Shown for scale; not in the score.
+         . For scale: ₹433 cr is 0.35% of the company's market value (₹124,558 cr) and 0.5 years of its operating cash flow (3-year average ₹882 cr). Shown for scale; not in the score.
   0.65 SUNPHARMA  2026-10-30 Results          Q2 FY27: revenue +12%, PAT -36% YoY
          . The stock moved +0.7% vs market on 3.4x volume that session; for its volatility at the time, a day this unusual comes about 1 in 56. This event carries 88% of the credit among 2 that session.
   0.63 TRENT      2026-10-29 Management       Noel N. Tata retires as Chairman and Director
@@ -71,7 +71,7 @@ risk: 20x20 covariance over 250 sessions, 1 eigenvalue(s) above the Marchenko-Pa
          . The stock moved -5.2% vs market on 13.7x volume that session; for its volatility at the time, a day this unusual comes about 1 in 46. This event carries 79% of the credit among 3 that session.
   0.55 PAYTM      2026-11-19 M&A              Paytm Singapore Board approves partnership with Funding Societies, including a proposed in
          . ₹200 cr is 4.6x this company's SEBI materiality line (₹44 cr, 5% of 3-year average profit)
-         . For scale: ₹200 cr is 0.18% of the company's market value (₹111,490 cr). Shown for scale; not in the score.
+         . For scale: ₹200 cr is 0.18% of the company's market value (₹111,170 cr). Shown for scale; not in the score.
   0.52 SRF        2026-10-21 Results          Q2 FY27: revenue +35%, PAT +31% YoY
          . The stock moved -4.9% vs market on 3.9x volume that session; for its volatility at the time, a day this unusual comes about 1 in 63. This event carries 24% of the credit among 2 that session.
          . Filed at 14:54. In the next 30 minutes the volume-weighted price moved -3.74% against the session so far on 22.4x the usual volume for that time of day: a half hour like that comes about 1 in 813 at that time of day (n=815). Shown as evidence; not in the score.
@@ -93,10 +93,10 @@ risk: 20x20 covariance over 250 sessions, 1 eigenvalue(s) above the Marchenko-Pa
          . The stock moved +1.3% vs market on 5.6x volume that session; for its volatility at the time, a day this unusual comes about 1 in 125. This event carries 23% of the credit among 4 that session.
   0.37 TRENT      2026-10-23 M&A              Nahar Retail Trading Services to divest its entire shareholding in Netria Property Holding
          . ₹172 cr is 2.2x this company's SEBI materiality line (₹79 cr, 5% of 3-year average profit)
-         . For scale: ₹172 cr is 0.10% of the company's market value (₹171,263 cr) and 0.1 years of its operating cash flow (3-year average ₹1,893 cr). Shown for scale; not in the score.
+         . For scale: ₹172 cr is 0.10% of the company's market value (₹171,061 cr) and 0.1 years of its operating cash flow (3-year average ₹1,893 cr). Shown for scale; not in the score.
   0.37 TCS        2026-11-04 Business update  Published Enterprise AI Study indicating productivity is top benefit while security remain
          . ₹4,645 cr is 2.2x this company's SEBI materiality line (₹2,145 cr, 2% of net worth)
-         . For scale: ₹4,645 cr is 0.52% of the company's market value (₹890,499 cr) and 0.1 years of its operating cash flow (3-year average ₹48,447 cr). Shown for scale; not in the score.
+         . For scale: ₹4,645 cr is 0.52% of the company's market value (₹890,050 cr) and 0.1 years of its operating cash flow (3-year average ₹48,447 cr). Shown for scale; not in the score.
          . Filed at 11:00. In the next 30 minutes the volume-weighted price moved -1.22% against the session so far on 1.3x the usual volume for that time of day: a half hour like that comes about 1 in 147 at that time of day (n=1,475). Shown as evidence; not in the score.
   0.33 HDFCBANK   2026-11-06 Management       V. N. Srivatsan joins as Chief Compliance Officer
          . V. N. Srivatsan, Chief Compliance Officer: senior executive
@@ -106,7 +106,7 @@ risk: 20x20 covariance over 250 sessions, 1 eigenvalue(s) above the Marchenko-Pa
          . Filed at 14:28. In the next 30 minutes the volume-weighted price moved +1.15% against the session so far on 12.8x the usual volume for that time of day: a half hour like that comes about 1 in 1124 at that time of day (n=1,123). Shown as evidence; not in the score.
   0.21 HDFCBANK   2026-10-31 Management       Sanjay D’Souza ceases to be Group Head – Business Banking, Emerging & Micro Enterprises Gr
          . Sanjay D’Souza, Group Head – Business Banking, Emerging & Micro Enterprises Group and a Senior Management Personnel: senior executive
---- WORTH A GLANCE (47)
+--- WORTH A GLANCE (48)
   0.17 ETERNAL    2026-10-21 M&A              Company transfers Going-out India business to subsidiary and swaps Adonmo shares for Mygat
          . The stock moved -2.0% vs market on 3.9x volume that session; for its volatility at the time, a day this unusual comes about 1 in 42.
   0.15 CGPOWER    2026-11-05 Legal & regulatory Maharashtra Pollution Control Board directed closure of manufacturing operations at Waluj 
@@ -144,6 +144,8 @@ risk: 20x20 covariance over 250 sessions, 1 eigenvalue(s) above the Marchenko-Pa
          . Filed at 14:27. In the next 30 minutes the volume-weighted price moved +1.15% against the session so far on 12.8x the usual volume for that time of day: a half hour like that comes about 1 in 1124 at that time of day (n=1,123). Shown as evidence; not in the score.
   0.10 ASIANPAINT 2026-11-06 Management       Leo Puri joins as Independent Director
          . Leo Puri, Independent Director: board oversight role
+  0.10 DIXON      2026-11-24 Management       Aruna Jayanthi joins as Other
+         . Aruna Jayanthi, Other: board oversight role
   0.09 BAJFINANCE 2026-11-11 Fund raise       Company opened its qualified institutions placement of equity shares and approved a floor 
   0.09 MARUTI     2026-10-27 M&A              Board approved incorporation of a wholly owned subsidiary named Osamu Suzuki Centre of Exc
          . Filed at 13:18. In the next 30 minutes the volume-weighted price moved +0.05% against the session so far on 0.7x the usual volume for that time of day: nothing unusual for that time of day (n=1,475). Shown as evidence; not in the score.
@@ -167,9 +169,9 @@ risk: 20x20 covariance over 250 sessions, 1 eigenvalue(s) above the Marchenko-Pa
   0.08 CGPOWER    2026-11-07 Legal & regulatory High Court stays MPCB closure direction for Waluj manufacturing unit
   0.08 PAYTM      2026-11-13 Legal & regulatory RBI grants in-principle authorization to Paytm Payments Services Limited to operate PPIs
          . Filed at 14:42. In the next 30 minutes the volume-weighted price moved +0.88% against the session so far on 4.4x the usual volume for that time of day: a half hour like that comes about 1 in 39 at that time of day (n=944). Shown as evidence; not in the score.
-  0.08 BHARTIARTL 2026-11-16 Legal & regulatory (‘SEBI Listing Regulations’)
-         . Filed at 13:42. In the next 30 minutes the volume-weighted price moved -0.03% against the session so far on 0.5x the usual volume for that time of day: nothing unusual for that time of day (n=1,475). Shown as evidence; not in the score.
   0.08 SRF        2026-11-20 Legal & regulatory Dear Sir
+  0.08 BHARTIARTL 2026-11-24 Legal & regulatory (‘SEBI Listing Regulations’)
+         . Filed at 13:42. In the next 30 minutes the volume-weighted price moved -0.03% against the session so far on 0.5x the usual volume for that time of day: nothing unusual for that time of day (n=1,475). Shown as evidence; not in the score.
   0.04 RELIANCE   2026-10-21 Credit rating    ICRA Limited assigned and reaffirmed credit ratings for various debt instruments and bank 
   0.04 RELIANCE   2026-11-04 Credit rating    S&P Global Ratings reaffirmed credit rating of A minus with a Stable outlook for Senior Un
   0.04 TRENT      2026-11-16 Credit rating    Intimation regarding Credit Rating
@@ -177,10 +179,10 @@ risk: 20x20 covariance over 250 sessions, 1 eigenvalue(s) above the Marchenko-Pa
   0.04 SUNPHARMA  2026-11-23 Credit rating    Credit Rating
   0.01 RELIANCE   2026-10-29 M&A              Step-down subsidiary Hamleys (Franchising) Limited to be struck off the register and disso
          . ₹56 cr is 0.013x this company's SEBI materiality line (₹4,268 cr, 5% of 3-year average profit)
-         . For scale: ₹56 cr is 0.00% of the company's market value (₹1,831,436 cr) and 0.0 years of its operating cash flow (3-year average ₹176,535 cr). Shown for scale; not in the score.
+         . For scale: ₹56 cr is 0.00% of the company's market value (₹1,828,245 cr) and 0.0 years of its operating cash flow (3-year average ₹176,535 cr). Shown for scale; not in the score.
 --- THE CLOSE 2026-11-23: portfolio -0.66%, NIFTY -1.75%, alpha +1.11% (1 in 22); 5 up, 14 down; regime elevated; rotation -0.1
     sectors vs NIFTY: IT +3.50%, Realty +2.10%, Pharma +1.43%, FMCG +1.31%, Auto +0.73%, Infra +0.11%, Energy -0.04%, Bank -1.45%, Metal -1.97%
-    world: Nikkei 225 -5.06% (11-20), Hang Seng -1.89% (11-20), Shanghai -1.22% (11-20), KOSPI -5.21% (11-20), NIFTY 50 -1.75% (11-23), DAX +2.15% (11-23), Euro Stoxx 50 +2.23% (11-23), FTSE 100 +1.30% (11-23), S&P 500 +4.73% (11-23), Nasdaq +6.51% (11-23)
---- SET ASIDE (123 events, 142 filings)
+    world: Nikkei 225 +3.91% (11-24), Hang Seng -0.73% (11-24), Shanghai +0.27% (11-24), KOSPI +6.32% (11-24), NIFTY 50 -1.75% (11-23), DAX +2.15% (11-23), Euro Stoxx 50 +2.23% (11-23), FTSE 100 +1.30% (11-23), S&P 500 +4.73% (11-23), Nasdaq +6.51% (11-23)
+--- SET ASIDE (125 events, 144 filings)
 
-run: {'filings': 280, 'events': 200, 'documents_read': 47, 'tiers': {'act': {'events': 30, 'filings': 79}, 'glance': {'events': 47, 'filings': 59}, 'aside': {'events': 123, 'filings': 142}}, 'llm': {'calls': 0, 'cache_hits': 47, 'input_tokens': 0, 'output_tokens': 0, 'by_tier': {}}, 'http': {'fetched': 310, 'cached': 2372, 'bytes': 18460904}, 'seconds': 215.5, 'ocr_pages': 4, 'llm_available': False}
+run: {'filings': 284, 'events': 203, 'documents_read': 47, 'tiers': {'act': {'events': 30, 'filings': 79}, 'glance': {'events': 48, 'filings': 61}, 'aside': {'events': 125, 'filings': 144}}, 'llm': {'calls': 0, 'cache_hits': 47, 'input_tokens': 0, 'output_tokens': 0, 'by_tier': {}}, 'http': {'fetched': 453, 'cached': 2231, 'bytes': 25920775}, 'seconds': 401.2, 'ocr_pages': 4, 'llm_available': False}
