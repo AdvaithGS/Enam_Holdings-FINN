@@ -1,15 +1,15 @@
-FINN digest  2026-11-23 19:29 IST  window 2026-10-19 .. 2026-11-23
+FINN digest  2026-11-24 07:09 IST  window 2026-10-20 .. 2026-11-24
 baseline P(noticed | no filing) = 0.071; 'what matters' cut-off = 3x = 0.214
 market volume: 600 sessions from constituent medians (bhavcopy), 1236 with aggregate NIFTY 500 turnover as fallback
 prices: 20 stocks, latest session 2026-11-23; fx {'USD': 92.9, 'EUR': 101.634, 'GBP': 121.4022}
 quiet period (quarter ended 2026-09-30): no holding is in one
-filings: 289 in window
-opaque titles opened locally: 84 (OCR pages: 4)
-events after folding: 210
-intraday: 25 filings timed during trading hours
+filings: 280 in window
+opaque titles opened locally: 80 (OCR pages: 3)
+events after folding: 203
+intraday: 24 filings timed during trading hours
 merged 3 events that were the same disclosure under two categories
   sector model RELIANCE: no peer factor passes
-  sector model HDFCBANK (R2 10%, 1 of 1 tested): its businesses by revenue (86% private banks, 14% insurers) [ICICIBANK, AXISBANK, HDFCLIFE, SBILIFE] t = 5.3, PC1 34%
+  sector model HDFCBANK (R2 11%, 1 of 1 tested): its businesses by revenue (86% private banks, 14% insurers) [ICICIBANK, AXISBANK, HDFCLIFE, SBILIFE] t = 5.5, PC1 34%
   sector model TCS (R2 64%, 1 of 1 tested): its Computers - Software & Consulting peers [INFY, HCLTECH, WIPRO, TECHM...] t = 20.6, PC1 66%
   sector model BHARTIARTL: no peer factor passes
   sector model ITC (R2 5%, 1 of 1 tested): its Nifty FMCG peers [DABUR, HINDUNILVR, MARICO, RADICO...] t = 3.5, PC1 30%
@@ -17,21 +17,21 @@ merged 3 events that were the same disclosure under two categories
   sector model SUNPHARMA (R2 14%, 1 of 1 tested): its Pharmaceuticals peers [DIVISLAB, TORNTPHARM, LAURUSLABS, ZYDUSLIFE...] t = 6.2, PC1 40%
   sector model MARUTI (R2 10%, 1 of 1 tested): its Passenger Cars & Utility Vehicles peers [M&M, HYUNDAI, TMPV, FORCEMOT...] t = 5.0, PC1 30%
   sector model TITAN (R2 18%, 1 of 1 tested): its Gems, Jewellery And Watches peers [KALYANKJIL, PCJEWELLER, SKYGOLD, THANGAMAYL...] t = 7.0, PC1 36%
-  sector model BAJFINANCE (R2 19%, 1 of 1 tested): its Non Banking Financial Company (NBFC) peers [SHRIRAMFIN, CHOLAFIN, MUTHOOTFIN, LTF...] t = 7.5, PC1 43%
+  sector model BAJFINANCE (R2 19%, 1 of 1 tested): its Non Banking Financial Company (NBFC) peers [SHRIRAMFIN, CHOLAFIN, MUTHOOTFIN, LTF...] t = 7.4, PC1 43%
   sector model ASIANPAINT (R2 9%, 1 of 1 tested): its Paints peers [BERGEPAINT, KANSAINER, JSWDULUX, INDIGOPNTS...] t = 4.8, PC1 30%
   sector model ETERNAL (R2 20%, 1 of 1 tested): its named peers [SWIGGY, NYKAA, POLICYBZR, DELHIVERY...] t = 7.7, PC1 25%
   sector model TRENT (R2 7%, 1 of 1 tested): its named peers [DMART, ABFRL, SHOPERSTOP, VMART...] t = 4.1, PC1 26%
   sector model DIXON (R2 6%, 1 of 1 tested): its Consumer Electronics peers [HAVELLS, PGEL, IKIO, ONIDA...] t = 4.0, PC1 30%
   sector model KAYNES (R2 12%, 1 of 1 tested): its Industrial Products peers [CPPLUS, SYRMA, HONAUT, JYOTICNC] t = 5.7, PC1 33%
   sector model CGPOWER (R2 44%, 1 of 1 tested): its Heavy Electrical Equipment peers [ABB, BHEL, POWERINDIA, SIEMENS...] t = 13.6, PC1 52%
-  sector model SRF (R2 5%, 1 of 1 tested): its Commodity Chemicals peers [DEEPAKFERT, TATACHEM, GNFC, GUJALKALI...] t = 3.6, PC1 34%
-  sector model DEEPAKNTR (R2 5%, 1 of 1 tested): its Specialty Chemicals peers [PIDILITIND, FLUOROCHEM, NAVINFLUOR, AETHER...] t = 3.5, PC1 30%
-  sector model CREDITACC (R2 12%, 1 of 1 tested): its Microfinance Institutions peers [SATIN, MUTHOOTMF, FUSION, SPANDANA] t = 5.6, PC1 40%
+  sector model SRF (R2 5%, 1 of 1 tested): its Commodity Chemicals peers [DEEPAKFERT, TATACHEM, GNFC, GUJALKALI...] t = 3.7, PC1 34%
+  sector model DEEPAKNTR (R2 5%, 1 of 1 tested): its Specialty Chemicals peers [PIDILITIND, FLUOROCHEM, NAVINFLUOR, AETHER...] t = 3.6, PC1 30%
+  sector model CREDITACC (R2 11%, 1 of 1 tested): its Microfinance Institutions peers [SATIN, MUTHOOTMF, FUSION, SPANDANA] t = 5.5, PC1 40%
   sector model PAYTM (R2 4%, 1 of 1 tested): its Nifty Financial Services Ex-Bank peers [POLICYBZR, BAJFINANCE, SHRIRAMFIN, BSE...] t = 3.0, PC1 21%
-moves without a filing: 131 examined, 82 with a supported explanation
+moves without a filing: 128 examined, 77 with a supported explanation
 risk: 20x20 covariance over 250 sessions, 1 eigenvalue(s) above the Marchenko-Pastur edge kept, the rest flattened
 
---- WHAT MATTERS (31)
+--- WHAT MATTERS (30)
   0.99 KAYNES     2026-11-15 Business update  Kaynes Technology approved a joint venture with Toyokawa Techno and voluntary strike-off o
          . ₹4,279 cr is 3.1e+02x this company's SEBI materiality line (₹14 cr, 5% of 3-year average profit)
          . For scale: ₹4,279 cr is 22.60% of the company's market value (₹18,935 cr). Shown for scale; not in the score.
@@ -80,8 +80,6 @@ risk: 20x20 covariance over 250 sessions, 1 eigenvalue(s) above the Marchenko-Pa
   0.47 CGPOWER    2026-10-23 Results          Q2 FY27: revenue +30%, PAT +44% YoY
          . The stock moved -0.2% vs market on 3.6x volume that session; for its volatility at the time, a day this unusual comes about 1 in 28. This event carries 60% of the credit among 4 that session.
          . Filed at 14:26. In the next 30 minutes the volume-weighted price moved +1.15% against the session so far on 12.8x the usual volume for that time of day: a half hour like that comes about 1 in 1124 at that time of day (n=1,123). Shown as evidence; not in the score.
-  0.46 BAJFINANCE 2026-10-19 Results          Q2 FY27: revenue +22%, PAT +29% YoY
-         . The stock moved -2.8% vs market on 2.4x volume that session; for its volatility at the time, a day this unusual comes about 1 in 25. This event carries 78% of the credit among 3 that session.
   0.42 ETERNAL    2026-10-21 Results          Q2 FY27: revenue +78%, PAT +92% YoY
   0.42 PAYTM      2026-10-26 Results          Q2 FY27: revenue +28%, PAT +971% YoY
   0.42 MARUTI     2026-10-27 Results          Q2 FY27: revenue +26%, PAT -26% YoY
@@ -108,7 +106,7 @@ risk: 20x20 covariance over 250 sessions, 1 eigenvalue(s) above the Marchenko-Pa
          . Filed at 14:28. In the next 30 minutes the volume-weighted price moved +1.15% against the session so far on 12.8x the usual volume for that time of day: a half hour like that comes about 1 in 1124 at that time of day (n=1,123). Shown as evidence; not in the score.
   0.21 HDFCBANK   2026-10-31 Management       Sanjay D’Souza ceases to be Group Head – Business Banking, Emerging & Micro Enterprises Gr
          . Sanjay D’Souza, Group Head – Business Banking, Emerging & Micro Enterprises Group and a Senior Management Personnel: senior executive
---- WORTH A GLANCE (50)
+--- WORTH A GLANCE (47)
   0.17 ETERNAL    2026-10-21 M&A              Company transfers Going-out India business to subsidiary and swaps Adonmo shares for Mygat
          . The stock moved -2.0% vs market on 3.9x volume that session; for its volatility at the time, a day this unusual comes about 1 in 42.
   0.15 CGPOWER    2026-11-05 Legal & regulatory Maharashtra Pollution Control Board directed closure of manufacturing operations at Waluj 
@@ -117,11 +115,7 @@ risk: 20x20 covariance over 250 sessions, 1 eigenvalue(s) above the Marchenko-Pa
   0.15 ASIANPAINT 2026-10-29 Dividend         Board approved payment of interim dividend of Rs. 5.75 per equity share
          . The stock moved -0.2% vs market on 3.7x volume that session; for its volatility at the time, a day this unusual comes about 1 in 63. This event carries 15% of the credit among 2 that session.
          . Filed at 14:12. In the next 30 minutes the volume-weighted price moved +0.14% against the session so far on 10.9x the usual volume for that time of day: a half hour like that comes about 1 in 1299 at that time of day (n=1,300). Shown as evidence; not in the score.
-  0.12 TCS        2026-10-19 Business update  TCS BaNCS for Treasury marks its entry into Sri Lanka with Indian Bank
-         . Filed at 11:30. In the next 30 minutes the volume-weighted price moved -0.48% against the session so far on 2.5x the usual volume for that time of day: a half hour like that comes about 1 in 11 at that time of day (n=1,475). Shown as evidence; not in the score.
   0.12 DIXON      2026-11-21 Business update  Update on Asset Purchase Agreement executed between Dixon Technologies (India) Limited and
-  0.12 LT         2026-10-19 Business update  L&T commences initial activities for the New Tashkent International Airport ultra-mega pro
-         . Filed at 10:18. In the next 30 minutes the volume-weighted price moved +0.50% against the session so far on 2.6x the usual volume for that time of day: a half hour like that comes about 1 in 15 at that time of day (n=1,309). Shown as evidence; not in the score.
   0.12 SUNPHARMA  2026-10-20 Business update  UNLOXCYT receives Category 2A preferred designation in updated NCCN guidelines for laCSCC 
   0.12 LT         2026-10-21 Business update  Secured two large orders for construction projects in New Delhi and Andhra Pradesh
          . Filed at 09:46. In the next 30 minutes the volume-weighted price moved -0.34% against the session so far on 2.3x the usual volume for that time of day: a half hour like that comes about 1 in 9 at that time of day (n=955). Shown as evidence; not in the score.
@@ -148,8 +142,6 @@ risk: 20x20 covariance over 250 sessions, 1 eigenvalue(s) above the Marchenko-Pa
          . Filed at 11:20. In the next 30 minutes the volume-weighted price moved -0.10% against the session so far on 0.6x the usual volume for that time of day: nothing unusual for that time of day (n=1,475). Shown as evidence; not in the score.
   0.10 CGPOWER    2026-10-23 Capex            Capacity addition
          . Filed at 14:27. In the next 30 minutes the volume-weighted price moved +1.15% against the session so far on 12.8x the usual volume for that time of day: a half hour like that comes about 1 in 1124 at that time of day (n=1,123). Shown as evidence; not in the score.
-  0.10 BAJFINANCE 2026-10-19 Management       Prashant Verma re-appointed as Chief Information Security Officer
-         . Prashant Verma, Chief Information Security Officer: board oversight role (re-appointment)
   0.10 ASIANPAINT 2026-11-06 Management       Leo Puri joins as Independent Director
          . Leo Puri, Independent Director: board oversight role
   0.09 BAJFINANCE 2026-11-11 Fund raise       Company opened its qualified institutions placement of equity shares and approved a floor 
@@ -164,8 +156,8 @@ risk: 20x20 covariance over 250 sessions, 1 eigenvalue(s) above the Marchenko-Pa
   0.09 KAYNES     2026-11-12 M&A              Executed a binding term sheet with Vishay Intertechnology and Ecomal Nederland to establis
   0.09 RELIANCE   2026-10-24 Fund raise       Jio Platforms Limited finalises IPO issue price at 1,119 per equity share and files prospe
   0.09 BAJFINANCE 2026-11-10 Fund raise       Allotment of 5,74,25,740 warrants convertible into equity shares to Bajaj Finserv Limited
+         . Filed at 12:29. In the next 30 minutes the volume-weighted price moved -0.78% against the session so far on 2.1x the usual volume for that time of day: a half hour like that comes about 1 in 9 at that time of day (n=1,475). Shown as evidence; not in the score.
   0.09 BAJFINANCE 2026-11-17 Fund raise       Allotment of 114146341 securities pursuant to Qualified Institution Placement at its meeti
-  0.09 TRENT      2026-10-19 Management       Resignation of Director/KMP/SMP
   0.09 HDFCBANK   2026-10-27 Management       Anup Bagchi assumes charge as Managing Director and Chief Executive Officer
   0.09 HDFCBANK   2026-11-12 Management       Approval from the Reserve Bank of India for re-appointment of Mr. V. Srinivasa Rangan asth
   0.09 HDFCBANK   2026-11-13 Management       Change in Director(s) of the company
@@ -182,12 +174,13 @@ risk: 20x20 covariance over 250 sessions, 1 eigenvalue(s) above the Marchenko-Pa
   0.04 RELIANCE   2026-11-04 Credit rating    S&P Global Ratings reaffirmed credit rating of A minus with a Stable outlook for Senior Un
   0.04 TRENT      2026-11-16 Credit rating    Intimation regarding Credit Rating
   0.04 TITAN      2026-11-23 Credit rating    Ratings Update from ICRA Ltd
+  0.04 SUNPHARMA  2026-11-23 Credit rating    Credit Rating
   0.01 RELIANCE   2026-10-29 M&A              Step-down subsidiary Hamleys (Franchising) Limited to be struck off the register and disso
          . ₹56 cr is 0.013x this company's SEBI materiality line (₹4,268 cr, 5% of 3-year average profit)
          . For scale: ₹56 cr is 0.00% of the company's market value (₹1,831,436 cr) and 0.0 years of its operating cash flow (3-year average ₹176,535 cr). Shown for scale; not in the score.
 --- THE CLOSE 2026-11-23: portfolio -0.66%, NIFTY -1.75%, alpha +1.11% (1 in 22); 5 up, 14 down; regime elevated; rotation -0.1
     sectors vs NIFTY: IT +3.50%, Realty +2.10%, Pharma +1.43%, FMCG +1.31%, Auto +0.73%, Infra +0.11%, Energy -0.04%, Bank -1.45%, Metal -1.97%
-    world: Nikkei 225 -5.06% (11-20), Hang Seng -0.12% (11-23), Shanghai +0.15% (11-23), KOSPI -3.31% (11-23), NIFTY 50 -1.75% (11-23), DAX -2.60% (11-20), Euro Stoxx 50 -2.81% (11-20), FTSE 100 -1.02% (11-20), S&P 500 -3.70% (11-20), Nasdaq -5.28% (11-20)
---- SET ASIDE (126 events, 145 filings)
+    world: Nikkei 225 -5.06% (11-20), Hang Seng -1.89% (11-20), Shanghai -1.22% (11-20), KOSPI -5.21% (11-20), NIFTY 50 -1.75% (11-23), DAX +2.15% (11-23), Euro Stoxx 50 +2.23% (11-23), FTSE 100 +1.30% (11-23), S&P 500 +4.73% (11-23), Nasdaq +6.51% (11-23)
+--- SET ASIDE (123 events, 142 filings)
 
-run: {'filings': 289, 'events': 207, 'documents_read': 50, 'tiers': {'act': {'events': 31, 'filings': 81}, 'glance': {'events': 50, 'filings': 63}, 'aside': {'events': 126, 'filings': 145}}, 'llm': {'calls': 0, 'cache_hits': 50, 'input_tokens': 0, 'output_tokens': 0, 'by_tier': {}}, 'http': {'fetched': 498, 'cached': 2197, 'bytes': 29970527}, 'seconds': 431.1, 'ocr_pages': 5, 'llm_available': False}
+run: {'filings': 280, 'events': 200, 'documents_read': 47, 'tiers': {'act': {'events': 30, 'filings': 79}, 'glance': {'events': 47, 'filings': 59}, 'aside': {'events': 123, 'filings': 142}}, 'llm': {'calls': 0, 'cache_hits': 47, 'input_tokens': 0, 'output_tokens': 0, 'by_tier': {}}, 'http': {'fetched': 310, 'cached': 2372, 'bytes': 18460904}, 'seconds': 215.5, 'ocr_pages': 4, 'llm_available': False}
