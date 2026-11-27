@@ -1,37 +1,37 @@
-FINN digest  2026-11-27 18:58 IST  window 2026-10-23 .. 2026-11-27
+FINN digest  2026-11-28 03:58 IST  window 2026-10-24 .. 2026-11-28
 baseline P(noticed | no filing) = 0.071; 'what matters' cut-off = 3x = 0.214
 market volume: 600 sessions from constituent medians (bhavcopy), 1235 with aggregate NIFTY 500 turnover as fallback
 prices: 20 stocks, latest session 2026-11-27; fx {'USD': 92.87, 'EUR': 101.6616, 'GBP': 121.7128}
 quiet period (quarter ended 2026-09-30): no holding is in one
-filings: 282 in window
-opaque titles opened locally: 73 (OCR pages: 3)
-events after folding: 204
-intraday: 22 filings timed during trading hours
+filings: 265 in window
+opaque titles opened locally: 68 (OCR pages: 3)
+events after folding: 190
+intraday: 19 filings timed during trading hours
 merged 3 events that were the same disclosure under two categories
   sector model RELIANCE: no peer factor passes
-  sector model HDFCBANK (R2 10%, 1 of 1 tested): its businesses by revenue (86% private banks, 14% insurers) [ICICIBANK, AXISBANK, HDFCLIFE, SBILIFE] t = 5.4, PC1 34%
-  sector model TCS (R2 65%, 1 of 1 tested): its Computers - Software & Consulting peers [INFY, HCLTECH, WIPRO, TECHM...] t = 20.7, PC1 66%
+  sector model HDFCBANK (R2 10%, 1 of 1 tested): its businesses by revenue (86% private banks, 14% insurers) [ICICIBANK, AXISBANK, HDFCLIFE, SBILIFE] t = 5.2, PC1 33%
+  sector model TCS (R2 64%, 1 of 1 tested): its Computers - Software & Consulting peers [INFY, HCLTECH, WIPRO, TECHM...] t = 20.6, PC1 66%
   sector model BHARTIARTL: no peer factor passes
-  sector model ITC (R2 7%, 1 of 1 tested): its Nifty FMCG peers [HINDUNILVR, BRITANNIA, NESTLEIND, GODREJCP...] t = 4.1, PC1 25%
+  sector model ITC (R2 7%, 1 of 1 tested): its Nifty FMCG peers [HINDUNILVR, BRITANNIA, NESTLEIND, GODREJCP...] t = 4.2, PC1 25%
   sector model LT: no peer factor passes
   sector model SUNPHARMA (R2 14%, 1 of 1 tested): its Pharmaceuticals peers [DIVISLAB, TORNTPHARM, LAURUSLABS, ZYDUSLIFE...] t = 6.2, PC1 40%
-  sector model MARUTI (R2 11%, 1 of 1 tested): its Passenger Cars & Utility Vehicles peers [M&M, HYUNDAI, TMPV, FORCEMOT...] t = 5.5, PC1 31%
+  sector model MARUTI (R2 11%, 1 of 1 tested): its Passenger Cars & Utility Vehicles peers [M&M, HYUNDAI, TMPV, FORCEMOT...] t = 5.3, PC1 31%
   sector model TITAN (R2 18%, 1 of 1 tested): its Gems, Jewellery And Watches peers [KALYANKJIL, PCJEWELLER, SKYGOLD, THANGAMAYL...] t = 7.1, PC1 36%
-  sector model BAJFINANCE (R2 20%, 1 of 1 tested): its Non Banking Financial Company (NBFC) peers [SHRIRAMFIN, CHOLAFIN, MUTHOOTFIN, LTF...] t = 7.6, PC1 43%
-  sector model ASIANPAINT (R2 10%, 1 of 1 tested): its Paints peers [BERGEPAINT, KANSAINER, JSWDULUX, INDIGOPNTS...] t = 5.0, PC1 30%
-  sector model ETERNAL (R2 21%, 1 of 1 tested): its named peers [SWIGGY, NYKAA, POLICYBZR, DELHIVERY...] t = 8.0, PC1 25%
-  sector model TRENT (R2 7%, 1 of 1 tested): its named peers [DMART, ABFRL, SHOPERSTOP, VMART...] t = 4.2, PC1 26%
-  sector model DIXON (R2 7%, 1 of 1 tested): its Consumer Electronics peers [HAVELLS, PGEL, IKIO, ONIDA...] t = 4.2, PC1 30%
-  sector model KAYNES (R2 12%, 1 of 1 tested): its Industrial Products peers [CPPLUS, SYRMA, HONAUT, JYOTICNC] t = 5.7, PC1 34%
-  sector model CGPOWER (R2 45%, 1 of 1 tested): its Heavy Electrical Equipment peers [ABB, BHEL, POWERINDIA, SIEMENS...] t = 13.7, PC1 53%
-  sector model SRF (R2 7%, 1 of 1 tested): its Commodity Chemicals peers [DEEPAKFERT, TATACHEM, GNFC, GUJALKALI...] t = 4.1, PC1 34%
-  sector model DEEPAKNTR (R2 6%, 1 of 1 tested): its Specialty Chemicals peers [PIDILITIND, FLUOROCHEM, NAVINFLUOR, AETHER...] t = 3.8, PC1 30%
-  sector model CREDITACC (R2 12%, 1 of 1 tested): its Microfinance Institutions peers [SATIN, MUTHOOTMF, FUSION, SPANDANA] t = 5.7, PC1 40%
-  sector model PAYTM (R2 8%, 1 of 1 tested): its Nifty Financial Services Ex-Bank peers [SHRIRAMFIN, BSE, ANGELONE, MCX...] t = 4.6, PC1 26%
-moves without a filing: 130 examined, 75 with a supported explanation
+  sector model BAJFINANCE (R2 20%, 1 of 1 tested): its Non Banking Financial Company (NBFC) peers [SHRIRAMFIN, CHOLAFIN, MUTHOOTFIN, LTF...] t = 7.6, PC1 44%
+  sector model ASIANPAINT (R2 9%, 1 of 1 tested): its Paints peers [BERGEPAINT, KANSAINER, JSWDULUX, INDIGOPNTS...] t = 4.8, PC1 30%
+  sector model ETERNAL (R2 14%, 1 of 1 tested): its named peers [SWIGGY, NYKAA, POLICYBZR, DELHIVERY...] t = 6.2, PC1 26%
+  sector model TRENT (R2 7%, 1 of 1 tested): its named peers [DMART, ABFRL, SHOPERSTOP, VMART...] t = 4.3, PC1 26%
+  sector model DIXON (R2 7%, 1 of 1 tested): its Consumer Electronics peers [HAVELLS, PGEL, IKIO, ONIDA...] t = 4.4, PC1 30%
+  sector model KAYNES (R2 12%, 1 of 1 tested): its Industrial Products peers [CPPLUS, SYRMA, HONAUT, JYOTICNC] t = 5.8, PC1 34%
+  sector model CGPOWER (R2 44%, 1 of 1 tested): its Heavy Electrical Equipment peers [ABB, BHEL, POWERINDIA, SIEMENS...] t = 13.6, PC1 53%
+  sector model SRF (R2 7%, 1 of 1 tested): its Commodity Chemicals peers [DEEPAKFERT, TATACHEM, GNFC, GUJALKALI...] t = 4.1, PC1 35%
+  sector model DEEPAKNTR (R2 6%, 1 of 1 tested): its Specialty Chemicals peers [PIDILITIND, FLUOROCHEM, NAVINFLUOR, AETHER...] t = 3.9, PC1 30%
+  sector model CREDITACC (R2 13%, 1 of 1 tested): its Microfinance Institutions peers [SATIN, MUTHOOTMF, FUSION, SPANDANA] t = 5.9, PC1 40%
+  sector model PAYTM (R2 9%, 1 of 1 tested): its Nifty Financial Services Ex-Bank peers [SHRIRAMFIN, BSE, ANGELONE, MCX...] t = 4.7, PC1 27%
+moves without a filing: 124 examined, 69 with a supported explanation
 risk: 20x20 covariance over 250 sessions, 1 eigenvalue(s) above the Marchenko-Pastur edge kept, the rest flattened
 
---- WHAT MATTERS (26)
+--- WHAT MATTERS (23)
   0.99 KAYNES     2026-11-15 Business update  Kaynes Technology approved a joint venture with Toyokawa Techno and voluntary strike-off o
          . ₹4,279 cr is 3.1e+02x this company's SEBI materiality line (₹14 cr, 5% of 3-year average profit)
          . For scale: ₹4,279 cr is 23.33% of the company's market value (₹18,341 cr). Shown for scale; not in the score.
@@ -67,9 +67,6 @@ risk: 20x20 covariance over 250 sessions, 1 eigenvalue(s) above the Marchenko-Pa
          . For scale: ₹200 cr is 0.18% of the company's market value (₹111,953 cr). Shown for scale; not in the score.
   0.49 TRENT      2026-10-29 Results          Q2 FY27: revenue +22%, PAT +25% YoY
          . The stock moved +4.8% vs market on 3.9x volume that session; for its volatility at the time, a day this unusual comes about 1 in 39. This event carries 40% of the credit among 2 that session.
-  0.47 CGPOWER    2026-10-23 Results          Q2 FY27: revenue +30%, PAT +44% YoY
-         . The stock moved -0.2% vs market on 3.6x volume that session; for its volatility at the time, a day this unusual comes about 1 in 28. This event carries 60% of the credit among 4 that session.
-         . Filed at 14:26. In the next 30 minutes the volume-weighted price moved +1.15% against the session so far on 12.2x the usual volume for that time of day: a half hour like that comes about 1 in 1124 at that time of day (n=1,128). Shown as evidence; not in the score.
   0.42 PAYTM      2026-10-26 Results          Q2 FY27: revenue +28%, PAT +971% YoY
   0.42 MARUTI     2026-10-27 Results          Q2 FY27: revenue +26%, PAT -26% YoY
   0.42 ITC        2026-11-02 Results          Q2 FY27: revenue +44%, PAT -18% YoY
@@ -80,9 +77,6 @@ risk: 20x20 covariance over 250 sessions, 1 eigenvalue(s) above the Marchenko-Pa
   0.38 TITAN      2026-11-05 Management       Noel N. Tata retires as Non- Executive, Non-Independent Director and Vice-Chairman
          . Noel N. Tata, Non- Executive, Non-Independent Director and Vice-Chairman: senior executive
          . The stock moved +1.3% vs market on 5.6x volume that session; for its volatility at the time, a day this unusual comes about 1 in 125. This event carries 23% of the credit among 4 that session.
-  0.37 TRENT      2026-10-23 M&A              Nahar Retail Trading Services to divest its entire shareholding in Netria Property Holding
-         . ₹172 cr is 2.2x this company's SEBI materiality line (₹79 cr, 5% of 3-year average profit)
-         . For scale: ₹172 cr is 0.10% of the company's market value (₹174,527 cr) and 0.1 years of its operating cash flow (3-year average ₹1,893 cr). Shown for scale; not in the score.
   0.37 TCS        2026-11-04 Business update  Published Enterprise AI Study indicating productivity is top benefit while security remain
          . ₹4,644 cr is 2.2x this company's SEBI materiality line (₹2,145 cr, 2% of net worth)
          . For scale: ₹4,644 cr is 0.50% of the company's market value (₹930,859 cr) and 0.1 years of its operating cash flow (3-year average ₹48,447 cr). Shown for scale; not in the score.
@@ -90,12 +84,9 @@ risk: 20x20 covariance over 250 sessions, 1 eigenvalue(s) above the Marchenko-Pa
   0.33 HDFCBANK   2026-11-06 Management       V. N. Srivatsan joins as Chief Compliance Officer
          . V. N. Srivatsan, Chief Compliance Officer: senior executive
          . The stock moved +1.3% vs market on 2.3x volume that session; for its volatility at the time, a day this unusual comes about 1 in 36.
-  0.23 CGPOWER    2026-10-23 Management       Rajat Shah joins as Senior Management Personnel (Vice President - Services)
-         . Rajat Shah, Senior Management Personnel (Vice President - Services): senior executive
-         . Filed at 14:28. In the next 30 minutes the volume-weighted price moved +1.15% against the session so far on 12.2x the usual volume for that time of day: a half hour like that comes about 1 in 1124 at that time of day (n=1,128). Shown as evidence; not in the score.
   0.21 HDFCBANK   2026-10-31 Management       Sanjay D’Souza ceases to be Group Head – Business Banking, Emerging & Micro Enterprises Gr
          . Sanjay D’Souza, Group Head – Business Banking, Emerging & Micro Enterprises Group and a Senior Management Personnel: senior executive
---- WORTH A GLANCE (46)
+--- WORTH A GLANCE (44)
   0.15 ASIANPAINT 2026-10-29 Dividend         Board approved payment of interim dividend of Rs. 5.75 per equity share
          . The stock moved -0.2% vs market on 3.7x volume that session; for its volatility at the time, a day this unusual comes about 1 in 63. This event carries 15% of the credit among 2 that session.
          . Filed at 14:12. In the next 30 minutes the volume-weighted price moved +0.14% against the session so far on 10.5x the usual volume for that time of day: a half hour like that comes about 1 in 1299 at that time of day (n=1,301). Shown as evidence; not in the score.
@@ -108,7 +99,6 @@ risk: 20x20 covariance over 250 sessions, 1 eigenvalue(s) above the Marchenko-Pa
          . The stock moved -5.6% vs market on 2.0x volume that session; for its volatility at the time, a day this unusual comes about 1 in 31.
          . Filed at 12:35. In the next 30 minutes the volume-weighted price moved -1.16% against the session so far on 7.2x the usual volume for that time of day: a half hour like that comes about 1 in 98 at that time of day (n=1,475). Shown as evidence; not in the score.
   0.12 DIXON      2026-11-21 Business update  Update on Asset Purchase Agreement executed between Dixon Technologies (India) Limited and
-  0.12 SUNPHARMA  2026-10-23 Business update  Company to present long-term follow-up data on UNLOXCYT at ESMO 2026 congress
   0.12 MARUTI     2026-10-24 Business update  Maruti Suzuki launches the VICTORIS AURUM Edition SUV to celebrate its first anniversary
   0.12 LT         2026-10-27 Business update  Secured major design and build orders for two systems packages of Dhaka Metro Line 1
          . Filed at 10:16. In the next 30 minutes the volume-weighted price moved +0.01% against the session so far on 0.6x the usual volume for that time of day: nothing unusual for that time of day (n=1,308). Shown as evidence; not in the score.
@@ -129,8 +119,6 @@ risk: 20x20 covariance over 250 sessions, 1 eigenvalue(s) above the Marchenko-Pa
   0.12 DEEPAKNTR  2026-11-20 Other            Lnvestment in Deepak Chem Tech Limited bv Deepak Phenolics Limited
   0.12 ASIANPAINT 2026-11-20 Insider trade    Trading Plan pursuant to SEBI (Prohibition of Insider Trading) Regulations, 2015
          . Filed at 11:20. In the next 30 minutes the volume-weighted price moved -0.10% against the session so far on 0.5x the usual volume for that time of day: nothing unusual for that time of day (n=1,475). Shown as evidence; not in the score.
-  0.10 CGPOWER    2026-10-23 Capex            Capacity addition
-         . Filed at 14:27. In the next 30 minutes the volume-weighted price moved +1.15% against the session so far on 12.2x the usual volume for that time of day: a half hour like that comes about 1 in 1124 at that time of day (n=1,128). Shown as evidence; not in the score.
   0.10 ASIANPAINT 2026-11-06 Management       Leo Puri joins as Independent Director
          . Leo Puri, Independent Director: board oversight role
   0.10 CREDITACC  2026-11-25 Management       Udaya Kumar Hebbar resigns as Non-Executive Director
@@ -171,7 +159,7 @@ risk: 20x20 covariance over 250 sessions, 1 eigenvalue(s) above the Marchenko-Pa
          . For scale: ₹56 cr is 0.00% of the company's market value (₹1,870,071 cr) and 0.0 years of its operating cash flow (3-year average ₹176,535 cr). Shown for scale; not in the score.
 --- THE CLOSE 2026-11-27: portfolio -0.34%, NIFTY -1.07%, alpha +0.72% (1 in 7); 7 up, 13 down; regime elevated; rotation -0.4
     sectors vs NIFTY: Metal +2.50%, Energy +1.23%, Pharma +0.68%, Infra +0.34%, Bank +0.30%, FMCG +0.14%, Realty -0.36%, Auto -0.41%, IT -0.82%
-    world: Nikkei 225 +2.11% (11-27), Hang Seng +2.11% (11-27), Shanghai +3.73% (11-27), KOSPI +4.34% (11-27), NIFTY 50 -1.07% (11-27), DAX +2.08% (11-26), Euro Stoxx 50 +2.04% (11-26), FTSE 100 +1.75% (11-26), S&P 500 -0.25% (11-25), Nasdaq -0.62% (11-25)
---- SET ASIDE (129 events, 150 filings)
+    world: Nikkei 225 +2.11% (11-27), Hang Seng +2.11% (11-27), Shanghai +3.73% (11-27), KOSPI +4.34% (11-27), NIFTY 50 -1.07% (11-27), DAX +0.90% (11-27), Euro Stoxx 50 +1.24% (11-27), FTSE 100 +0.84% (11-27), S&P 500 +1.60% (11-27), Nasdaq +2.31% (11-27)
+--- SET ASIDE (120 events, 141 filings)
 
-run: {'filings': 282, 'events': 201, 'documents_read': 39, 'tiers': {'act': {'events': 26, 'filings': 69}, 'glance': {'events': 46, 'filings': 63}, 'aside': {'events': 129, 'filings': 150}}, 'llm': {'calls': 0, 'cache_hits': 39, 'input_tokens': 0, 'output_tokens': 0, 'by_tier': {}}, 'http': {'fetched': 456, 'cached': 2195, 'bytes': 26127202}, 'seconds': 419.4, 'ocr_pages': 4, 'llm_available': False}
+run: {'filings': 265, 'events': 187, 'documents_read': 36, 'tiers': {'act': {'events': 23, 'filings': 63}, 'glance': {'events': 44, 'filings': 61}, 'aside': {'events': 120, 'filings': 141}}, 'llm': {'calls': 0, 'cache_hits': 36, 'input_tokens': 0, 'output_tokens': 0, 'by_tier': {}}, 'http': {'fetched': 309, 'cached': 2326, 'bytes': 17799147}, 'seconds': 230.1, 'ocr_pages': 4, 'llm_available': False}
